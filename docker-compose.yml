@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  ##
+  # Basic Rails application build image
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/data # mount current directory into the image
+    # use tmpfs for tmp and log for performance and to allow
+    # multiple builds in parallel. Both directories are mounted
+    # into the image AFTER the working directory is mounted.
+    tmpfs:
+      - /data/log
+    command: >
+      bash -c "echo running"
+
