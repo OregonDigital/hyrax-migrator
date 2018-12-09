@@ -1,9 +1,13 @@
-version: '3'
+version: "3"
+
+networks:
+  external:
+  internal:
 
 services:
   ##
   # Basic Rails application build image
-  app:
+  app: &app
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,4 +18,11 @@ services:
     # into the image AFTER the working directory is mounted.
     tmpfs:
       - /data/log
-
+    networks:
+      external:
+      internal:
+    expose:
+      - 3000
+  server:
+    <<: *app
+    command: bundle exec rackup -s puma -p 3000 -o 0.0.0.0 config.ru
