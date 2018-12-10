@@ -25,4 +25,5 @@ services:
       - 3000
   server:
     <<: *app
-    command: bundle exec rackup -s puma -p 3000 -o 0.0.0.0 config.ru
+    command: >
+      bash -c "cd test/dummy && bundle exec rails s"
