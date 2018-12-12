@@ -32,7 +32,7 @@ jobs:
             - ./vendor/bundle
       - run:
           name: Create DB
-          command: spec/dummy/bin rake db:create db:schema:load --trace
+          command: spec/dummy/bin/rake db:create db:schema:load --trace
       - run:
           name: Run Tests
           command: |
