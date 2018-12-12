@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 module Hyrax
   module Migrator
+    ##
+    # Base application ActionMailer class
     class ApplicationMailer < ActionMailer::Base
       default from: 'from@example.com'
       layout 'mailer'
