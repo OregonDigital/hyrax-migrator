@@ -2,6 +2,8 @@
 
 module Hyrax
   module Migrator
+    ##
+    # The Rails engine class
     class Engine < ::Rails::Engine
       isolate_namespace Hyrax::Migrator
     end
