@@ -25,9 +25,12 @@ Gem::Specification.new do |s|
   s.add_dependency 'haml'
   s.add_dependency 'rails', '~> 5.1.6'
 
+  s.add_development_dependency 'coveralls', '~> 0.8'
   s.add_development_dependency 'puma'
   s.add_development_dependency 'rspec-rails', '~> 3.8'
+  s.add_development_dependency 'rspec_junit_formatter'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'rubocop-rspec'
+  s.add_development_dependency 'simplecov', '>= 0.9'
   s.add_development_dependency 'sqlite3'
 end
