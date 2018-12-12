@@ -51,7 +51,3 @@ RSpec/LetSetup:
 # # The default assumes EnforcedStyle is 'have_received'. Most of our specs are 'receive'
 RSpec/MessageSpies:
   Enabled: false
-
-# FactoryBot 5 will require dynamic definition, so we should allow it.
-FactoryBot/StaticAttributeDefinedDynamically:
-  Enabled: false
