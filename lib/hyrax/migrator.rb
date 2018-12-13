@@ -2,6 +2,7 @@
 
 require 'haml'
 require 'hyrax/migrator/engine'
+require 'hyrax/migrator/middleware'
 
 module Hyrax
   ##
