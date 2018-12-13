@@ -1,8 +1,8 @@
-version: "3"
+version: '3'
 
 networks:
-  external:
-  internal:
+  ? external
+  ? internal
 
 services:
   ##
@@ -19,11 +19,11 @@ services:
     tmpfs:
       - /data/log
     networks:
-      external:
-      internal:
+      ? external
+      ? internal
     expose:
       - 3000
   server:
     <<: *app
     command: >
-      bash -c "cd test/dummy && bundle exec rails s"
+      bash -c "cd spec/dummy && bundle exec rails s"
