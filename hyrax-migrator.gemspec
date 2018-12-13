@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec_junit_formatter'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'rubocop-rspec'
+  s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'simplecov', '>= 0.9'
   s.add_development_dependency 'sqlite3'
 end
