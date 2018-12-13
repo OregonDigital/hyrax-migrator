@@ -10,6 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 20181213181357) do
+
+  create_table "hyrax_migrator_works", force: :cascade do |t|
+    t.string "pid", null: false
+    t.string "file_path"
+    t.string "aasm_state"
+    t.string "status_message"
+    t.string "status"
+    t.text "env"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pid"], name: "index_hyrax_migrator_works_on_pid", unique: true
+  end
 
 end

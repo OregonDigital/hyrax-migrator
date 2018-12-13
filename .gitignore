@@ -7,3 +7,5 @@ spec/dummy/log/*.log
 spec/dummy/tmp/
 
 docker-compose.override.yml
+
+coverage/*

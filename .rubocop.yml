@@ -51,3 +51,8 @@ RSpec/LetSetup:
 # # The default assumes EnforcedStyle is 'have_received'. Most of our specs are 'receive'
 RSpec/MessageSpies:
   Enabled: false
+
+Metrics/LineLength:
+  IgnoredPatterns: ['\A#']
+  Exclude:
+    - 'spec/**/*'
