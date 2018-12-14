@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
     'Rakefile',
     'README.md']
 
+  s.add_dependency 'aasm'
   s.add_dependency 'haml'
   s.add_dependency 'rails', '~> 5.1.6'
 
