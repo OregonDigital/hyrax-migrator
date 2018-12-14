@@ -26,4 +26,4 @@ services:
   server:
     <<: *app
     command: >
-      bash -c "cd spec/dummy && bundle exec rails s"
+      bash -c "cd spec/dummy && bundle exec rails s && tail -f log/development.txt"
