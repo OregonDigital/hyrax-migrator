@@ -1,5 +1,7 @@
 # frozen_string_literal:true
 
+require 'aasm'
+
 module Hyrax::Migrator::Actors
   ##
   # Abstract class that actors should inherit from

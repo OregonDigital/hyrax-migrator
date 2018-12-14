@@ -14,6 +14,8 @@ AllCops:
 
 Metrics/BlockLength:
   ExcludedMethods: ['included']
+  Exclude:
+    - 'hyrax-migrator.gemspec'
 
 Style/AsciiComments:
   Enabled: false
@@ -53,6 +55,7 @@ RSpec/MessageSpies:
   Enabled: false
 
 Metrics/LineLength:
-  IgnoredPatterns: ['\A#']
+  # Ignore comment lines starting with a #
+  IgnoredPatterns: ['(\A|\s)#']
   Exclude:
     - 'spec/**/*'
