@@ -11,18 +11,12 @@ module Hyrax::Migrator::Actors
     ##
     # @!attribute next_actor [r]
     #   @return [AbstractActor]
-    attr_reader :next_actor
-
-    ##
-    # @param next_actor [AbstractActor]
-    def initialize(next_actor)
-      @next_actor = next_actor
-    end
+    attr_accessor :next_actor
 
     ##
     # Call the next actor, passing the env along for processing
     # @param work [Hyrax::Migrator::Work] - the Work model to be processed, including env
-    def next(work)
+    def next_actor_for(work)
       return true if @next_actor.nil?
 
       @next_actor.create(work)
