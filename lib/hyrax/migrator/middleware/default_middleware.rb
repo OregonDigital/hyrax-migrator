@@ -64,8 +64,9 @@ module Hyrax
           state_method = "#{aasm_state}?".to_sym
           current_actor = @actor_stack
           until current_actor.respond_to? state_method
-            current_actor = current_actor.next_actor
             return current_actor if current_actor.next_actor.nil?
+
+            current_actor = current_actor.next_actor
           end
           current_actor
         end
