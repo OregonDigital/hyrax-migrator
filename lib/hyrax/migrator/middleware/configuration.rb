@@ -12,6 +12,8 @@ module Hyrax
         # set, the default is provided.
         attr_writer :actor_stack
         def actor_stack
+          # TODO: Replace this with a valid default stack of actors for
+          # processing a work through migration.
           @actor_stack ||= []
         end
       end
