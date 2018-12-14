@@ -2,12 +2,15 @@ PATH
   remote: .
   specs:
     hyrax-migrator (0.1.0)
+      aasm
       haml
       rails (~> 5.1.6)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    aasm (5.0.0)
+      concurrent-ruby (~> 1.0)
     actioncable (5.1.6.1)
       actionpack (= 5.1.6.1)
       nio4r (~> 2.0)
