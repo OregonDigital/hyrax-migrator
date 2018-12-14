@@ -16,6 +16,7 @@ Metrics/BlockLength:
   ExcludedMethods: ['included']
   Exclude:
     - 'hyrax-migrator.gemspec'
+    - 'spec/**/*'
 
 Style/AsciiComments:
   Enabled: false

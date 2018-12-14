@@ -6,8 +6,23 @@ module Hyrax
       ##
       # The default middleware for actors processing works through the migrator
       class DefaultMiddleware
-        def initialize(actor_stack)
-          puts actor_stack
+        attr_reader :actor_stack
+
+        def initialize(actors)
+          @actor_stack ||= build_actor_stack(actors)
+        end
+
+        def start(aasm_state = nil)
+          # If aasm_state is nil, then
+        end
+
+        private
+
+        def build_actor_stack(actors)
+          actors.map.with_index do |actor, i|
+            next_actor = actors[i + 1] || nil
+            actor.new(next_actor)
+          end
         end
       end
     end
