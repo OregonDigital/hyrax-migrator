@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Hyrax
   module Migrator
     module Actors
@@ -8,21 +10,26 @@ module Hyrax
 
         aasm do
           state :bag_validator_initial, initial: true
-          state :bag_validator_succeeded
-          event :succeeded, after: :post_success do
+          state :bag_validator_succeeded, :bag_validator_failed
+
+          event :bag_validator_initial do
+            transitions from: %i[bag_validator_initial bag_validator_failed], to: :bag_validator_initial
+          end
+          event :bag_validator_failed do
+            transitions from: :bag_validator_initial, to: :bag_validator_failed
+          end
+          event :bag_validator_succeeded, after: :post_success do
             transitions from: :bag_validator_initial, to: :bag_validator_succeeded
           end
         end
 
         def create(work)
           @work = work
+          bag_validator_initial
           update_work(@work)
           bag = BagIt::Bag.new work.file_path
-          if bag.valid?
-            update_work(@work)
-          else
-            log("failed bag validation")
-          end
+          bag.valid? ? bag_validator_succeeded : bag_validator_failed
+          update_work(@work)
         rescue StandardError => e
           log("failed bag validation: #{e.message}")
         end
