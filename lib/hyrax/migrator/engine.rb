@@ -1,5 +1,6 @@
 # frozen_string_literal:true
 
+# rubocop:disable Metrics/LineLength
 module Hyrax
   module Migrator
     ##
@@ -17,10 +18,11 @@ module Hyrax
         if Hyrax::Migrator.config.mount_at
           Hyrax::Migrator.config.logger.info("after_initialize, mounting hyrax-migrator at '/#{Hyrax::Migrator.config.mount_at}'")
           app.routes.prepend do
-            mount Hyrax::Migrator::Engine => Hyrax::Migrator.config.mount_at, as: "migrator"
+            mount Hyrax::Migrator::Engine => Hyrax::Migrator.config.mount_at, as: 'migrator'
           end
         end
       end
     end
   end
 end
+# rubocop:enable Metrics/LineLength
