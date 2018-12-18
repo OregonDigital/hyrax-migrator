@@ -25,5 +25,17 @@ services:
       - 3000
   server:
     <<: *app
+    environment:
+      - RAILS_ENV=development
+      - RAILS_LOG_TO_STDOUT=1
     command: >
-      bash -c "cd spec/dummy && bundle exec rails s && tail -f log/development.txt"
+      bash -c "rm -f spec/dummy/tmp/pids/server.pid && bundle exec rails s"
+  test:
+    <<: *app
+    environment:
+      - RAILS_ENV=test
+      - RAILS_LOG_TO_STDOUT=1
+    command: >
+      bash -c "rm -f spec/dummy/tmp/pids/server.pid && bundle exec rails s -e test -p 3001"
+    expose:
+      - 3001

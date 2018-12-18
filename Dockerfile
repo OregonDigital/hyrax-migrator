@@ -16,7 +16,16 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN mkdir /data
 WORKDIR /data
 
+# Pre-install gems so we aren't reinstalling all the gems when literally any
+# filesystem change happens
+ADD Gemfile /data
+ADD Gemfile.lock /data
+ADD hyrax-migrator.gemspec /data
+RUN mkdir /data/build
+ADD ./build/install_gems.sh /data/build
+RUN mkdir -p /data/lib/hyrax/migrator
+ADD ./lib/hyrax/migrator/version.rb /data/lib/hyrax/migrator
+RUN ./build/install_gems.sh
+
 # Add the application code
 ADD . /data
-
-RUN ./build/install_gems.sh

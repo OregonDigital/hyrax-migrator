@@ -4,3 +4,6 @@ services:
   server:
     ports:
       - 3000:3000
+  test:
+    ports:
+      - 3001:3001
