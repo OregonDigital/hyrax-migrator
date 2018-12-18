@@ -1,5 +1,7 @@
 .bundle/
 log/*.log
+tmp/pids/*
+!tmp/pids/.keep
 pkg/
 spec/dummy/db/*.sqlite3
 spec/dummy/db/*.sqlite3-journal
