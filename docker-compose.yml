@@ -1,5 +1,8 @@
 version: '3'
 
+volumes:
+  ? redis-dev
+
 networks:
   ? external
   ? internal
@@ -23,19 +26,47 @@ services:
       ? internal
     expose:
       - 3000
-  server:
+  server: &server
     <<: *app
     environment:
       - RAILS_ENV=development
       - RAILS_LOG_TO_STDOUT=1
+      - REDIS_HOST=redis-dev
+      - REDIS_PORT='6379'
+    depends_on:
+      - redis-dev
+      - workers
     command: >
       bash -c "rm -f spec/dummy/tmp/pids/server.pid && bundle exec rails s"
+  workers:
+    <<: *server
+    command: bash -c "./build/install_gems.sh && bundle exec sidekiq -r /data/spec/dummy"
+    depends_on:
+      - redis-dev
   test:
     <<: *app
     environment:
       - RAILS_ENV=test
       - RAILS_LOG_TO_STDOUT=1
+      - REDIS_HOST=redis-test
+      - REDIS_PORT='6379'
+    depends_on:
+      - redis-test
     command: >
       bash -c "rm -f spec/dummy/tmp/pids/server.pid && bundle exec rails s -e test -p 3001"
     expose:
       - 3001
+  ##
+  # Redis queue server
+  redis: &redis
+    image: redis:4-alpine
+    command: redis-server
+    networks:
+      ? internal
+  redis-dev:
+    <<: *redis
+    volumes:
+      - redis-dev:/data
+  redis-test:
+    <<: *redis
+    tmpfs: /data

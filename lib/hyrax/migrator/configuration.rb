@@ -4,6 +4,20 @@ module Hyrax::Migrator
   ##
   # The main hyrax migrator configuration!
   class Configuration
+    def initialize
+      @registered_models = []
+    end
+
+    def register_model(*models)
+      Array.wrap(models).flatten.compact.each do |m|
+        @registered_models << m unless @registered_models.include? m
+      end
+    end
+
+    def models
+      @registered_models
+    end
+
     # The path to automatically mount the migrator engine to, or setting to false will prevent automatic mounting.
     attr_writer :mount_at
     def mount_at

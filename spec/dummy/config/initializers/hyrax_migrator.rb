@@ -14,4 +14,8 @@ Hyrax::Migrator.config do |config|
 
   # Set a specific logger for the engine to use
   config.logger = Rails.logger
+
+  # Register models for migration
+  # config.register_model ::Models::Image
+  config.register_model String
 end
