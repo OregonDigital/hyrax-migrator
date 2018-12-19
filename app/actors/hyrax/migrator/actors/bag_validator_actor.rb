@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bagit'
+
 module Hyrax
   module Migrator
     module Actors
@@ -37,7 +39,7 @@ module Hyrax
         private
 
         def post_success
-          next_actor.create(@work)
+          next_actor_for(@work)
         end
 
         def log(message)
