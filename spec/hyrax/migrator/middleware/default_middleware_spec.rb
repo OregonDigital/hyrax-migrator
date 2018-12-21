@@ -59,7 +59,8 @@ class TestActor < Hyrax::Migrator::Actors::AbstractActor
     end
   end
   def create(work)
-    next_actor_for(work)
+    @work = work
+    next_actor_for
   end
 end
 
@@ -73,6 +74,7 @@ class AnotherTestActor < Hyrax::Migrator::Actors::AbstractActor
     end
   end
   def create(work)
-    next_actor_for(work)
+    @work = work
+    next_actor_for
   end
 end

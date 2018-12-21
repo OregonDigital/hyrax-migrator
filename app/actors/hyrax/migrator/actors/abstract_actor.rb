@@ -28,6 +28,7 @@ module Hyrax::Migrator::Actors
     ##
     # Create must be overridden by an actor inheriting this class
     # @param work [Hyrax::Migrator::Work] - the Work model to be processed, including env
+    # Create must do the assignment @work = work
     def create(_work)
       raise NotImplementedError, 'An actor class must be able to #create'
     end
