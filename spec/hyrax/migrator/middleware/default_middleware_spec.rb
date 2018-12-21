@@ -11,7 +11,7 @@ RSpec.describe Hyrax::Migrator::Middleware::DefaultMiddleware do
   it { is_expected.to respond_to(:start) }
 
   context 'with an array of actors' do
-    let(:actors) { [TestActor, TestActor, AnotherTestActor] }
+    let(:actors) { [TestActor, TestActor, TerminalTestActor] }
     let(:aasm_state) { nil }
     let(:work) { create(:work, aasm_state: aasm_state) }
 
@@ -31,7 +31,7 @@ RSpec.describe Hyrax::Migrator::Middleware::DefaultMiddleware do
     end
 
     describe '#start with a work having a previously set aasm_state' do
-      let(:aasm_state) { 'another_test_failed' }
+      let(:aasm_state) { 'terminal_test_failed' }
 
       it 'skips the first actor' do
         expect(middleware.actor_stack).not_to receive(:create)
@@ -44,6 +44,15 @@ RSpec.describe Hyrax::Migrator::Middleware::DefaultMiddleware do
       it 'calls the actor with the aasm_state method' do
         expect(middleware.actor_stack.next_actor.next_actor).to receive(:create).with(work)
         middleware.start(work)
+      end
+    end
+
+    describe '#start with an improperly overridden #create in an Actor' do
+      let(:actors) { [TerminalTestActor, TestActor] }
+      let(:aasm_state) { 'terminal_test_failed' }
+
+      it 'raises an exception because @work was not set' do
+        expect { middleware.start(work) }.to raise_error StandardError
       end
     end
   end
@@ -59,22 +68,23 @@ class TestActor < Hyrax::Migrator::Actors::AbstractActor
     end
   end
   def create(work)
-    @work = work
-    next_actor_for
+    super
+    call_next_actor
   end
 end
 
-class AnotherTestActor < Hyrax::Migrator::Actors::AbstractActor
+class TerminalTestActor < Hyrax::Migrator::Actors::AbstractActor
   aasm do
-    state :another_test_init, initial: true
-    state :another_test_failed
-    state :another_test_succeeded
-    event :another_test_succeeded do
-      transitions from: :another_test_init, to: :another_test_succeeded
+    state :terminal_test_init, initial: true
+    state :terminal_test_failed
+    state :terminal_test_succeeded
+    event :terminal_test_succeeded do
+      transitions from: :terminal_test_init, to: :terminal_test_succeeded
     end
   end
-  def create(work)
-    @work = work
-    next_actor_for
+  def create(_work)
+    # Super not called, expects actor to fail in call_next_actor
+    # super
+    call_next_actor
   end
 end
