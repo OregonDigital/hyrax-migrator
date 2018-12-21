@@ -19,8 +19,9 @@ module Hyrax::Migrator::Actors
 
     ##
     # Call the next actor, passing the env along for processing
-    def next_actor_for
+    def call_next_actor
       return true if @next_actor.nil?
+      raise StandardError, "#{self.class} missing @work, try calling super in #create or set the variable directly." unless @work
 
       @next_actor.create(@work)
     end
@@ -28,9 +29,8 @@ module Hyrax::Migrator::Actors
     ##
     # Create must be overridden by an actor inheriting this class
     # @param work [Hyrax::Migrator::Work] - the Work model to be processed, including env
-    # Create must do the assignment @work = work
-    def create(_work)
-      raise NotImplementedError, 'An actor class must be able to #create'
+    def create(work)
+      @work = work
     end
 
     ##

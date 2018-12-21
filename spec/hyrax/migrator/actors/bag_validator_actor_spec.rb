@@ -6,7 +6,7 @@ RSpec.describe Hyrax::Migrator::Actors::BagValidatorActor do
   let(:actor) { described_class.new }
   let(:terminal) { Hyrax::Migrator::Actors::TerminalActor.new }
   let(:work) { create(:work, pid: pid) }
-  let(:bag) { BagIt::Bag.new(pid) }
+  let(:bag) { BagIt::Bag.new(File.join(Rails.root, 'tmp', pid)) }
   let(:pid) { 'abcde1234' }
 
   describe '#create' do
@@ -39,7 +39,7 @@ RSpec.describe Hyrax::Migrator::Actors::BagValidatorActor do
         expect(work.aasm_state).to eq('bag_validator_failed')
       end
       it 'does not call the next actor' do
-        expect(terminal).not_to receive('create')
+        expect(terminal).not_to receive(:create)
         actor.create(work)
       end
     end
