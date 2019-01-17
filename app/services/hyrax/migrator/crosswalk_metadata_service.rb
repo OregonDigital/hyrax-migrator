@@ -33,10 +33,10 @@ module Hyrax
         end
       end
 
-      # Given an OD1 predicate, returns associated property data or nil
+      # Given an OD2 predicate, returns associated property data or nil
       def lookup(predicate)
         hash = crosswalk_hash[:crosswalk]
-        (hash.select { |k| k[:od1_predicate] == predicate }).first
+        (hash.select { |k| k[:od2_predicate] == predicate }).first
       rescue StandardError
         raise PredicateNotFoundError, predicate.to_s
       end
@@ -46,7 +46,7 @@ module Hyrax
         !data[:function].blank? ? send(data[:function].to_sym, object) : object
       end
 
-      # Returns a hash that maps OD1 predicates to OD2 properties and other data needed to process each field.
+      # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
       def crosswalk_hash
         @crosswalk_hash ||= YAML.load_file(CONFIG_FILE).deep_symbolize_keys
       end

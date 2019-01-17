@@ -13,7 +13,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
   let(:predicate_str) { 'http://purl.org/dc/elements/1.1/creator' }
   let(:predicate) { RDF::URI(predicate_str) }
   let(:object) { RDF::URI('http://id.loc.gov/authorities/names/nr93013379') }
-  let(:data) { { od2_property: 'creator', od1_predicate: predicate_str, multiple: true } }
+  let(:data) { { od2_property: 'creator', od2_predicate: predicate_str, multiple: true } }
   let(:service) { described_class.new }
   let(:result_hash) { { creator: object } }
 
@@ -35,7 +35,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
     context 'when given a property hash that does have a function' do
       let(:predicate2_str) { 'http://example.org/ns/myFakePred' }
       let(:object2) { RDF::Literal('my little pony') }
-      let(:data2) { { od2_property: 'test', od1_predicate: predicate2_str, function: 'add_foo', multiple: true } }
+      let(:data2) { { od2_property: 'test', od2_predicate: predicate2_str, function: 'add_foo', multiple: true } }
 
       it 'returns the object' do
         expect(service.process(data2, object2)).to eq(RDF::Literal('my little pony foo'))
