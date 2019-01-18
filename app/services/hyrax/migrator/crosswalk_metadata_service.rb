@@ -36,9 +36,10 @@ module Hyrax
       # Given an OD2 predicate, returns associated property data or nil
       def lookup(predicate)
         hash = crosswalk_hash[:crosswalk]
-        (hash.select { |k| k[:od2_predicate] == predicate }).first
-      rescue StandardError
-        raise PredicateNotFoundError, predicate.to_s
+        result = (hash.select { |k| k[:od2_predicate] == predicate }).first
+        return result unless result.nil?
+
+        raise PredicateNotFoundError, predicate
       end
 
       # Given property data and an OD1 object, returns either the object, or a modified object

@@ -501,5 +501,6 @@ crosswalk:
     od2_predicate: http://opaquenamespace.org/oembed
     multiple: false
   - od2_property: test
-    od2_predicate: http://exampmle.org/ns/myFakePred
+    od2_predicate: http://example.org/ns/myFakePred
     multiple: true
+    function: add_foo

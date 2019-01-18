@@ -23,6 +23,15 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
         expect(service.lookup(predicate_str)).to eq data
       end
     end
+
+    context 'when given a predicate that is not in the config' do
+      let(:bad_predicate) { 'http://example.org/ns/iDontExist' }
+      let(:error) { Hyrax::Migrator::CrosswalkMetadataService::PredicateNotFoundError }
+
+      it 'raises an error' do
+        expect { service.lookup(bad_predicate) }.to raise_error(error)
+      end
+    end
   end
 
   describe 'process' do
