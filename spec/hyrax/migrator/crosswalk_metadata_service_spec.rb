@@ -13,14 +13,14 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
   let(:predicate_str) { 'http://purl.org/dc/elements/1.1/creator' }
   let(:predicate) { RDF::URI(predicate_str) }
   let(:object) { RDF::URI('http://id.loc.gov/authorities/names/nr93013379') }
-  let(:data) { { od2_property: 'creator', od2_predicate: predicate_str, multiple: true } }
+  let(:data) { { property: 'creator', predicate: predicate_str, multiple: true } }
   let(:service) { described_class.new }
   let(:result_hash) { { creator: object } }
 
   describe 'lookup' do
     context 'when given a predicate' do
       it 'returns the associated property hash' do
-        expect(service.lookup(predicate_str)).to eq data
+        expect(service.send(:lookup, predicate_str)).to eq data
       end
     end
 
@@ -29,7 +29,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
       let(:error) { Hyrax::Migrator::CrosswalkMetadataService::PredicateNotFoundError }
 
       it 'raises an error' do
-        expect { service.lookup(bad_predicate) }.to raise_error(error)
+        expect { service.send(:lookup, bad_predicate) }.to raise_error(error)
       end
     end
   end
@@ -37,17 +37,26 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
   describe 'process' do
     context 'when given a property hash that does not contain a function' do
       it 'returns the object' do
-        expect(service.process(data, object)).to eq(object)
+        expect(service.send(:process, data, object)).to eq(object)
       end
     end
 
     context 'when given a property hash that does have a function' do
       let(:predicate2_str) { 'http://example.org/ns/myFakePred' }
       let(:object2) { RDF::Literal('my little pony') }
-      let(:data2) { { od2_property: 'test', od2_predicate: predicate2_str, function: 'add_foo', multiple: true } }
+      let(:data2) { { property: 'test', predicate: predicate2_str, function: 'add_foo', multiple: true } }
 
-      it 'returns the object' do
-        expect(service.process(data2, object2)).to eq(RDF::Literal('my little pony foo'))
+      before do
+        described_class.class_eval do
+          def add_foo(obj)
+            RDF::Literal(obj.to_s + ' foo')
+          end
+        end
+        allow(service).to receive(:lookup).and_return(data2)
+      end
+
+      it 'modifies the object' do
+        expect(service.send(:process, data2, object2)).to eq(RDF::Literal('my little pony foo'))
       end
     end
   end

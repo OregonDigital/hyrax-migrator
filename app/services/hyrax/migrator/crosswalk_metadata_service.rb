@@ -8,7 +8,9 @@ module Hyrax
     class CrosswalkMetadataService
       include RDF
 
-      CONFIG_FILE = 'config/migrator/crosswalk.yml'
+      def initialize(config = 'config/migrator/crosswalk.yml')
+        @config = config
+      end
 
       # Given a graph, returns result hash
       def crosswalk(graph)
@@ -20,43 +22,38 @@ module Hyrax
         @result
       end
 
+      private
+
       # Given property data and an object, adds them to result hash
       def assemble_hash(data, object)
-        return if data[:od2_property].blank?
+        return if data[:property].blank?
 
         @result ||= {}
         if data[:multiple]
-          @result[data[:od2_property].to_sym] ||= []
-          @result[data[:od2_property].to_sym] += [object]
+          @result[data[:property].to_sym] ||= []
+          @result[data[:property].to_sym] += [object]
         else
-          @result[data[:od2_property].to_sym] = object
+          @result[data[:property].to_sym] = object
         end
       end
 
       # Given an OD2 predicate, returns associated property data or nil
       def lookup(predicate)
         hash = crosswalk_hash[:crosswalk]
-        result = (hash.select { |k| k[:od2_predicate] == predicate }).first
-        return result unless result.nil?
+        result = hash.select { |k| k[:predicate].casecmp(predicate).zero? }
+        return result.first unless result.empty?
 
         raise PredicateNotFoundError, predicate
       end
 
       # Given property data and an OD1 object, returns either the object, or a modified object
       def process(data, object)
-        !data[:function].blank? ? send(data[:function].to_sym, object) : object
+        data[:function].blank? ? object : send(data[:function].to_sym, object)
       end
 
       # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
       def crosswalk_hash
-        @crosswalk_hash ||= YAML.load_file(CONFIG_FILE).deep_symbolize_keys
-      end
-
-      # test modifier function
-      def add_foo(object)
-        RDF::Literal(object.to_s + ' foo')
-      rescue StandardError
-        raise ModifyObjectFailedError, "Could not add foo to #{object}"
+        @crosswalk_hash ||= YAML.load_file(@config).deep_symbolize_keys
       end
 
       # Raise in lookup
