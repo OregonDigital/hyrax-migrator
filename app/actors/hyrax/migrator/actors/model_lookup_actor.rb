@@ -3,7 +3,6 @@
 module Hyrax::Migrator::Actors
   # Lookup which model to use for the work
   class ModelLookupActor < Hyrax::Migrator::Actors::AbstractActor
-
     aasm do
       state :model_lookup_initial, initial: true
       state :model_lookup_succeeded, :model_lookup_failed
@@ -35,9 +34,11 @@ module Hyrax::Migrator::Actors
 
     private
 
+    #:nocov:
     def service
       @service ||= ModelLookupService.new(@work, config)
     end
+    #:nocov:
 
     def post_fail
       update_work
