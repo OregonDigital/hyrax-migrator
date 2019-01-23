@@ -12,9 +12,9 @@ module Hyrax::Migrator::Services
     METADATA_FILE = 'descmetadata.nt'
     METADATA_FORMAT = :ntriples
 
-    def initialize(work, crosswalk_yaml_path)
+    def initialize(work, migrator_config)
       @work = work
-      @crosswalk_yaml_path = crosswalk_yaml_path
+      @crosswalk_yaml_path = migrator_config.model_crosswalk
       crosswalk
     end
 

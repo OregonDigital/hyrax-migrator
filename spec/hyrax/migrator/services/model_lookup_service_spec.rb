@@ -1,19 +1,24 @@
 # frozen_string_literal:true
 
 RSpec.describe Hyrax::Migrator::Services::ModelLookupService do
-  let(:crosswalk_yaml_path) { File.join(Rails.root, '..', 'fixtures', 'model_lookup.yml') }
-  let(:service) { described_class.new(work, crosswalk_yaml_path) }
+  let(:config) { Hyrax::Migrator::Configuration.new }
+  let(:model_crosswalk) { File.join(Rails.root, '..', 'fixtures', 'model_lookup.yml') }
+  let(:service) { described_class.new(work, config) }
   let(:work) { create(:work, pid: pid, file_path: File.join(Rails.root, '..', 'fixtures', pid)) }
   let(:pid) { '3t945r08v' }
   let(:object) { RDF::URI('http://purl.org/dc/dcmitype/Image') }
 
+  before do
+    config.model_crosswalk = model_crosswalk
+  end
+
   it { expect(service.model).to eq 'Image' }
 
   context 'with a missing lookup configuration' do
-    let(:crosswalk_yaml_path) { File.join(Rails.root, '..', 'fixtures', 'doesntexist.yml') }
+    let(:model_crosswalk) { File.join(Rails.root, '..', 'fixtures', 'doesntexist.yml') }
     let(:service) { described_class }
 
-    it { expect { service.new(work, crosswalk_yaml_path) }.to raise_error StandardError }
+    it { expect { service.new(work, config) }.to raise_error StandardError }
   end
 
   describe '#model' do
@@ -54,7 +59,7 @@ RSpec.describe Hyrax::Migrator::Services::ModelLookupService do
         allow(service).to receive(:crosswalk).and_return('http://doesntexist' => 'Image')
       end
 
-      it { expect { service.model }.to raise_error(StandardError, "could not find a configuration for #{object} in #{crosswalk_yaml_path}") }
+      it { expect { service.model }.to raise_error(StandardError, "could not find a configuration for #{object} in #{model_crosswalk}") }
     end
   end
 end
