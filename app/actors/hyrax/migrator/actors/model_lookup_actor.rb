@@ -21,6 +21,10 @@ module Hyrax::Migrator::Actors
       end
     end
 
+    ##
+    # Use the ModelLookupService and configurations to determine what kind
+    # of registered model this work will be initialized as when it comes time
+    # to create the work in Hyrax.
     def create(work)
       super
       model_lookup_initial

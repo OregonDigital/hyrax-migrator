@@ -19,7 +19,13 @@ module Hyrax::Migrator::Services
     end
 
     ##
-    # Using the configured crosswalk for model lookup,
+    # Using the configured crosswalk for model lookup, and the migrator engine configuration,
+    # determine what model to use for this work and if the model is registered to the engine
+    # through the initializer. This model name will eventually be used to build a new instance
+    # set the attributes, collection membership, and associate uploaded files before calling
+    # #save on it to persist to the Hyrax application.
+    #
+    # returns [String] the model name found in the model_crosswalk so long as its a registered model in the engine
     def model
       object = object(graph)
       lookup_model(object)
@@ -66,6 +72,7 @@ module Hyrax::Migrator::Services
       statement.object
     end
 
+    ## Case insensitive matching the statements predicate to the TYPE_URI constant
     def predicate?(statement)
       statement.predicate.to_s.casecmp(TYPE_URI).zero?
     end
