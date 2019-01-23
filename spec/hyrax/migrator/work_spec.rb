@@ -1,4 +1,5 @@
 # frozen_string_literal:true
+
 require 'bagit'
 
 RSpec.describe Hyrax::Migrator::Work do
