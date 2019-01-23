@@ -6,7 +6,7 @@ RSpec.describe Hyrax::Migrator::Actors::BagValidatorActor do
   let(:actor) { described_class.new }
   let(:terminal) { Hyrax::Migrator::Actors::TerminalActor.new }
   let(:work) { create(:work, pid: pid, file_path: File.join(Rails.root, '..', 'fixtures', pid)) }
-  let(:pid) { 'abcde1234' }
+  let(:pid) { '3t945r08v' }
 
   describe '#create' do
     context 'when the validation succeeds' do

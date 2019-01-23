@@ -3,7 +3,7 @@
 require 'bagit'
 
 RSpec.describe Hyrax::Migrator::Work do
-  let(:pid) { 'abcde1234' }
+  let(:pid) { '3t945r08v' }
   let(:model) { create(:work, file_path: File.join(Rails.root, '..', 'fixtures', pid)) }
 
   it { expect(model.env).to be_a Hash }
