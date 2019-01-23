@@ -8,6 +8,10 @@ module Hyrax::Migrator::Actors
   class AbstractActor
     include AASM
 
+    def config
+      Hyrax::Migrator.config
+    end
+
     ##
     # @!attribute next_actor [r]
     #   @return [AbstractActor]
