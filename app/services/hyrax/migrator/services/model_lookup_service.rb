@@ -14,10 +14,12 @@ module Hyrax::Migrator::Services
 
     def initialize(work, migrator_config)
       @work = work
-      @crosswalk_yaml_path = migrator_config.model_crosswalk
+      @config = migrator_config
       crosswalk
     end
 
+    ##
+    # Using the configured crosswalk for model lookup,
     def model
       object = object(graph)
       lookup_model(object)
@@ -26,9 +28,9 @@ module Hyrax::Migrator::Services
     private
 
     def crosswalk
-      @crosswalk ||= YAML.load_file(@crosswalk_yaml_path)
+      @crosswalk ||= YAML.load_file(@config.model_crosswalk)
     rescue Errno::ENOENT
-      raise StandardError, "could not find model lookup configuration at #{crosswalk_yaml_path}"
+      raise StandardError, "could not find model lookup configuration at #{@config.model_crosswalk}"
     end
 
     def metadata_file
@@ -49,7 +51,10 @@ module Hyrax::Migrator::Services
 
     def lookup_model(object)
       model = crosswalk[object.to_s]
-      raise StandardError, "could not find a configuration for #{object} in #{@crosswalk_yaml_path}" unless model
+      raise StandardError, "could not find a configuration for #{object} in #{@config.model_crosswalk}" unless model
+
+      message = "#{model} not a registered model in the migrator initializer"
+      raise StandardError, message unless @config.models.include?(model)
 
       model
     end

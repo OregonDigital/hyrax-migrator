@@ -3,6 +3,7 @@
 RSpec.describe Hyrax::Migrator::Services::ModelLookupService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:model_crosswalk) { File.join(Rails.root, '..', 'fixtures', 'model_lookup.yml') }
+  let(:registered_model) { 'Image' }
   let(:service) { described_class.new(work, config) }
   let(:work) { create(:work, pid: pid, file_path: File.join(Rails.root, '..', 'fixtures', pid)) }
   let(:pid) { '3t945r08v' }
@@ -10,6 +11,7 @@ RSpec.describe Hyrax::Migrator::Services::ModelLookupService do
 
   before do
     config.model_crosswalk = model_crosswalk
+    config.register_model registered_model
   end
 
   it { expect(service.model).to eq 'Image' }
@@ -60,6 +62,12 @@ RSpec.describe Hyrax::Migrator::Services::ModelLookupService do
       end
 
       it { expect { service.model }.to raise_error(StandardError, "could not find a configuration for #{object} in #{model_crosswalk}") }
+    end
+
+    context 'when missing a configuration a registered model' do
+      let(:registered_model) { 'BobRoss' }
+
+      it { expect { service.model }.to raise_error(StandardError, 'Image not a registered model in the migrator initializer') }
     end
   end
 end
