@@ -29,8 +29,7 @@ module Hyrax::Migrator::Actors
       super
       bag_validator_initial
       update_work
-      bag = BagIt::Bag.new @work.file_path
-      bag.valid? ? bag_validator_succeeded : bag_validator_failed
+      work.bag.valid? ? bag_validator_succeeded : bag_validator_failed
     rescue StandardError => e
       log("failed bag validation: #{e.message}")
     end

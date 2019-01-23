@@ -1,0 +1,23 @@
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/title> "Paul Richie" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/date> "2004" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/sportsTeam> "Oregon State University" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/description> "Paul Richie played all 4 seasons for OSU. Photo was used in the 2005 Oregon State baseball guide, page 43." .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/subject> <http://id.loc.gov/authorities/subjects/sh85012045> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/elements/1.1/subject> "Richie, Paul" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/type> <http://purl.org/dc/dcmitype/Image> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://vocab.getty.edu/aat/300215302> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/rights/rightsHolder> "Oregon State University Sports Information Office" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://id.loc.gov/vocabulary/relators/own> "Oregon State University Sports Information Office" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/elements/1.1/source> "2005 Media Guide" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/conversionSpecifications> "Master scanned with Epson 1640XL scanner at 600 dpi. Image manipulated with Adobe Photoshop ver. 7.0." .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/full> "Volume2\\RichieAp43.jpg" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/created> "2007-02-06" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/modified> "2007-02-21" .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/replaces> <http://oregondigital.org/u?/baseball,1728> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/contributingInstitution> <http://dbpedia.org/resource/Oregon_State_University> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/set> <http://oregondigital.org/resource/oregondigital:osu-baseball> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/set> <http://oregondigital.org/resource/oregondigital:osu-scarc> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/set> <http://oregondigital.org/resource/oregondigital:osu-athletics> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://opaquenamespace.org/ns/primarySet> <http://oregondigital.org/resource/oregondigital:osu-baseball> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/format> <https://w3id.org/spar/mediatype/image/jpeg> .
+<http://oregondigital.org/resource/oregondigital:3t945r08v> <http://purl.org/dc/terms/rights> <http://opaquenamespace.org/ns/rights/rr-f> .
