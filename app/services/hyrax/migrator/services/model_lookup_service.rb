@@ -1,16 +1,13 @@
 # frozen_string_literal:true
 
-require 'rdf'
+require 'nokogiri'
 
 module Hyrax::Migrator::Services
   ##
   # A service to inspect the metadata and crosswalk the type to a model used for migration
   class ModelLookupService
-    include RDF
-
-    TYPE_URI = 'http://purl.org/dc/terms/type'
-    METADATA_FILE = 'descmetadata.nt'
-    METADATA_FORMAT = :ntriples
+    XML_NODE_XPATH = '//rdf:RDF/rdf:Description/ns0:hasModel'
+    XML_FILE = 'rels-ext.xml'
 
     def initialize(work, migrator_config)
       @work = work
@@ -27,8 +24,8 @@ module Hyrax::Migrator::Services
     #
     # returns [String] the model name found in the model_crosswalk so long as its a registered model in the engine
     def model
-      object = object(graph)
-      lookup_model(object)
+      node_value = at_node(doc)
+      lookup_model(node_value)
     end
 
     private
@@ -39,42 +36,35 @@ module Hyrax::Migrator::Services
       raise StandardError, "could not find model lookup configuration at #{@config.model_crosswalk}"
     end
 
-    def metadata_file
+    def doc
+      File.open(xml_file) { |f| Nokogiri::XML(f) }
+    rescue Errno::ENOENT
+      raise StandardError, "could not find xml file #{xml_file} in #{@work.bag.data_dir}"
+    end
+
+    def xml_file
       files = @work.bag.bag_files
-      file = files.find { |f| f.downcase.end_with?(METADATA_FILE) }
-      raise StandardError, "could not find a metadata file ending with '#{METADATA_FILE}' in #{@work.bag.data_dir}" unless file
+      file = files.find { |f| f.downcase.end_with?(XML_FILE) }
+      raise StandardError, "could not find an xml file ending with '#{XML_FILE}' in #{@work.bag.data_dir}" unless file
 
       file
     end
 
-    def graph
-      RDF::Graph.load(metadata_file, format: METADATA_FORMAT)
-    rescue RDF::FormatError
-      raise StandardError, "invalid metadata format, could not load #{METADATA_FORMAT} metadata file"
-    rescue IOError
-      raise StandardError, "could not find metadata file at #{metadata_file}"
+    def at_node(doc)
+      node = doc.xpath(XML_NODE_XPATH)
+      raise StandardError, "could not find #{XML_NODE_XPATH} in xml file" if node.empty?
+
+      node.first.attributes['resource'].value
     end
 
-    def lookup_model(object)
-      model = crosswalk[object.to_s]
-      raise StandardError, "could not find a configuration for #{object} in #{@config.model_crosswalk}" unless model
+    def lookup_model(node_value)
+      model = crosswalk[node_value]
+      raise StandardError, "could not find a configuration for #{node_value} in #{@config.model_crosswalk}" unless model
 
       message = "#{model} not a registered model in the migrator initializer"
       raise StandardError, message unless @config.models.include?(model)
 
       model
-    end
-
-    def object(graph)
-      statement = graph.statements.find { |s| predicate?(s) }
-      raise StandardError, "could not find #{TYPE_URI} in metadata" if statement.nil?
-
-      statement.object
-    end
-
-    ## Case insensitive matching the statements predicate to the TYPE_URI constant
-    def predicate?(statement)
-      statement.predicate.to_s.casecmp(TYPE_URI).zero?
     end
   end
 end
