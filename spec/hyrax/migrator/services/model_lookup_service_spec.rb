@@ -2,7 +2,7 @@
 
 RSpec.describe Hyrax::Migrator::Services::ModelLookupService do
   let(:config) { Hyrax::Migrator::Configuration.new }
-  let(:model_crosswalk) { File.join(Rails.root, '..', 'fixtures', 'model_lookup.yml') }
+  let(:model_crosswalk) { File.join(Rails.root, '..', 'fixtures', 'model_crosswalk.yml') }
   let(:registered_model) { 'Image' }
   let(:service) { described_class.new(work, config) }
   let(:work) { create(:work, pid: pid, file_path: File.join(Rails.root, '..', 'fixtures', pid)) }
