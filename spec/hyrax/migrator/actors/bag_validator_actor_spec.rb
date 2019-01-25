@@ -5,12 +5,15 @@ require 'bagit'
 RSpec.describe Hyrax::Migrator::Actors::BagValidatorActor do
   let(:actor) { described_class.new }
   let(:terminal) { Hyrax::Migrator::Actors::TerminalActor.new }
-  let(:work) { create(:work, pid: pid, file_path: File.join(Rails.root, '..', 'fixtures', pid)) }
-  let(:pid) { '3t945r08v' }
+  let(:work) { create(:work, pid: pid) }
+  let(:bag) { BagIt::Bag.new(File.join(Rails.root, 'tmp', pid)) }
+  let(:pid) { 'abcde1234' }
 
   describe '#create' do
     context 'when the validation succeeds' do
       before do
+        allow(BagIt::Bag).to receive(:new).and_return(bag)
+        allow(bag).to receive(:valid?).and_return(true)
         actor.next_actor = terminal
       end
 
@@ -26,7 +29,8 @@ RSpec.describe Hyrax::Migrator::Actors::BagValidatorActor do
 
     context 'when the validation fails' do
       before do
-        allow(work.bag).to receive(:valid?).and_return(false)
+        allow(BagIt::Bag).to receive(:new).and_return(bag)
+        allow(bag).to receive(:valid?).and_return(false)
         actor.next_actor = terminal
       end
 
