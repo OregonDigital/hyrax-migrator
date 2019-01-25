@@ -43,13 +43,13 @@ module Hyrax::Migrator::Actors
 
     def post_fail
       @work.status_message = "Work #{work.pid} failed publishing to the repository."
-      @work.status = 'fail'
+      @work.status = Hyrax::Migrator::Work::FAIL
       update_work
     end
 
     def post_success
       @work.status_message = "Work #{work.pid} published to the repository."
-      @work.status = 'success'
+      @work.status = Hyrax::Migrator::Work::SUCCESS
       update_work
       call_next_actor
     end
