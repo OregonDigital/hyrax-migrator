@@ -11,6 +11,7 @@ module Hyrax::Migrator::Services
 
     def initialize(work, migrator_config)
       @work = work
+      @data_dir = File.join(work.file_path, 'data')
       @config = migrator_config
       crosswalk
     end
@@ -39,15 +40,17 @@ module Hyrax::Migrator::Services
     def doc
       File.open(xml_file) { |f| Nokogiri::XML(f) }
     rescue Errno::ENOENT
-      raise StandardError, "could not find xml file #{xml_file} in #{@work.bag.data_dir}"
+      raise StandardError, "could not find xml file #{xml_file} in #{@data_dir}"
     end
 
     def xml_file
-      files = @work.bag.bag_files
+      files = Dir.entries(@data_dir)
       file = files.find { |f| f.downcase.end_with?(XML_FILE) }
-      raise StandardError, "could not find an xml file ending with '#{XML_FILE}' in #{@work.bag.data_dir}" unless file
+      raise StandardError, "could not find an xml file ending with '#{XML_FILE}' in #{@data_dir}" unless file
 
-      file
+      File.join(@data_dir, file)
+    rescue Errno::ENOENT
+      raise StandardError, "data directory #{@data_dir} not found"
     end
 
     def at_node(doc)
