@@ -18,6 +18,31 @@ module Hyrax::Migrator
       @registered_models
     end
 
+    attr_writer :file_system_path 
+    def file_system_path
+      @file_system_path ||= ENV['BROWSEEVERYTHING_FILESYSTEM_PATH']
+    end
+
+    attr_writer :aws_s3_app_key
+    def aws_s3_app_key
+      @aws_s3_app_key ||= ENV['AWS_S3_APP_KEY']
+    end
+
+    attr_writer :aws_s3_app_secret
+    def aws_s3_app_secret
+      @aws_s3_app_secret ||= ENV['AWS_S3_APP_SECRET']
+    end
+
+    attr_writer :aws_s3_bucket
+    def aws_s3_bucket
+      @aws_s3_bucket ||= ENV['AWS_S3_BUCKET']
+    end
+
+    attr_writer :aws_s3_region
+    def aws_s3_region
+      @aws_s3_region ||= ENV['AWS_S3_REGION']
+    end
+
     # The path to automatically mount the migrator engine to, or setting to false will prevent automatic mounting.
     attr_writer :mount_at
     def mount_at
