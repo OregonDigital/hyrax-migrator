@@ -1,0 +1,6 @@
+cd36b025f4393ace2caa47c6e65f25ed data/3t945r08v_content.jpeg
+6fa5555a78502932f3d7b0c8b60a259a data/3t945r08v_DC.xml
+4a166637a5eda4381ffc9801a0bbb7a5 data/3t945r08v_descMetadata.nt
+f46b9614d6e5b4cf28233a480d029c0e data/3t945r08v_RELS-EXT.xml
+39a8c582b5757429cae3abe9ae2a81e5 data/3t945r08v_rightsMetadata.xml
+cc1f797c7cc6963eea8d1fe1f03872dc data/3t945r08v_workflowMetadata.yml
