@@ -35,5 +35,18 @@ module Hyrax::Migrator
     def logger
       @logger ||= Logger.new nil
     end
+
+    # The crosswalk file for looking up a model related to the metadata type URI for a work.
+    # The model should match one that is found in the models configuration for this engine.
+    #
+    # For example, the following lines in the hyrax_migrator initializer will include
+    # reference to the Image and Generic models found in the MyApp::Models namespace
+    #
+    # config.register_model MyApp::Models::Image
+    # config.register_model MyApp::Models::Generic
+    attr_writer :model_crosswalk
+    def model_crosswalk
+      @model_crosswalk ||= ''
+    end
   end
 end

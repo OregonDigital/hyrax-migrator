@@ -18,4 +18,7 @@ Hyrax::Migrator.config do |config|
   # Register models for migration
   # config.register_model ::Models::Image
   config.register_model String
+
+  # The model crosswalk used by ModelLookupService
+  config.model_crosswalk = File.join(Rails.root, '../fixtures/model_crosswalk.yml')
 end

@@ -204,6 +204,7 @@ DEPENDENCIES
   coveralls (~> 0.8)
   factory_bot_rails
   hyrax-migrator!
+  nokogiri
   puma
   rspec-rails (~> 3.8)
   rspec_junit_formatter
