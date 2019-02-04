@@ -36,6 +36,12 @@ module Hyrax::Migrator
       @logger ||= Logger.new nil
     end
 
+    # The crosswalk metadata file contains the properties and predicates used for transforming the descriptive metadata.
+    attr_writer :crosswalk_metadata_file
+    def crosswalk_metadata_file
+      @crosswalk_metadata_file ||= ''
+    end
+
     # The crosswalk file for looking up a model related to the metadata type URI for a work.
     # The model should match one that is found in the models configuration for this engine.
     #

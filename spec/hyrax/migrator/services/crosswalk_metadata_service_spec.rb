@@ -2,7 +2,7 @@
 
 require 'rdf'
 
-RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
+RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:graph) do
     g = RDF::Graph.new
     s = RDF::Statement.new(RDF::URI(subject), RDF::URI(predicate), RDF::URI(object))
@@ -14,8 +14,18 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
   let(:predicate) { RDF::URI(predicate_str) }
   let(:object) { RDF::URI('http://id.loc.gov/authorities/names/nr93013379') }
   let(:data) { { property: 'creator', predicate: predicate_str, multiple: true } }
-  let(:service) { described_class.new }
+  let(:config) { Hyrax::Migrator::Configuration.new }
+  let(:pid) { '3t945r08v' }
+  let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
+  let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
+  let(:work) { create(:work, pid: pid, file_path: file_path) }
+  let(:service) { described_class.new(work, config) }
   let(:result_hash) { { creator: object } }
+
+  before do
+    config.crosswalk_metadata_file = crosswalk_metadata_file
+    allow(RDF::Graph).to receive(:load).and_return(graph)
+  end
 
   describe 'lookup' do
     context 'when given a predicate' do
@@ -26,7 +36,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
 
     context 'when given a predicate that is not in the config' do
       let(:bad_predicate) { 'http://example.org/ns/iDontExist' }
-      let(:error) { Hyrax::Migrator::CrosswalkMetadataService::PredicateNotFoundError }
+      let(:error) { Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError }
 
       it 'raises an error' do
         expect { service.send(:lookup, bad_predicate) }.to raise_error(error)
@@ -62,9 +72,9 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataService do
   end
 
   describe 'crosswalk' do
-    context 'when given a graph' do
+    context 'when there is an nt to process' do
       it 'processes the statements and returns a result hash' do
-        response = service.crosswalk(graph)
+        response = service.crosswalk
         expect(response[:creator]).to eq([object])
       end
     end
