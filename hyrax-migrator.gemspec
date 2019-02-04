@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails', '~> 5.1.6'
   s.add_dependency 'rdf'
   s.add_dependency 'sidekiq'
+  s.add_dependency 'aws-sdk-s3'
 
   s.add_development_dependency 'byebug'
   s.add_development_dependency 'coveralls', '~> 0.8'
