@@ -21,4 +21,7 @@ Hyrax::Migrator.config do |config|
 
   # The model crosswalk used by ModelLookupService
   config.model_crosswalk = File.join(Rails.root, '../fixtures/model_crosswalk.yml')
+
+  # The crosswalk metadata file that lists properties and predicates
+  config.crosswalk_metadata_file = File.join(Rails.root, '../fixtures/crosswalk.yml')
 end
