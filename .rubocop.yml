@@ -56,7 +56,4 @@ RSpec/MessageSpies:
   Enabled: false
 
 Metrics/LineLength:
-  # Ignore comment lines starting with a #
-  IgnoredPatterns: ['(\A|\s)#']
-  Exclude:
-    - 'spec/**/*'
+  Enabled: false
