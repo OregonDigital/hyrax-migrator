@@ -1,6 +1,5 @@
 # frozen_string_literal:true
 
-# rubocop:disable Metrics/LineLength
 module Hyrax
   module Migrator
     ##
@@ -25,4 +24,3 @@ module Hyrax
     end
   end
 end
-# rubocop:enable Metrics/LineLength
