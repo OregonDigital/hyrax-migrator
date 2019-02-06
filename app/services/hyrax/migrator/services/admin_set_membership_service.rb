@@ -10,7 +10,7 @@ module Hyrax::Migrator::Services
       @config = migrator_config
     end
 
-    def crosswalk
+    def get_set_ids
       result = {}
       result[:admin_set_id] = admin_set(@work.env[:crosswalk_metadata])
       result[:collection_ids] = coll_ids(@work.env[:crosswalk_metadata])

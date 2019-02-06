@@ -73,7 +73,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     end
   end
 
-  describe 'crosswalk' do
+  describe 'get_set_ids' do
     context 'when called' do
       before do
         work.env[:crosswalk_metadata] = crosswalk_metadata
