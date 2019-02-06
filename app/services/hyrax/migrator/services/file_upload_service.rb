@@ -1,10 +1,10 @@
-require 'aws-sdk-s3'  # v2: require 'aws-sdk'
+require 'aws-sdk-s3'
 module Hyrax
   module Migrator::Services
     class FileUploadService
       attr_reader :data_dir, :work_file_path, :file_system_path,
                   :aws_s3_app_key, :aws_s3_app_secret,
-                  :aws_s3_bucket, :aws_s3_region,
+                  :aws_s3_bucket, :aws_s3_region, :upload_storage_service
 
       CONTENT_FILE = '_content'
       AWS_S3_PRESIGNED_GET_URL_VALID = 3600
@@ -12,6 +12,7 @@ module Hyrax
       # @param config [Hyrax::Migrator::Configuration]
       def initialize(work_file_path, migrator_config)
         @data_dir = File.join(work_file_path, 'data')
+        @upload_storage_service = migrator_config.upload_storage_service
         @file_system_path = migrator_config.file_system_path
         @aws_s3_app_key = migrator_config.aws_s3_app_key
         @aws_s3_app_secret = migrator_config.aws_s3_app_secret
@@ -20,24 +21,17 @@ module Hyrax
       end
 
       def upload_file_content
-        # TODO: upload file content to proper storage place
-        # 1. get source path of bag data: 
-        # @data_dir
-
-        # 2. get destination path: 
-        # @file_system_path (dev env)
-
-        # 3. retrieve content from bag:
-        # content_file
-
-        # 4. upload content
-        # upload_to_file_system (dev)
-        # upload_to_s3 (staging, prod)
-
-        false
+        if @upload_storage_service == :aws_s3
+          upload_to_s3
+        elsif @upload_storage_service == :file_system
+          upload_to_file_system
+        end
       end
 
       def upload_to_file_system
+        name = File.basename(content_file)
+        dest_name = File.join(file_system_path, name)
+        IO.copy_stream(content_file, dest_name)
       end
 
       def upload_to_s3
