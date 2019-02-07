@@ -25,6 +25,7 @@ module Hyrax
         @aws_s3_bucket = migrator_config.aws_s3_bucket
         @aws_s3_region = migrator_config.aws_s3_region
         @aws_s3_url_availability = migrator_config.aws_s3_url_availability
+        @logger = Logger.new(STDERR)
       end
 
       # @param work_file_path [String]
@@ -45,6 +46,8 @@ module Hyrax
         raise StandardError, "Expected #{File.size(dest_file)} bytes but got #{bytes_copied}" unless File.size(dest_file) == bytes_copied
 
         dest_file
+      rescue StandardError => e
+        @logger.error("FileUploadService upload_to_file_system error: #{e.message} : #{e.backtrace}")
       end
 
       def make_path_for(file)
@@ -57,6 +60,8 @@ module Hyrax
         return nil unless obj.upload_file(content_file)
 
         obj.presigned_url(:get, expires_in: aws_s3_url_availability)
+      rescue StandardError => e
+        @logger.error("FileUploadService upload_to_s3 error: #{e.message} : #{e.backtrace}")
       end
 
       def aws_s3_resource

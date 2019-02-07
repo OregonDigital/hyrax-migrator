@@ -38,7 +38,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       end
 
       it 'raises file not found error' do
-        expect { service.upload_file_content }.to raise_error(StandardError, "could not find a content file in #{work.file_path}/data")
+        expect { service.send(:content_file) }.to raise_error(StandardError, "could not find a content file in #{work.file_path}/data")
       end
     end
 
@@ -50,7 +50,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       end
 
       it 'raises data directory not found' do
-        expect { service.upload_file_content }.to raise_error(StandardError, "data directory #{work.file_path}/data not found")
+        expect { service.send(:content_file) }.to raise_error(StandardError, "data directory #{work.file_path}/data not found")
       end
     end
   end
@@ -80,7 +80,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       let(:work_file_path) { 'invalid' }
 
       it 'raises data directory not found' do
-        expect { service.upload_file_content }.to raise_error(StandardError, "data directory #{work.file_path}/data not found")
+        expect { service.send(:content_file) }.to raise_error(StandardError, "data directory #{work.file_path}/data not found")
       end
     end
   end
