@@ -1,13 +1,18 @@
+# frozen_string_literal:true
+
 require 'aws-sdk-s3'
+
 module Hyrax
   module Migrator::Services
+    # Service used to upload a given content file to s3 or the file system
     class FileUploadService
       attr_reader :data_dir, :work_file_path, :file_system_path,
                   :aws_s3_app_key, :aws_s3_app_secret,
                   :aws_s3_bucket, :aws_s3_region, :upload_storage_service
 
       CONTENT_FILE = '_content'
-      AWS_S3_PRESIGNED_GET_URL_VALID = 3600
+      AWS_S3_SIGNED_URL_EXPIRES_IN = 3600
+
       # @param work_file_path [String]
       # @param config [Hyrax::Migrator::Configuration]
       def initialize(work_file_path, migrator_config)
@@ -20,6 +25,8 @@ module Hyrax
         @aws_s3_region = migrator_config.aws_s3_region
       end
 
+      # @param work_file_path [String]
+      # @param config [Hyrax::Migrator::Configuration]
       def upload_file_content
         if @upload_storage_service == :aws_s3
           upload_to_s3
@@ -28,21 +35,23 @@ module Hyrax
         end
       end
 
+      private
+
       def upload_to_file_system
         name = File.basename(content_file)
-        dest_name = File.join(file_system_path, name)
-        IO.copy_stream(content_file, dest_name)
+        dest_file = File.join(file_system_path, name)
+        bytes_copied = IO.copy_stream(content_file, dest_file)
+        raise StandardError, "Expected #{File.size(dest_file)} bytes but got #{bytes_copied}" unless File.size(dest_file) == bytes_copied
+
+        dest_file
       end
 
       def upload_to_s3
-        # Get just the file name
         name = File.basename(content_file)
-        # Create the object to upload
         obj = aws_s3_resource.bucket(@aws_s3_bucket).object(name)
-        # Upload it      
         return nil unless obj.upload_file(content_file)
-        # if upload is successful, return presigned url available for 1 hour
-        obj.presigned_url(:get, expires_in: AWS_S3_PRESIGNED_GET_URL_VALID)
+
+        obj.presigned_url(:get, expires_in: AWS_S3_SIGNED_URL_EXPIRES_IN)
       end
 
       def aws_s3_resource
@@ -52,7 +61,7 @@ module Hyrax
       def aws_s3_client
         Aws::S3::Client.new(
           region: aws_s3_region,
-          credentials: aws_s3_credentials,
+          credentials: aws_s3_credentials
         )
       end
 
@@ -64,6 +73,7 @@ module Hyrax
         files = Dir.entries(@data_dir)
         file = files.find { |f| f.downcase.include?(CONTENT_FILE) }
         raise StandardError, "could not find a content file in #{@data_dir}" unless file
+
         File.join(@data_dir, file)
       rescue Errno::ENOENT
         raise StandardError, "data directory #{@data_dir} not found"

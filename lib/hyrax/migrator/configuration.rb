@@ -18,16 +18,16 @@ module Hyrax::Migrator
       @registered_models
     end
 
-    attr_writer :upload_storage_service 
+    attr_writer :upload_storage_service
     def upload_storage_service
       @upload_storage_service ||= if Rails.env.staging? || Rails.env.production?
-                             :aws_s3
-                           else
-                             :file_system
-                           end
+                                    :aws_s3
+                                  else
+                                    :file_system
+                                  end
     end
 
-    attr_writer :file_system_path 
+    attr_writer :file_system_path
     def file_system_path
       @file_system_path ||= ENV['BROWSEEVERYTHING_FILESYSTEM_PATH']
     end
