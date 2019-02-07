@@ -1,6 +1,7 @@
 # frozen_string_literal:true
 
 require 'aws-sdk-s3'
+require "fileutils"
 
 module Hyrax
   module Migrator::Services
@@ -38,12 +39,15 @@ module Hyrax
       private
 
       def upload_to_file_system
-        name = File.basename(content_file)
-        dest_file = File.join(file_system_path, name)
-        bytes_copied = IO.copy_stream(content_file, dest_file)
+        dest_file = File.join(file_system_path, File.basename(content_file))
+        bytes_copied = IO.copy_stream(content_file, make_path_for(dest_file))
         raise StandardError, "Expected #{File.size(dest_file)} bytes but got #{bytes_copied}" unless File.size(dest_file) == bytes_copied
 
         dest_file
+      end
+
+      def make_path_for(file)
+        file.tap { |path| FileUtils.mkdir_p File.dirname(path) }
       end
 
       def upload_to_s3
