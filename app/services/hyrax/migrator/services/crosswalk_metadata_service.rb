@@ -1,6 +1,7 @@
 # frozen_string_literal:true
 
 require 'rdf'
+require 'rdf/ntriples'
 
 module Hyrax::Migrator::Services
   # Called by the CrosswalkMetadataActor to map OD1 metadata to OD2
