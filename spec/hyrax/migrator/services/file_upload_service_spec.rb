@@ -7,9 +7,10 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
   let(:service) { described_class.new(work.file_path, config) }
   let(:pid) { '3t945r08v' }
   let(:basename_content_file) { "#{pid}_content.jpeg" }
+  let(:filesystem_path) { File.join(Rails.root, 'tmp') }
 
   before do
-    config.file_system_path = '/'
+    config.file_system_path = filesystem_path
     config.aws_s3_app_key = 'test'
     config.aws_s3_app_secret = 'test'
     config.aws_s3_bucket = 'my-bucket'
