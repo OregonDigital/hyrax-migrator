@@ -19,6 +19,9 @@ Hyrax::Migrator.config do |config|
   # config.register_model ::Models::Image
   config.register_model String
 
+  # Migration user
+  config.migration_user = 'admin@example.org'
+
   # The model crosswalk used by ModelLookupService
   config.model_crosswalk = File.join(Rails.root, '../fixtures/model_crosswalk.yml')
 
