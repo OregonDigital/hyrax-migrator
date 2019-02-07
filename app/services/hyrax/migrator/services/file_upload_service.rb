@@ -1,7 +1,7 @@
 # frozen_string_literal:true
 
 require 'aws-sdk-s3'
-require "fileutils"
+require 'fileutils'
 
 module Hyrax
   module Migrator::Services
