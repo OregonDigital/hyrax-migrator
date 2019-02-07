@@ -9,10 +9,10 @@ module Hyrax
     class FileUploadService
       attr_reader :data_dir, :work_file_path, :file_system_path,
                   :aws_s3_app_key, :aws_s3_app_secret,
-                  :aws_s3_bucket, :aws_s3_region, :upload_storage_service
+                  :aws_s3_bucket, :aws_s3_region, :upload_storage_service,
+                  :aws_s3_url_availability
 
       CONTENT_FILE = '_content'
-      AWS_S3_SIGNED_URL_EXPIRES_IN = 3600
 
       # @param work_file_path [String]
       # @param config [Hyrax::Migrator::Configuration]
@@ -24,6 +24,7 @@ module Hyrax
         @aws_s3_app_secret = migrator_config.aws_s3_app_secret
         @aws_s3_bucket = migrator_config.aws_s3_bucket
         @aws_s3_region = migrator_config.aws_s3_region
+        @aws_s3_url_availability = migrator_config.aws_s3_url_availability
       end
 
       # @param work_file_path [String]
@@ -55,7 +56,7 @@ module Hyrax
         obj = aws_s3_resource.bucket(@aws_s3_bucket).object(name)
         return nil unless obj.upload_file(content_file)
 
-        obj.presigned_url(:get, expires_in: AWS_S3_SIGNED_URL_EXPIRES_IN)
+        obj.presigned_url(:get, expires_in: aws_s3_url_availability)
       end
 
       def aws_s3_resource

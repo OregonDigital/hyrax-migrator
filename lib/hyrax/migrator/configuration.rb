@@ -52,6 +52,12 @@ module Hyrax::Migrator
       @aws_s3_region ||= ENV['AWS_S3_REGION']
     end
 
+    # The time a presigned_url is available after the upload in seconds (defaults to 24 hours).
+    attr_writer :aws_s3_url_availability
+    def aws_s3_url_availability
+      @aws_s3_url_availability ||= 86_400
+    end
+
     # The path to automatically mount the migrator engine to, or setting to false will prevent automatic mounting.
     attr_writer :mount_at
     def mount_at

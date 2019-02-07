@@ -9,11 +9,12 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
   let(:basename_content_file) { "#{pid}_content.jpeg" }
 
   before do
-    config.file_system_path = '/data/tmp'
+    config.file_system_path = '/'
     config.aws_s3_app_key = 'test'
     config.aws_s3_app_secret = 'test'
     config.aws_s3_bucket = 'my-bucket'
     config.aws_s3_region = 'test'
+    config.aws_s3_url_availability = 86_400
   end
 
   describe '#upload_file_content' do
@@ -61,7 +62,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
         'get_object',
         bucket: config.aws_s3_bucket,
         key: basename_content_file,
-        expires_in: described_class::AWS_S3_SIGNED_URL_EXPIRES_IN
+        expires_in: config.aws_s3_url_availability
       ).and_return(aws_signed_url)
       allow(Aws::S3::Presigner).to receive(:new).with(client: s3_client).and_return(presigner)
     end
