@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'coveralls', '~> 0.8'
   s.add_development_dependency 'factory_bot_rails'
   s.add_development_dependency 'nokogiri'
+  s.add_development_dependency 'pry-byebug'
   s.add_development_dependency 'puma'
   s.add_development_dependency 'rspec-rails', '~> 3.8'
   s.add_development_dependency 'rspec_junit_formatter'

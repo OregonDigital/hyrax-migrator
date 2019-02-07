@@ -54,5 +54,12 @@ module Hyrax::Migrator
     def model_crosswalk
       @model_crosswalk ||= ''
     end
+
+    # The users email address who would be shown as having been the depositor of the
+    # works being migrated.
+    attr_writer :migration_user
+    def migration_user
+      @migration_user ||= nil
+    end
   end
 end
