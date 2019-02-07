@@ -10,12 +10,12 @@ module Hyrax::Migrator::Services
     end
 
     ##
-    # Initialize the model, set its attributes, and save it
+    # Pass the user, model, and attributes to the Hyrax integration class
+    # to cause it to persist the work.
     #
-    # returns [Boolean] true if the model saved, false if it failed
+    # returns [Boolean] true if the works saved, false if it failed
     def persist_work
-      model.attributes = attributes
-      model.save
+      actor_stack.create
     rescue StandardError => e
       message = "failed persisting work #{@work.pid}, #{e.message}"
       Rails.logger.error message
@@ -24,11 +24,13 @@ module Hyrax::Migrator::Services
 
     private
 
-    # :nocov:
-    def model
-      @model ||= @work.env[:model].constantize.new
+    def actor_stack
+      @actor_stack ||= Hyrax::Migrator::HyraxCore::ActorStack.new(
+        migration_user: @config.migration_user,
+        model: @work.env[:model],
+        attributes: attributes
+      )
     end
-    # :nocov:
 
     def attributes
       @work.env[:attributes].merge(id: @work.pid)

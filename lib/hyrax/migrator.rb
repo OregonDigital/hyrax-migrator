@@ -7,6 +7,7 @@ require 'haml'
 require 'sidekiq'
 require 'hyrax/migrator/engine' if defined?(Rails)
 require 'hyrax/migrator/middleware'
+require 'hyrax/migrator/hyrax_core/actor_stack'
 
 module Hyrax
   ##

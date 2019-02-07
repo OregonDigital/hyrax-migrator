@@ -7,6 +7,6 @@ FactoryBot.define do
     aasm_state { 'state' }
     status_message { 'Migrated!' }
     status { 'succeeded' }
-    env { { key: 'value', another_key: 'value' } }
+    env { { attributes: { title: 'title' }, model: 'String' } }
   end
 end
