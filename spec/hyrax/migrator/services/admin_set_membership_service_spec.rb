@@ -79,7 +79,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
       it 'returns a hash with two members' do
         response = service.acquire_set_ids
-        expect(response.size).to eq 2
+        expect(response.keys).to eq %w[admin_set_id member_of_collections_attributes]
       end
     end
   end
