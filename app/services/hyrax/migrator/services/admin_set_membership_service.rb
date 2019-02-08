@@ -10,10 +10,10 @@ module Hyrax::Migrator::Services
       @config = migrator_config
     end
 
-    def get_set_ids
+    def acquire_set_ids
       result = {}
       result[:admin_set_id] = admin_set(@work.env[:crosswalk_metadata])
-      result[:collection_ids] = coll_ids(@work.env[:crosswalk_metadata])
+      result[:member_of_collections_attributes] = coll_ids(@work.env[:crosswalk_metadata])
       result
     end
 
@@ -30,11 +30,11 @@ module Hyrax::Migrator::Services
     end
 
     def coll_ids(metadata)
-      result = []
+      result = {}
       return result if metadata[:set].blank?
 
-      metadata[:set].each do |s|
-        result << strip_id(s)
+      metadata[:set].each_with_index do |s, index|
+        result[index.to_s] = { 'id' => strip_id(s) }
       end
       result
     end

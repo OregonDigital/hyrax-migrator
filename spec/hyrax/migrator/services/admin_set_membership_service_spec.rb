@@ -17,9 +17,6 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(work, config) }
 
-  before do
-  end
-
   describe 'admin_set' do
     context 'when a primarySet exists' do
       it 'uses the primarySet' do
@@ -36,14 +33,16 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
   describe 'coll_ids' do
     context 'when given one or more colls' do
-      it 'returns an array of the ids' do
-        expect(service.send(:coll_ids, crosswalk_metadata)).to eq(['little-dogs', 'heavy-rocks'])
+      let(:result) { { '0' => { 'id' => 'little-dogs' }, '1' => { 'id' => 'heavy-rocks' } } }
+
+      it 'returns an hash of the ids' do
+        expect(service.send(:coll_ids, crosswalk_metadata)).to eq(result)
       end
     end
 
     context 'when there are no colls' do
-      it 'returns an empty array' do
-        expect(service.send(:coll_ids, crosswalk_metadata.except(:set))).to eq []
+      it 'returns an empty hash' do
+        expect(service.send(:coll_ids, crosswalk_metadata.except(:set))).to eq({})
       end
     end
   end
@@ -72,14 +71,14 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     end
   end
 
-  describe 'get_set_ids' do
+  describe 'acquire_set_ids' do
     context 'when called' do
       before do
         work.env[:crosswalk_metadata] = crosswalk_metadata
       end
 
       it 'returns a hash with two members' do
-        response = service.crosswalk
+        response = service.acquire_set_ids
         expect(response.size).to eq 2
       end
     end
