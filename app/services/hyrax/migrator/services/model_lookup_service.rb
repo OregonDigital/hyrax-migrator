@@ -65,7 +65,7 @@ module Hyrax::Migrator::Services
       raise StandardError, "could not find a configuration for #{node_value} in #{@config.model_crosswalk}" unless model
 
       message = "#{model} not a registered model in the migrator initializer"
-      raise StandardError, message unless @config.models.include?(model)
+      raise StandardError, message unless @config.models.map(&:to_s).include?(model)
 
       model
     end
