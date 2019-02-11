@@ -70,7 +70,7 @@ module Hyrax::Migrator::Services
     def process(data, object)
       return object.to_s if data[:function].blank?
 
-      data[:function].include?('lambda') ? eval(data[:function]).call(object) : send(data[:function].to_sym, object)
+      data[:function].include?('lambda') ? class_eval(data[:function]).call(object) : send(data[:function].to_sym, object)
     end
 
     # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
