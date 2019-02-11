@@ -51,7 +51,7 @@ module Hyrax::Migrator
       end
 
       def actor_environment
-        @actor_environment = Hyrax::Actors::Environment.new(curation_concern, current_ability, attributes)
+        @actor_environment = Hyrax::Actors::Environment.new(curation_concern, current_ability, @attributes)
       end
 
       def curation_concern
@@ -60,7 +60,7 @@ module Hyrax::Migrator
       end
 
       def current_ability
-        @current_ability = ::User.where(email: migration_user).first.ability
+        @current_ability = ::User.where(email: @migration_user).first.ability
       end
       # :nocov:
     end
