@@ -28,6 +28,9 @@ Hyrax::Migrator.config do |config|
   # The crosswalk metadata file that lists properties and predicates
   config.crosswalk_metadata_file = File.join(Rails.root, '../fixtures/crosswalk.yml')
 
+  # The crosswalk metadata file that lists properties and predicates
+  config.crosswalk_problems_file = File.join(Rails.root, '../fixtures/crosswalk_problems.yml')
+
   # The service used to upload files ready for migration. It defaults to file_system for test and development. On staging and production, it defaults to aws_s3
   # config.upload_storage_service = if Rails.env.staging? || Rails.env.production?
   #                                   :aws_s3

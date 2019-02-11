@@ -59,7 +59,7 @@ module Hyrax::Migrator::Services
 
     # Given an OD2 predicate, returns associated property data or nil
     def lookup(predicate)
-      hash = crosswalk_hash[:crosswalk]
+      hash = crosswalk_hash
       result = hash.select { |k| k[:predicate].casecmp(predicate).zero? }
       return result.first unless result.empty?
 
@@ -68,12 +68,20 @@ module Hyrax::Migrator::Services
 
     # Given property data and an OD1 object, returns either the object, or a modified object
     def process(data, object)
-      data[:function].blank? ? object : send(data[:function].to_sym, object)
+      data[:function].blank? ? object : eval(data[:function]).call(object)
     end
 
     # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
     def crosswalk_hash
-      @crosswalk_hash ||= YAML.load_file(@config.crosswalk_metadata_file).deep_symbolize_keys
+      @crosswalk_hash ||= @crosswalk_data[:crosswalk] + @crosswalk_probs[:problems]
+    end
+
+    def crosswalk_data
+      @crosswalk_data ||= YAML.load_file(@config.crosswalk_metadata_file).deep_symbolize_keys
+    end
+
+    def crosswalk_probs
+      @crosswalk_probs ||= YAML.load_file(@config.problems_metadata_file).deep_symbolize_keys
     end
 
     # Raise in lookup

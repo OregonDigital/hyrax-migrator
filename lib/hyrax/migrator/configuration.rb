@@ -82,6 +82,12 @@ module Hyrax::Migrator
       @crosswalk_metadata_file ||= ''
     end
 
+    attr_writer :crosswalk_problems_file
+    def crosswalk_problems_file
+      @crosswalk_problems_file ||= ''
+    end
+
+
     # The crosswalk file for looking up a model related to the metadata type URI for a work.
     # The model should match one that is found in the models configuration for this engine.
     #
