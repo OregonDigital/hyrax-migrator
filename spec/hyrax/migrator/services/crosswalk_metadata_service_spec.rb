@@ -17,6 +17,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:pid) { '3t945r08v' }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
+  let(:crosswalk_problems_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_problems.yml') }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(work, config) }
@@ -24,6 +25,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
+    config.crosswalk_problems_file = crosswalk_problems_file
     allow(RDF::Graph).to receive(:load).and_return(graph)
   end
 
@@ -47,26 +49,21 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   describe 'process' do
     context 'when given a property hash that does not contain a function' do
       it 'returns the object' do
-        expect(service.send(:process, data, object)).to eq(object)
+        expect(service.send(:process, data, object)).to eq(object.to_s)
       end
     end
 
     context 'when given a property hash that does have a function' do
       let(:predicate2_str) { 'http://example.org/ns/myFakePred' }
       let(:object2) { RDF::Literal('my little pony') }
-      let(:data2) { { property: 'test', predicate: predicate2_str, function: 'add_foo', multiple: true } }
+      let(:data2) { { property: 'test', predicate: predicate2_str, function: 'lambda {|x| x.to_s+\' foo\'}', multiple: true } }
 
       before do
-        described_class.class_eval do
-          def add_foo(obj)
-            RDF::Literal(obj.to_s + ' foo')
-          end
-        end
         allow(service).to receive(:lookup).and_return(data2)
       end
 
       it 'modifies the object' do
-        expect(service.send(:process, data2, object2)).to eq(RDF::Literal('my little pony foo'))
+        expect(service.send(:process, data2, object2)).to eq('my little pony foo')
       end
     end
   end
@@ -75,7 +72,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     context 'when there is an nt to process' do
       it 'processes the statements and returns a result hash' do
         response = service.crosswalk
-        expect(response[:creator]).to eq([object])
+        expect(response[:creator]).to eq([object.to_s])
       end
     end
   end
