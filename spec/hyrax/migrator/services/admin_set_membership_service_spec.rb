@@ -29,6 +29,12 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
         expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet))).to eq 'University-of-Oregon-State-University'
       end
     end
+
+    context 'when none of the possible set values exist' do
+      it 'uses a default value' do
+        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet, :institution))).to eq 'admin/default'
+      end
+    end
   end
 
   describe 'coll_ids' do
