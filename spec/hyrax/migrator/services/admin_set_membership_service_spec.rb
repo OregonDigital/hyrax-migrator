@@ -9,6 +9,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     h[:set] = [RDF::URI('http://oregondigital.org/resource/oregondigital:little-dogs')]
     h[:set] += [RDF::URI('http://oregondigital.org/resource/oregondigital:heavy-rocks')]
     h[:institution] = [RDF::URI('http://dbpedia.org/resource/University-of-Oregon-State-University')]
+    h[:repository] = [RDF::URI('http://dbpedia.org/resource/Hogwarts-Special-Collections-and-Archives')]
     h
   end
   let(:config) { Hyrax::Migrator::Configuration.new }
@@ -30,9 +31,15 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
       end
     end
 
+    context 'when primarySet and institution do not exist' do
+      it 'uses a fallback value' do
+        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet, :institution))).to eq 'Hogwarts-Special-Collections-and-Archives'
+      end
+    end
+
     context 'when none of the possible set values exist' do
       it 'uses a default value' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet, :institution))).to eq 'admin/default'
+        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet, :institution, :repository))).to eq 'admin/default'
       end
     end
   end
