@@ -1,9 +1,0 @@
-problems:
-  - property: source
-    predicate: http://purl.org/dc/elements/1.1/source
-    multiple: true
-  - predicate: http://opaquenamespace.org/ns/fullText
-    function: "lambda { return nil } "
-  - property: rightsHolder
-    predicate: http://opaquenamespace.org/right/rightsHolder
-    multiple: true

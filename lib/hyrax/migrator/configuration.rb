@@ -82,9 +82,9 @@ module Hyrax::Migrator
       @crosswalk_metadata_file ||= ''
     end
 
-    attr_writer :crosswalk_problems_file
-    def crosswalk_problems_file
-      @crosswalk_problems_file ||= ''
+    attr_writer :crosswalk_overrides_file
+    def crosswalk_overrides_file
+      @crosswalk_overrides_file ||= ''
     end
 
 

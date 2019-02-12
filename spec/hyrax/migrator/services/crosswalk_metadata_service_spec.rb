@@ -5,11 +5,11 @@ require 'rdf'
 RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:graph) do
     g = RDF::Graph.new
-    s = RDF::Statement.new(RDF::URI(subject), RDF::URI(predicate), RDF::URI(object))
+    s = RDF::Statement.new(RDF::URI(rdfsubject), RDF::URI(predicate), RDF::URI(object))
     g << s
     g
   end
-  let(:subject) { RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234') }
+  let(:rdfsubject) { RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234') }
   let(:predicate_str) { 'http://purl.org/dc/elements/1.1/creator' }
   let(:predicate) { RDF::URI(predicate_str) }
   let(:object) { RDF::URI('http://id.loc.gov/authorities/names/nr93013379') }
@@ -17,7 +17,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:pid) { '3t945r08v' }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
-  let(:crosswalk_problems_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_problems.yml') }
+  let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(work, config) }
@@ -25,7 +25,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
-    config.crosswalk_problems_file = crosswalk_problems_file
+    config.crosswalk_overrides_file = crosswalk_overrides_file
     allow(RDF::Graph).to receive(:load).and_return(graph)
   end
 
@@ -54,16 +54,12 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     end
 
     context 'when given a property hash that does have a function' do
-      let(:predicate2_str) { 'http://example.org/ns/myFakePred' }
+      let(:predicate2_str) { 'http://opaquenamespace.org/ns/fullText' }
       let(:object2) { RDF::Literal('my little pony') }
-      let(:data2) { { property: 'test', predicate: predicate2_str, function: 'lambda {|x| x.to_s+\' foo\'}', multiple: true } }
-
-      before do
-        allow(service).to receive(:lookup).and_return(data2)
-      end
+      let(:data2) { { property: 'test', predicate: predicate2_str, function: 'return_nil', multiple: true } }
 
       it 'modifies the object' do
-        expect(service.send(:process, data2, object2)).to eq('my little pony foo')
+        expect(service.send(:process, data2, object2)).to eq(nil)
       end
     end
   end
@@ -73,6 +69,20 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       it 'processes the statements and returns a result hash' do
         response = service.crosswalk
         expect(response[:creator]).to eq([object.to_s])
+      end
+    end
+
+    context 'when processing uses the nil function' do
+      let(:predicate2) { RDF::URI('http://opaquenamespace.org/ns/fullText') }
+      let(:object2) { RDF::Literal('my little pony') }
+
+      before do
+        graph << RDF::Statement(rdfsubject, predicate2, object2)
+      end
+
+      it 'keeps calm and carries on' do
+        response = service.crosswalk
+        expect(response.keys).to eq([:creator])
       end
     end
   end

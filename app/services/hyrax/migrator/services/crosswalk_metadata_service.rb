@@ -68,25 +68,23 @@ module Hyrax::Migrator::Services
 
     # Given property data and an OD1 object, returns either the object, or a modified object
     def process(data, object)
-      return object.to_s if data[:function].blank?
-
-      data[:function].include?('lambda') ? class_eval(data[:function]).call(object) : send(data[:function].to_sym, object)
+      data[:function].blank? ? object.to_s : send(data[:function].to_sym, object)
     end
 
     # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
     def crosswalk_hash
-      @crosswalk_hash ||= crosswalk_data[:crosswalk] + crosswalk_probs[:problems]
+      @crosswalk_hash ||= crosswalk_data[:crosswalk] + crosswalk_overrides[:overrides]
     end
 
     def crosswalk_data
       @crosswalk_data ||= YAML.load_file(@config.crosswalk_metadata_file).deep_symbolize_keys
     end
 
-    def crosswalk_probs
-      @crosswalk_probs ||= YAML.load_file(@config.crosswalk_problems_file).deep_symbolize_keys
+    def crosswalk_overrides
+      @crosswalk_overrides ||= YAML.load_file(@config.crosswalk_overrides_file).deep_symbolize_keys
     end
 
-    def return_nil
+    def return_nil(_object)
       nil
     end
 
