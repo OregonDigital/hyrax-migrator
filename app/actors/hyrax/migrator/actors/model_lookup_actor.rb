@@ -40,7 +40,7 @@ module Hyrax::Migrator::Actors
 
     #:nocov:
     def service
-      @service ||= ModelLookupService.new(@work, config)
+      @service ||= Hyrax::Migrator::Services::ModelLookupService.new(@work, config)
     end
     #:nocov:
 
