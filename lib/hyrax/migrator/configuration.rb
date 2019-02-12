@@ -87,7 +87,6 @@ module Hyrax::Migrator
       @crosswalk_overrides_file ||= ''
     end
 
-
     # The crosswalk file for looking up a model related to the metadata type URI for a work.
     # The model should match one that is found in the models configuration for this engine.
     #
