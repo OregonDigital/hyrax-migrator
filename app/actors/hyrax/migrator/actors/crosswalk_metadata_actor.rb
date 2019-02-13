@@ -41,7 +41,7 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      @work.env[:crosswalk_metadata] = @hash
+      @work.env[:attributes] = @hash
       update_work
       call_next_actor
     end
