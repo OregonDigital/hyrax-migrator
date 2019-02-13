@@ -14,7 +14,13 @@ module Hyrax
         def actor_stack
           # TODO: Replace this with a valid default stack of actors for
           # processing a work through migration.
-          @actor_stack ||= []
+          @actor_stack ||= [
+            Hyrax::Migrator::Actors::BagValidatorActor,
+            Hyrax::Migrator::Actors::CrosswalkMetadataActor,
+            Hyrax::Migrator::Actors::ModelLookupActor,
+            Hyrax::Migrator::Actors::PersistWorkActor,
+            Hyrax::Migrator::Actors::TerminalActor
+          ]
         end
       end
     end
