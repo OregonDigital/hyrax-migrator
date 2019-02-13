@@ -5,7 +5,12 @@ module Hyrax
     module Actors
       # Like Hyrax::Actors::Terminator, place last in actor stack.
       class TerminalActor
-        def create(_work)
+        def create(work)
+          work.remove_temp_directory
+          true
+        end
+
+        def next_actor
           true
         end
       end

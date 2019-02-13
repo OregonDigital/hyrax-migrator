@@ -26,7 +26,7 @@ module Hyrax::Migrator::Actors
     def create(work)
       super
       persist_work_initial
-      update_work
+      update_work(aasm.current_state)
       service.persist_work ? persist_work_succeeded : persist_work_failed
     rescue StandardError => e
       persist_work_failed
@@ -42,21 +42,11 @@ module Hyrax::Migrator::Actors
     #:nocov:
 
     def post_fail
-      @work.status_message = "Work #{work.pid} failed publishing to the repository."
-      @work.status = Hyrax::Migrator::Work::FAIL
-      update_work
+      failed(aasm.current_state, "Work #{@work.pid} failed publishing to the repository.", Hyrax::Migrator::Work::FAIL)
     end
 
     def post_success
-      @work.status_message = "Work #{work.pid} published to the repository."
-      @work.status = Hyrax::Migrator::Work::SUCCESS
-      update_work
-      call_next_actor
-    end
-
-    def update_work
-      @work.aasm_state = aasm.current_state
-      @work.save
+      succeeded(aasm.current_state, "Work #{@work.pid} published to the repository.", Hyrax::Migrator::Work::SUCCESS)
     end
   end
 end
