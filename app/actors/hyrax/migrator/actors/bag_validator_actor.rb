@@ -28,8 +28,8 @@ module Hyrax::Migrator::Actors
     def create(work)
       super
       bag_validator_initial
-      update_work
-      bag = BagIt::Bag.new @work.file_path
+      update_work(aasm.current_state)
+      bag = BagIt::Bag.new @work.working_directory
       bag.valid? ? bag_validator_succeeded : bag_validator_failed
     rescue StandardError => e
       log("failed bag validation: #{e.message}")
@@ -38,17 +38,11 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      update_work
-      call_next_actor
+      succeeded(aasm.current_state, "Work #{@work.pid} Bag valid.", Hyrax::Migrator::Work::SUCCESS)
     end
 
     def post_fail
-      update_work
-    end
-
-    def update_work
-      @work.aasm_state = aasm.current_state
-      @work.save
+      failed(aasm.current_state, "Work #{@work.pid} Bag invalid.", Hyrax::Migrator::Work::FAIL)
     end
   end
 end

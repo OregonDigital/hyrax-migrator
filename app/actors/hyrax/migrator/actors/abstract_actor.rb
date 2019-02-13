@@ -43,5 +43,21 @@ module Hyrax::Migrator::Actors
     def log(message)
       Rails.logger.warn "#{@work.pid} #{message}"
     end
+
+    def failed(aasm_state, message, status)
+      update_work(aasm_state, message, status)
+    end
+
+    def succeeded(aasm_state, message, status)
+      update_work(aasm_state, message, status)
+      call_next_actor
+    end
+
+    def update_work(aasm_state, message = nil, status = nil)
+      @work.status_message = message
+      @work.status = status
+      @work.aasm_state = aasm_state
+      @work.save
+    end
   end
 end
