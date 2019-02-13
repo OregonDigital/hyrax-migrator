@@ -21,12 +21,44 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(work, config) }
-  let(:result_hash) { { creator: object } }
+  let(:result_hash) { { creator: [object.to_s] } }
+  let(:predicate2_str) { 'http://opaquenamespace.org/ns/fullText' }
+  let(:object2) { RDF::Literal('my little pony') }
+  let(:data2) { { predicate: predicate2_str, function: 'return_nil' } }
+  let(:predicate2) { RDF::URI(predicate2_str) }
 
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
     config.crosswalk_overrides_file = crosswalk_overrides_file
     allow(RDF::Graph).to receive(:load).and_return(graph)
+  end
+
+  describe 'nt_file' do
+    context 'when there is a file with a valid path' do
+      it 'finds the file' do
+        expect(service.send(:nt_file)).to eq("#{file_path}/data/#{pid}_descMetadata.nt")
+      end
+    end
+  end
+
+  describe 'assemble_hash' do
+    context 'when given a property and an object' do
+      it 'adds the property and object to the result' do
+        service.send(:assemble_hash, data, object.to_s)
+        expect(service.instance_variable_get(:@result)).to eq(result_hash)
+      end
+    end
+  end
+
+  describe 'crosswalk_hash' do
+    context 'when the lookup files exist' do
+      it 'loads the OD2 properties into an array of hashes' do
+        expect(service.send(:crosswalk_hash)).to include(data)
+      end
+      it 'loads the override predicates into the array of hashes' do
+        expect(service.send(:crosswalk_hash)).to include(data2)
+      end
+    end
   end
 
   describe 'lookup' do
@@ -54,10 +86,6 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     end
 
     context 'when given a property hash that does have a function' do
-      let(:predicate2_str) { 'http://opaquenamespace.org/ns/fullText' }
-      let(:object2) { RDF::Literal('my little pony') }
-      let(:data2) { { property: 'test', predicate: predicate2_str, function: 'return_nil', multiple: true } }
-
       it 'modifies the object' do
         expect(service.send(:process, data2, object2)).to eq(nil)
       end
@@ -73,9 +101,6 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     end
 
     context 'when processing uses the nil function' do
-      let(:predicate2) { RDF::URI('http://opaquenamespace.org/ns/fullText') }
-      let(:object2) { RDF::Literal('my little pony') }
-
       before do
         graph << RDF::Statement(rdfsubject, predicate2, object2)
       end

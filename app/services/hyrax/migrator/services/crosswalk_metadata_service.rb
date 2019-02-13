@@ -68,7 +68,7 @@ module Hyrax::Migrator::Services
 
     # Given property data and an OD1 object, returns either the object, or a modified object
     def process(data, object)
-      data[:function].blank? ? object.to_s : send(data[:function].to_sym, object)
+      data[:function].blank? ? object.to_s : send(data[:function].to_sym, object.to_s)
     end
 
     # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
