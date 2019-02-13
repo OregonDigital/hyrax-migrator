@@ -12,8 +12,8 @@ module Hyrax::Migrator::Services
 
     def acquire_set_ids
       result = {}
-      result['admin_set_id'] = admin_set(@work.env[:crosswalk_metadata])
-      result['member_of_collections_attributes'] = coll_ids(@work.env[:crosswalk_metadata])
+      result['admin_set_id'] = admin_set(@work.env[:attributes])
+      result['member_of_collections_attributes'] = collection_ids(@work.env[:attributes])
       result
     end
 
@@ -29,7 +29,7 @@ module Hyrax::Migrator::Services
       'admin/default'
     end
 
-    def coll_ids(metadata)
+    def collection_ids(metadata)
       result = {}
       return result if metadata[:set].blank?
 

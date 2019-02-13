@@ -44,18 +44,18 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     end
   end
 
-  describe 'coll_ids' do
+  describe 'collection_ids' do
     context 'when given one or more colls' do
       let(:result) { { '0' => { 'id' => 'little-dogs' }, '1' => { 'id' => 'heavy-rocks' } } }
 
       it 'returns an hash of the ids' do
-        expect(service.send(:coll_ids, crosswalk_metadata)).to eq(result)
+        expect(service.send(:collection_ids, crosswalk_metadata)).to eq(result)
       end
     end
 
     context 'when there are no colls' do
       it 'returns an empty hash' do
-        expect(service.send(:coll_ids, crosswalk_metadata.except(:set))).to eq({})
+        expect(service.send(:collection_ids, crosswalk_metadata.except(:set))).to eq({})
       end
     end
   end
