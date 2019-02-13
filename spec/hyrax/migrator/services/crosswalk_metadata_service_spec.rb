@@ -26,6 +26,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:object2) { RDF::Literal('my little pony') }
   let(:data2) { { predicate: predicate2_str, function: 'return_nil' } }
   let(:predicate2) { RDF::URI(predicate2_str) }
+  let(:data3) { { property: 'resource_type', predicate: 'http://my_little_pred', multiple: false } }
 
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
@@ -39,6 +40,18 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
         expect(service.send(:nt_file)).to eq("#{file_path}/data/#{pid}_descMetadata.nt")
       end
     end
+
+    context 'when it cant find the file' do
+      let(:error) { StandardError }
+
+      before do
+        work.file_path = '/some_path'
+      end
+
+      it 'raises an error' do
+        expect { service.send(:nt_file) }.to raise_error(error)
+      end
+    end
   end
 
   describe 'assemble_hash' do
@@ -46,6 +59,13 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       it 'adds the property and object to the result' do
         service.send(:assemble_hash, data, object.to_s)
         expect(service.instance_variable_get(:@result)).to eq(result_hash)
+      end
+    end
+
+    context 'when given a property that takes only single values' do
+      it 'does not put the object in an array' do
+        service.send(:assemble_hash, data3, object2.to_s)
+        expect(service.instance_variable_get(:@result)[:resource_type]).not_to be(Array)
       end
     end
   end
