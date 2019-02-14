@@ -48,33 +48,28 @@ module Hyrax::Migrator::Actors
     end
 
     def post_success
-      # TODO: Refactor url parsing. I'm thinking the logic below would make more sense in the FileUploadService instead
-      parsed_content_file = Addressable::URI.parse(@uploaded_file)
-      if ["http", "https"].include?(parsed_content_file.schema)
-        # TODO: set remote_files attribute
+      if @uploaded_file['url'].present?
+        @work.env[:attributes].merge(remote_files: [@uploaded_file])
       else
-        # set uploaded_files attribute
-        local_file = File.open(@uploaded_file)
-        local_file_uri = URI.join('file:///', @uploaded_file)
-        uploaded = Hyrax::UploadedFile.create(user: config.migration_user, file_set_uri: local_file_uri, file: local_file)
-        @work.env[:attributes].merge(uploaded_files: [uploaded.id])
-        
-        # NOTE: Example test for a local file for reference
-        # f = File.open("/data/tmp/browse-everything/openaccessweekbanner-270.png")
-        # u = ::User.where(email: "gregorio.luisramirez@oregonstate.edu").first
-        # uploaded = Hyrax::UploadedFile.create(user: u, file_set_uri: "file:///data/tmp/browse-everything/openaccessweekbanner-270.png", file: f)
-        # actor_env = Hyrax::Actors::Environment.new(Generic.find("hq37vn56b"), u.ability, {"uploaded_files"=>[uploaded.id]})
-        # Hyrax::CurationConcern.actor.update(actor_env)
+        @work.env[:attributes].merge(uploaded_files: [hyrax_local_file_uploaded.id])
       end
-      
+
       update_work
       call_next_actor
+    end
+
+    def hyrax_local_file_uploaded
+      local_file = File.open(@uploaded_file['local_filename'])
+      Hyrax::UploadedFile.create(user: current_user, file_set_uri: @uploaded_file['local_file_uri'], file: local_file)
+    end
+
+    def current_user
+      @current_user = ::User.where(email: config.migration_user).first
     end
 
     def update_work
       @work.aasm_state = aasm.current_state
       @work.save
     end
-
   end
 end

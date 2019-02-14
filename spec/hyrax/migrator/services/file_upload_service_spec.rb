@@ -21,13 +21,19 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
   describe '#upload_file_content' do
     context 'when upload service is :file_system' do
       let(:dest_filename) { File.join(config.file_system_path, basename_content_file) }
+      let(:dest_filename_obj) do
+        {
+          'local_file_uri' => URI.join('file:///', dest_filename),
+          'local_filename' => '/data/spec/dummy/tmp/3t945r08v_content.jpeg'
+        }
+      end
 
       before do
         config.upload_storage_service = :file_system
       end
 
       it 'returns the destination filename of the content file transfered' do
-        expect(service.upload_file_content).to eq dest_filename
+        expect(service.upload_file_content).to eq dest_filename_obj
       end
     end
 
@@ -70,10 +76,16 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
 
     let(:s3_client) { instance_spy('s3 client') }
     let(:presigner) { instance_spy('s3 presigner') }
-    let(:aws_signed_url) { 'https://www.example.com' }
+    let(:aws_signed_url) { "https://www.example.com/#{basename_content_file}" }
+    let(:remote_file_obj) do
+      {
+        'url' => aws_signed_url,
+        'file_name' => basename_content_file
+      }
+    end
 
     it 'returns the signed_url of the new file' do
-      expect(service.upload_file_content).to eq aws_signed_url
+      expect(service.upload_file_content).to eq remote_file_obj
     end
 
     context 'when content file not found' do
