@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe Hyrax::Migrator::HyraxCore::ActorStack do
-  let(:actor_stack) { described_class.new(migration_user: migration_user, model: model, attributes: attributes) }
-  let(:migration_user) { 'admin@example.org' }
+  let(:actor_stack) { described_class.new(user: user, model: model, attributes: attributes) }
+  let(:user) { double }
   let(:model) { 'String' }
   let(:attributes) { { title: ['Title'] } }
   let(:actor_environment) { double }

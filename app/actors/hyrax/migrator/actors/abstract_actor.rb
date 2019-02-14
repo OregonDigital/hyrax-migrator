@@ -22,6 +22,12 @@ module Hyrax::Migrator::Actors
     attr_accessor :work
 
     ##
+    # The User record from the database (Hyrax) for the 'migration_user' configuration
+    def user
+      @user ||= Hyrax::Migrator::HyraxCore::User.find(config.migration_user)
+    end
+
+    ##
     # Call the next actor, passing the env along for processing
     def call_next_actor
       return true if @next_actor.nil?
@@ -42,6 +48,22 @@ module Hyrax::Migrator::Actors
     # @param message [String]
     def log(message)
       Rails.logger.warn "#{@work.pid} #{message}"
+    end
+
+    def failed(aasm_state, message, status)
+      update_work(aasm_state, message, status)
+    end
+
+    def succeeded(aasm_state, message, status)
+      update_work(aasm_state, message, status)
+      call_next_actor
+    end
+
+    def update_work(aasm_state, message = nil, status = nil)
+      @work.status_message = message
+      @work.status = status
+      @work.aasm_state = aasm_state
+      @work.save
     end
   end
 end
