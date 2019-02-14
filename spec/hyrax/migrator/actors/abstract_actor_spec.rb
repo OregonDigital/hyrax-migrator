@@ -4,9 +4,19 @@ RSpec.describe Hyrax::Migrator::Actors::AbstractActor do
   let(:actor) { described_class.new }
   let(:terminal) { Hyrax::Migrator::Actors::TerminalActor.new }
   let(:work) { create(:work) }
+  let(:fake_user_record) { { email: 'admin@example.org' } }
+
+  before do
+    class User
+      def self.where(_args)
+        [{ email: 'admin@example.org' }]
+      end
+    end
+  end
 
   it { expect(actor.config).to be_a Hyrax::Migrator::Configuration }
   it { expect(actor.next_actor).to be_nil }
+  it { expect(actor.user).to eq fake_user_record }
 
   describe '#call_next_actor' do
     context 'when there is no next actor' do

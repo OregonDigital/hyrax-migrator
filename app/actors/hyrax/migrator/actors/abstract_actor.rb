@@ -22,6 +22,12 @@ module Hyrax::Migrator::Actors
     attr_accessor :work
 
     ##
+    # The User record from the database (Hyrax) for the 'migration_user' configuration
+    def user
+      @user ||= Hyrax::Migrator::HyraxCore::User.find(config.migration_user)
+    end
+
+    ##
     # Call the next actor, passing the env along for processing
     def call_next_actor
       return true if @next_actor.nil?
