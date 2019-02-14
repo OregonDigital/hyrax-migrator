@@ -29,7 +29,7 @@ module Hyrax::Migrator::Actors
       super
       model_lookup_initial
       update_work(aasm.current_state)
-      @work.env[:model] = service.model
+      @model = service.model
       model_lookup_succeeded
     rescue StandardError => e
       model_lookup_failed
@@ -49,6 +49,7 @@ module Hyrax::Migrator::Actors
     end
 
     def post_success
+      @work.env[:model] = @model
       succeeded(aasm.current_state, "Work #{@work.pid} found #{@work.env[:model]} in lookup.", Hyrax::Migrator::Work::SUCCESS)
     end
   end
