@@ -27,13 +27,12 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
 
   before do
     allow(actor).to receive(:config).and_return(config)
+    allow(Hyrax::Migrator::Services::FileUploadService).to receive(:new).and_return(service)
   end
 
   describe '#create' do
     context 'when the content file is successfully uploaded to a remote location' do
       before do
-        allow(actor).to receive(:config).and_return(config)
-        allow(Hyrax::Migrator::Services::FileUploadService).to receive(:new).and_return(service)
         allow(service).to receive(:upload_file_content).and_return(remote_file_hash)
         actor.next_actor = terminal
       end
@@ -50,8 +49,6 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
 
     context 'when the content file is successfully uploaded to the local file system' do
       before do
-        allow(actor).to receive(:config).and_return(config)
-        allow(Hyrax::Migrator::Services::FileUploadService).to receive(:new).and_return(service)
         allow(service).to receive(:upload_file_content).and_return(local_file_hash)
         allow(actor).to receive(:hyrax_local_file_uploaded).and_return(hyrax_uploaded_file)
         actor.next_actor = terminal
@@ -71,8 +68,6 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
       let(:error) { StandardError }
 
       before do
-        allow(actor).to receive(:config).and_return(config)
-        allow(Hyrax::Migrator::Services::FileUploadService).to receive(:new).and_return(service)
         allow(service).to receive(:upload_file_content).and_raise(error)
         actor.next_actor = terminal
       end

@@ -24,7 +24,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       let(:dest_filename_obj) do
         {
           'local_file_uri' => URI.join('file:///', dest_filename),
-          'local_filename' => '/data/spec/dummy/tmp/3t945r08v_content.jpeg'
+          'local_filename' => dest_filename
         }
       end
 
