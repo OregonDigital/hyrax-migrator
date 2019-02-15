@@ -1,4 +1,9 @@
+# frozen_string_literal: true
+
 module Hyrax::Migrator
+  # Gives the ability to dynamically create a working directory when the
+  # file_path is pointing at a zip file or an S3 url, otherwise returns
+  # the original directory set in file_path.
   module HasWorkingDirectory
     extend ActiveSupport::Concern
 
