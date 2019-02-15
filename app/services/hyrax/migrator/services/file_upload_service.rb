@@ -41,13 +41,24 @@ module Hyrax
       private
 
       def upload_to_file_system
-        dest_file = File.join(file_system_path, File.basename(content_file))
-        bytes_copied = IO.copy_stream(content_file, make_path_for(dest_file))
-        raise StandardError, "Expected #{File.size(dest_file)} bytes but got #{bytes_copied}" unless File.size(dest_file) == bytes_copied
+        bytes_copied = copy_local_file
+        raise StandardError, "Expected #{File.size(dest_local_file)} bytes, received #{bytes_copied} bytes" unless File.size(dest_local_file) == bytes_copied
 
-        dest_file
+        local_file_obj
       rescue StandardError => e
         @logger.error("FileUploadService upload_to_file_system error: #{e.message} : #{e.backtrace}")
+      end
+
+      def copy_local_file
+        IO.copy_stream(content_file, make_path_for(dest_local_file))
+      end
+
+      def dest_local_file
+        File.join(file_system_path, File.basename(content_file))
+      end
+
+      def local_file_obj
+        { 'local_filename' => dest_local_file, 'local_file_uri' => URI.join('file:///', dest_local_file) }
       end
 
       def make_path_for(file)
@@ -59,9 +70,13 @@ module Hyrax
         obj = aws_s3_resource.bucket(@aws_s3_bucket).object(name)
         return nil unless obj.upload_file(content_file)
 
-        obj.presigned_url(:get, expires_in: aws_s3_url_availability)
+        remote_file_obj(obj, name)
       rescue StandardError => e
         @logger.error("FileUploadService upload_to_s3 error: #{e.message} : #{e.backtrace}")
+      end
+
+      def remote_file_obj(obj, name)
+        { 'url' => obj.presigned_url(:get, expires_in: aws_s3_url_availability), 'file_name' => name }
       end
 
       def aws_s3_resource
