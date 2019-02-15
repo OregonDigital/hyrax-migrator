@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'haml'
   s.add_dependency 'rails', '~> 5.1.6'
   s.add_dependency 'rdf'
+  s.add_dependency 'rubyzip'
   s.add_dependency 'sidekiq'
 
   s.add_development_dependency 'byebug'
