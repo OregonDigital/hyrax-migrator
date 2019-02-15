@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'zip'
+require 'tmpdir'
+require 'fileutils'
+
 module Hyrax::Migrator
   # Gives the ability to dynamically create a working directory when the
   # file_path is pointing at a zip file or an S3 url, otherwise returns
