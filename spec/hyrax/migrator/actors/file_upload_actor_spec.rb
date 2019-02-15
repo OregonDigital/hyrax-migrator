@@ -12,6 +12,8 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
   let(:filesystem_path) { File.join(Rails.root, 'tmp') }
   let(:local_filename) { File.join(filesystem_path, basename_content_file) }
   let(:hyrax_uploaded_file) { instance_double('Hyrax::UploadedFile', id: 0) }
+  let(:current_user) { instance_double('User') }
+  let(:hyrax_core_uploaded_file) { instance_double('Hyrax::Migrator::HyraxCore::UploadedFile') }
   let(:remote_file_hash) do
     {
       'url' => aws_signed_url,
@@ -41,6 +43,10 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
         actor.create(work)
         expect(work.aasm_state).to eq('file_upload_succeeded')
       end
+      it 'sets the remote_files attribute' do
+        actor.create(work)
+        expect(work.env[:attributes][:remote_files]).to eq [remote_file_hash]
+      end
       it 'calls the next actor' do
         expect(terminal).to receive(:create)
         actor.create(work)
@@ -50,13 +56,18 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
     context 'when the content file is successfully uploaded to the local file system' do
       before do
         allow(service).to receive(:upload_file_content).and_return(local_file_hash)
-        allow(actor).to receive(:hyrax_local_file_uploaded).and_return(hyrax_uploaded_file)
+        allow(hyrax_core_uploaded_file).to receive(:create).and_return(hyrax_uploaded_file)
+        allow(actor).to receive(:hyrax_file_uploaded).and_return(hyrax_core_uploaded_file)
         actor.next_actor = terminal
       end
 
       it 'updates the work' do
         actor.create(work)
         expect(work.aasm_state).to eq('file_upload_succeeded')
+      end
+      it 'sets the uploaded_files attribute' do
+        actor.create(work)
+        expect(work.env[:attributes][:uploaded_files]).to eq [hyrax_uploaded_file.id]
       end
       it 'calls the next actor' do
         expect(terminal).to receive(:create)

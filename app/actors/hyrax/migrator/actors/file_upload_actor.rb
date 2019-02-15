@@ -29,7 +29,8 @@ module Hyrax::Migrator::Actors
       file_upload_initial
       update_work
       @uploaded_file = service.upload_file_content
-      @uploaded_file ? file_upload_succeeded : file_upload_failed
+      @handled_uploaded_files = handle_uploaded_file(@uploaded_file)
+      @handled_uploaded_files ? file_upload_succeeded : file_upload_failed
     rescue StandardError => e
       file_upload_failed
       log("failed during file upload: #{e.message}")
@@ -47,22 +48,33 @@ module Hyrax::Migrator::Actors
       update_work
     end
 
+    def handle_uploaded_file(uploaded_file)
+      return [uploaded_file] if uploaded_file['url'].present?
+
+      local_file_uploaded = hyrax_file_uploaded.create
+      [local_file_uploaded.id] if local_file_uploaded
+    end
+
     def post_success
       if @uploaded_file['url'].present?
-        @work.env[:attributes].merge(remote_files: [@uploaded_file])
+        @work.env[:attributes][:remote_files] = @handled_uploaded_files
       else
-        @work.env[:attributes].merge(uploaded_files: [hyrax_local_file_uploaded.id])
+        @work.env[:attributes][:uploaded_files] = @handled_uploaded_files
       end
 
       update_work
       call_next_actor
     end
 
-    def hyrax_local_file_uploaded
-      local_file = File.open(@uploaded_file['local_filename'])
-      Hyrax::UploadedFile.create(user: current_user, file_set_uri: @uploaded_file['local_file_uri'], file: local_file)
+    def hyrax_file_uploaded
+      @hyrax_file_uploaded ||= Hyrax::Migrator::HyraxCore::UploadedFile.new(
+        user: current_user,
+        uploaded_file_uri: @uploaded_file['local_file_uri'],
+        uploaded_filename: @uploaded_file['local_filename']
+      )
     end
 
+    # TODO: move current_user to abstract actor
     def current_user
       @current_user = ::User.where(email: config.migration_user).first
     end
