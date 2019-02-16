@@ -4,9 +4,9 @@ module Hyrax::Migrator::Services
   ##
   # A service to build and persist the model in Hyrax
   class PersistWorkService
-    def initialize(work, migrator_config)
+    def initialize(work, user)
       @work = work
-      @config = migrator_config
+      @user = user
     end
 
     ##
@@ -26,7 +26,7 @@ module Hyrax::Migrator::Services
 
     def actor_stack
       @actor_stack ||= Hyrax::Migrator::HyraxCore::ActorStack.new(
-        migration_user: @config.migration_user,
+        user: @user,
         model: @work.env[:model],
         attributes: attributes
       )

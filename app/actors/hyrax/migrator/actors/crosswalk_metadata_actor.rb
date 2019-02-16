@@ -29,10 +29,10 @@ module Hyrax::Migrator::Actors
     def create(work)
       super
       crosswalk_metadata_initial
-      update_work
+      update_work(aasm.current_state)
       cms = Hyrax::Migrator::Services::CrosswalkMetadataService.new(work, config)
-      @hash = cms.crosswalk
-      @hash ? crosswalk_metadata_succeeded : crosswalk_metadata_failed
+      @attributes = cms.crosswalk
+      @attributes ? crosswalk_metadata_succeeded : crosswalk_metadata_failed
     rescue StandardError => e
       crosswalk_metadata_failed
       log("failed crosswalk: #{e.message}")
@@ -41,18 +41,12 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      @work.env[:attributes] = @hash
-      update_work
-      call_next_actor
+      @work.env[:attributes] = @attributes
+      succeeded(aasm.current_state, "Work #{@work.pid} crosswalked metadata.", Hyrax::Migrator::Work::SUCCESS)
     end
 
     def post_fail
-      update_work
-    end
-
-    def update_work
-      @work.aasm_state = aasm.current_state
-      @work.save
+      failed(aasm.current_state, "Work #{@work.pid} crosswalk metadata failed.", Hyrax::Migrator::Work::FAIL)
     end
   end
 end

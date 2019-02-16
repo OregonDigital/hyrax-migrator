@@ -9,13 +9,13 @@ module Hyrax::Migrator
       # persist and process it through ingest.
       #
       # @param [Hash] args :
-      #   migration_user: the email address of the migration user
+      #   user: the migration user
       #   model: the string name of the model being created
       #   attributes: a hash of the migrator Work#env (all migrator processing attributes)
       #
       # @see https://github.com/samvera/hyrax/blob/master/app/actors/hyrax/actors/environment.rb
       def initialize(args)
-        @migration_user = args[:migration_user]
+        @user = args[:user]
         @model = args[:model]
         @attributes = args[:attributes]
       end
@@ -51,16 +51,12 @@ module Hyrax::Migrator
       end
 
       def actor_environment
-        @actor_environment = Hyrax::Actors::Environment.new(curation_concern, current_ability, @attributes)
+        @actor_environment = Hyrax::Actors::Environment.new(curation_concern, @user.ability, @attributes)
       end
 
       def curation_concern
         # TODO: find or .new the model if the attributes have an id?
         @curation_concern ||= @model.constantize.new
-      end
-
-      def current_ability
-        @current_ability = ::User.where(email: @migration_user).first.ability
       end
       # :nocov:
     end
