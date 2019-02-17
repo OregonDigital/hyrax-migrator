@@ -27,7 +27,7 @@ module Hyrax::Migrator::Actors
     def create(work)
       super
       file_upload_initial
-      update_work
+      update_work(aasm.current_state)
       @uploaded_file = service.upload_file_content
       @handled_uploaded_files = handle_uploaded_file(@uploaded_file)
       @handled_uploaded_files ? file_upload_succeeded : file_upload_failed
@@ -40,12 +40,12 @@ module Hyrax::Migrator::Actors
 
     #:nocov:
     def service
-      @service ||= Hyrax::Migrator::Services::FileUploadService.new(@work.file_path, config)
+      @service ||= Hyrax::Migrator::Services::FileUploadService.new(@work.working_directory, config)
     end
     #:nocov:
 
     def post_fail
-      update_work
+      failed(aasm.current_state, "Work #{@work.pid} failed to upload original files.", Hyrax::Migrator::Work::FAIL)
     end
 
     def handle_uploaded_file(uploaded_file)
@@ -61,9 +61,7 @@ module Hyrax::Migrator::Actors
       else
         @work.env[:attributes][:uploaded_files] = @handled_uploaded_files
       end
-
-      update_work
-      call_next_actor
+      succeeded(aasm.current_state, "Work #{@work.pid} uploaded #{@handled_uploaded_files}.", Hyrax::Migrator::Work::SUCCESS)
     end
 
     def hyrax_file_uploaded
@@ -76,12 +74,7 @@ module Hyrax::Migrator::Actors
 
     # TODO: move current_user to abstract actor
     def current_user
-      @current_user = ::User.where(email: config.migration_user).first
-    end
-
-    def update_work
-      @work.aasm_state = aasm.current_state
-      @work.save
+      @current_user = Hyrax::Migrator::HyraxCore::User.find(email: config.migration_user)
     end
   end
 end
