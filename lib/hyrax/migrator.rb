@@ -10,6 +10,7 @@ require 'hyrax/migrator/middleware'
 require 'hyrax/migrator/hyrax_core/actor_stack'
 require 'hyrax/migrator/hyrax_core/user'
 require 'hyrax/migrator/hyrax_core/uploaded_file'
+require 'hyrax/migrator/hyrax_core/user'
 
 module Hyrax
   ##

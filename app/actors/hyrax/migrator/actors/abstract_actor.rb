@@ -51,6 +51,7 @@ module Hyrax::Migrator::Actors
     end
 
     def failed(aasm_state, message, status)
+      @work.remove_temp_directory
       update_work(aasm_state, message, status)
     end
 
