@@ -11,7 +11,7 @@ module Hyrax::Migrator::Services
 
     def initialize(work, migrator_config)
       @work = work
-      @data_dir = File.join(work.file_path, 'data')
+      @data_dir = File.join(work.working_directory, 'data')
       @config = migrator_config
       crosswalk
     end
