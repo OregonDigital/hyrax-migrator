@@ -3,6 +3,7 @@
 require 'zip'
 require 'tmpdir'
 require 'fileutils'
+require 'aws-sdk-s3'
 
 module Hyrax::Migrator
   # Gives the ability to dynamically create a working directory when the
@@ -27,10 +28,19 @@ module Hyrax::Migrator
     private
 
     def build_working_directory
-      # TODO: Consider if file_path could be an S3 url, fetch url before handling it?
-      return extract_zip(self[:file_path], self[:pid]) if %w[zip gz].include?(self[:file_path].split('.').last)
+      return handle_remote_file(self[:file_path], self[:pid]) if remote_file?(self[:file_path])
+
+      return extract_local_zip(self[:file_path], self[:pid]) if zip_file?(self[:file_path])
 
       self[:file_path]
+    end
+
+    def remote_file?(file_path)
+      file_path.downcase.start_with? 'http'
+    end
+
+    def zip_file?(file_path)
+      %w[zip gz].include? file_path.split('.').last
     end
 
     ##
@@ -38,14 +48,81 @@ module Hyrax::Migrator
     # is created but never removed, this is intented so that any actor can get access to the files
     # during processing. Because these processes are running on emphemeral containers, the temp
     # directory cannot be expected to exist between multiple runs (restarting the process).
-    def extract_zip(source_path, pid)
-      destination_path = Dir.mktmpdir([pid, Time.now.to_i.to_s])
+    def extract_local_zip(source_path, pid)
+      destination_path = temporary_directory(pid)
       Zip::File.open(source_path) do |zipfile|
         zipfile.each do |entry|
           entry.extract(File.join(destination_path, entry.to_s))
         end
       end
       destination_path
+    end
+
+    ##
+    # Download the file from the URL to a local path and return that path
+    # unless it is a zip file in which case also extract the zip file.
+    def handle_remote_file(url, pid)
+      local_path = download_remote_file(url, pid)
+      return local_path unless zip_file?(local_path)
+
+      extracted_local_zip = extract_local_zip(local_path, pid)
+      FileUtils.rm_rf(local_path)
+      extracted_local_zip
+    end
+
+    def download_remote_file(url, pid)
+      destination_dir = temporary_directory("#{pid}-download")
+      uri = URI.parse(url)
+      aws_s3_fetch_object(uri, destination_dir)
+    rescue StandardError => e
+      FileUtils.rm_rf(destination_dir)
+      raise e
+    end
+
+    def aws_s3_fetch_object(uri, destination_dir)
+      destination_path = File.join(destination_dir, aws_s3_object_filename(uri))
+      aws_s3_client.get_object(
+        response_target: destination_path,
+        bucket: aws_s3_bucket(uri),
+        key: aws_s3_object_key(uri)
+      )
+      destination_path
+    end
+
+    def aws_s3_client
+      Aws::S3::Client.new(
+        region: Hyrax::Migrator.config.aws_s3_region,
+        credentials: Aws::Credentials.new(Hyrax::Migrator.config.aws_s3_app_key, Hyrax::Migrator.config.aws_s3_app_secret)
+      )
+    end
+
+    ##
+    # Parse the bucket from the supplied URI
+    # uri#path = /bucket/path/to/file.zip
+    # split('/') = ['', 'bucket', 'path', 'to', 'file.zip']
+    def aws_s3_bucket(uri)
+      uri.path.split('/')[1]
+    end
+
+    ##
+    # Parse the key from the supplied URI
+    # uri#path          = /bucket/path/to/file.zip
+    # split('/')        = ['', 'bucket', 'path', 'to', 'file.zip']
+    # [2..-1].join('/') = 'path/to/file.zip'
+    def aws_s3_object_key(uri)
+      uri.path.split('/')[2..-1].join('/')
+    end
+
+    ##
+    # Parse the original filename from the supplied URI
+    # uri#path          = /bucket/path/to/file.zip
+    # split('/')        = ['', 'bucket', 'path', 'to', 'file.zip']
+    def aws_s3_object_filename(uri)
+      uri.path.split('/').last
+    end
+
+    def temporary_directory(prefix)
+      Dir.mktmpdir([prefix, Time.now.to_i.to_s])
     end
   end
 end
