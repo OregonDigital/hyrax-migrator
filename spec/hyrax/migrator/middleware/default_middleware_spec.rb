@@ -9,6 +9,7 @@ RSpec.describe Hyrax::Migrator::Middleware::DefaultMiddleware do
   it { is_expected.to respond_to(:actor_stack) }
   it { expect(middleware.actor_stack).to eq nil }
   it { is_expected.to respond_to(:start) }
+  it { expect(Hyrax::Migrator::Middleware.default.actor_stack.class).to eq Hyrax::Migrator::Actors::BagValidatorActor }
 
   context 'with an array of actors' do
     let(:actors) { [TestActor, TestActor, TerminalTestActor] }
