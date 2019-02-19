@@ -37,7 +37,7 @@ module Hyrax::Migrator::Actors
 
     #:nocov:
     def service
-      @service ||= Hyrax::Migrator::Services::PersistWorkService.new(@work, @user)
+      @service ||= Hyrax::Migrator::Services::PersistWorkService.new(@work, user)
     end
     #:nocov:
 
