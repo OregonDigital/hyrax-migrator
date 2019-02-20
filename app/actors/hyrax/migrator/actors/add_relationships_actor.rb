@@ -21,19 +21,32 @@ module Hyrax::Migrator::Actors
       end
     end
 
+    HAS_CHILD = 'Relationships added.'
+    NO_CHILD = 'No relationships to add.'
+
     ##
     # Use the AddRelationshipsService to create the work in Hyrax.
     def create(work)
       super
-      add_relationships_initial
-      update_work(aasm.current_state)
-      service.add_relationships ? add_relationships_succeeded : add_relationships_failed
+      if work.env[:attributes][:work_members_attributes].blank?
+        @message = NO_CHILD
+        add_relationships_succeeded
+      else
+        call_service
+      end
     rescue StandardError => e
       add_relationships_failed
       log("failed while adding relationships work: #{e.message}")
     end
 
     private
+
+    def call_service
+      @message = HAS_CHILD
+      add_relationships_initial
+      update_work(aasm.current_state)
+      service.add_relationships ? add_relationships_succeeded : add_relationships_failed
+    end
 
     #:nocov:
     def service
@@ -42,11 +55,11 @@ module Hyrax::Migrator::Actors
     #:nocov:
 
     def post_fail
-      failed(aasm.current_state, "Work #{@work.pid} failed adding relationships between parent and children.", Hyrax::Migrator::Work::FAIL)
+      failed(aasm.current_state, "Work #{@work.pid} failed adding relationships.", Hyrax::Migrator::Work::FAIL)
     end
 
     def post_success
-      succeeded(aasm.current_state, "Work #{@work.pid} added relationships between parent and children.", Hyrax::Migrator::Work::SUCCESS)
+      succeeded(aasm.current_state, "Work #{@work.pid} #{@message}", Hyrax::Migrator::Work::SUCCESS)
     end
   end
 end
