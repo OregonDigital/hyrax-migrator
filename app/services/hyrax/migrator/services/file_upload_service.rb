@@ -25,7 +25,6 @@ module Hyrax
         @aws_s3_bucket = migrator_config.aws_s3_bucket
         @aws_s3_region = migrator_config.aws_s3_region
         @aws_s3_url_availability = migrator_config.aws_s3_url_availability
-        @logger = Logger.new(STDERR)
       end
 
       # @param work_file_path [String]
@@ -46,7 +45,7 @@ module Hyrax
 
         local_file_obj
       rescue StandardError => e
-        @logger.error("FileUploadService upload_to_file_system error: #{e.message} : #{e.backtrace}")
+        log_and_raise("FileUploadService upload_to_file_system error: #{e.message} : #{e.backtrace}")
       end
 
       def copy_local_file
@@ -72,7 +71,12 @@ module Hyrax
 
         remote_file_obj(obj, name)
       rescue StandardError => e
-        @logger.error("FileUploadService upload_to_s3 error: #{e.message} : #{e.backtrace}")
+        log_and_raise("FileUploadService upload_to_s3 error: #{e.message} : #{e.backtrace}")
+      end
+
+      def log_and_raise(message)
+        Rails.logger.error(message)
+        raise StandardError, message
       end
 
       def remote_file_obj(obj, name)

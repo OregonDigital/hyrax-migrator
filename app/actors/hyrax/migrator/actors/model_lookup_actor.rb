@@ -33,7 +33,7 @@ module Hyrax::Migrator::Actors
       model_lookup_succeeded
     rescue StandardError => e
       model_lookup_failed
-      log("failed during model lookup: #{e.message}")
+      log("failed during model lookup: #{e.message} : #{e.backtrace}")
     end
 
     private

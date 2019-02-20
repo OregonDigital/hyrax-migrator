@@ -30,7 +30,7 @@ module Hyrax::Migrator::Actors
       service.persist_work ? persist_work_succeeded : persist_work_failed
     rescue StandardError => e
       persist_work_failed
-      log("failed while persisting work: #{e.message}")
+      log("failed while persisting work: #{e.message} : #{e.backtrace}")
     end
 
     private

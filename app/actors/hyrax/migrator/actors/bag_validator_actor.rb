@@ -32,7 +32,7 @@ module Hyrax::Migrator::Actors
       bag = BagIt::Bag.new @work.working_directory
       bag.valid? ? bag_validator_succeeded : bag_validator_failed
     rescue StandardError => e
-      log("failed bag validation: #{e.message}")
+      log("failed bag validation: #{e.message} : #{e.backtrace}")
     end
 
     private

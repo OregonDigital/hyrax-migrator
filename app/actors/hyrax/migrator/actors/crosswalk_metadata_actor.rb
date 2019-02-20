@@ -35,7 +35,7 @@ module Hyrax::Migrator::Actors
       @attributes ? crosswalk_metadata_succeeded : crosswalk_metadata_failed
     rescue StandardError => e
       crosswalk_metadata_failed
-      log("failed crosswalk: #{e.message}")
+      log("failed crosswalk: #{e.message} : #{e.backtrace}")
     end
 
     private
