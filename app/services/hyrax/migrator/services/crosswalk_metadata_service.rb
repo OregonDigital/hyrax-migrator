@@ -77,7 +77,7 @@ module Hyrax::Migrator::Services
 
     # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
     def crosswalk_hash
-      unique = crosswalk_data.reject { |x, predicate = x[:predicate]| crosswalk_overrides.one?(&find(predicate)) }
+      unique = crosswalk_data.reject { |x| crosswalk_overrides.one?(&find(x[:predicate])) }
       @crosswalk_hash ||= crosswalk_overrides + unique
     end
 
