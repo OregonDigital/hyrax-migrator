@@ -33,7 +33,7 @@ module Hyrax::Migrator::Actors
       @handled_uploaded_files ? file_upload_succeeded : file_upload_failed
     rescue StandardError => e
       file_upload_failed
-      log("failed during file upload: #{e.message}")
+      log("failed during file upload: #{e.message} : #{e.backtrace}")
     end
 
     private

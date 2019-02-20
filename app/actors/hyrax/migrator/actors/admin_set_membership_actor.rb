@@ -31,7 +31,7 @@ module Hyrax::Migrator::Actors
       @hash ? admin_set_membership_succeeded : admin_set_membership_failed
     rescue StandardError => e
       admin_set_membership_failed
-      log("did not obtain sets: #{e.message}")
+      log("did not obtain sets: #{e.message} : #{e.backtrace}")
     end
 
     private
