@@ -8,7 +8,7 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
   let(:work) { create(:work, pid: pid) }
   let(:pid) { 'abcde1234' }
   let(:config) { Hyrax::Migrator::Configuration.new }
-  let(:result_hash) { instance_double(Hash) }
+  let(:result_hash) { { id: 'I am what I am' } }
   let(:lcs) { instance_double('Hyrax::Migrator::Services::ListChildrenService') }
 
   describe '#create' do
@@ -27,6 +27,24 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
       it 'calls the next actor' do
         expect(terminal).to receive(:create)
         actor.create(work)
+      end
+      it 'adds to work.env[:attributes]' do
+        actor.create(work)
+        expect(work.env[:attributes]).to include(:work_members_attributes)
+      end
+    end
+
+    context 'when there are no children' do
+      before do
+        allow(actor).to receive(:config).and_return(config)
+        allow(Hyrax::Migrator::Services::ListChildrenService).to receive(:new).and_return(lcs)
+        allow(lcs).to receive(:list_children).and_return({})
+        actor.next_actor = terminal
+      end
+
+      it 'does not add to work.env[:attributes]' do
+        actor.create(work)
+        expect(work.env[:attributes]).not_to include(:work_members_attributes)
       end
     end
 

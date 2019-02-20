@@ -37,7 +37,7 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      @work.env[:work_members_attributes] = @children
+      @work.env[:attributes][:work_members_attributes] = @children unless @children.empty?
       succeeded(aasm.current_state, "Work #{@work.pid} acquired children.", Hyrax::Migrator::Work::SUCCESS)
     end
 
