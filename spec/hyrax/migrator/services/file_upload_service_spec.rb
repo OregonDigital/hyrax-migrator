@@ -37,6 +37,28 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       end
     end
 
+    context 'when upload service is :file_system and upload_to_file_system fails with file not found' do
+      before do
+        config.upload_storage_service = :file_system
+        allow(service).to receive(:upload_to_file_system).and_raise(StandardError.new('file not found'))
+      end
+
+      it 'raises file not found error' do
+        expect { service.upload_file_content }.to raise_error(StandardError, 'file not found')
+      end
+    end
+
+    context 'when upload service is :file_system and copy_local_file fails' do
+      before do
+        config.upload_storage_service = :file_system
+        allow(service).to receive(:copy_local_file).and_return 0
+      end
+
+      it 'raises file not found error' do
+        expect { service.upload_file_content }.to raise_error
+      end
+    end
+
     context 'when upload service is :file_system and content file is not found' do
       before do
         config.upload_storage_service = :file_system
@@ -93,6 +115,17 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
 
       it 'raises data directory not found' do
         expect { service.send(:content_file) }.to raise_error(StandardError, "data directory #{work.file_path}/data not found")
+      end
+    end
+
+    context 'when upload service is :aws_s3 and upload_to_s3 fails' do
+      before do
+        config.upload_storage_service = :aws_s3
+        allow(service).to receive(:upload_to_s3).and_raise(StandardError.new('file not found'))
+      end
+
+      it 'raises file not found error' do
+        expect { service.upload_file_content }.to raise_error(StandardError, 'file not found')
       end
     end
   end
