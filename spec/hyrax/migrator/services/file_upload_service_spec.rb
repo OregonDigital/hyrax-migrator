@@ -55,7 +55,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       end
 
       it 'raises file not found error' do
-        expect { service.upload_file_content }.to raise_error
+        expect { service.upload_file_content }.to raise_error(StandardError)
       end
     end
 
