@@ -12,9 +12,9 @@ module Hyrax::Migrator::Services
     end
 
     def list_children
-      return nil if @work.env[:attributes][:contents].blank?
-
       children = {}
+      return children if @work.env[:attributes][:contents].blank?
+
       @work.env[:attributes][:contents].each_with_index do |item, index|
         child_id = item.gsub('http://oregondigital.org/resource/oregondigital:', '')
         children[index.to_s] = { 'id' => child_id }

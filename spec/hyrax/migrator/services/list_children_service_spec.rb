@@ -32,8 +32,8 @@ RSpec.describe Hyrax::Migrator::Services::ListChildrenService do
         work.env[:attributes] = {}
       end
 
-      it 'returns nil' do
-        expect(service.list_children).to be(nil)
+      it 'returns an empty hash' do
+        expect(service.list_children).to be_empty
       end
     end
   end
