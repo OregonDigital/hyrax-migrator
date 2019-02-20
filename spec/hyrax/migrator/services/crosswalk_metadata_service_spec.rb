@@ -79,6 +79,20 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
         expect(service.send(:crosswalk_hash)).to include(data2)
       end
     end
+
+    context 'when a predicate is in both files' do
+      let(:overrides) { [{ property: 'rights-statement', predicate: 'http://purl.org/dc/terms/rights', multiple: false }] }
+
+      before do
+        allow(service).to receive(:crosswalk_overrides).and_return(overrides)
+      end
+
+      it 'favors overrides' do
+        p = service.send(:find, 'http://purl.org/dc/terms/rights')
+        result = service.send(:crosswalk_hash)
+        expect(result.select(&p).size).to eq(1)
+      end
+    end
   end
 
   describe 'lookup' do

@@ -57,10 +57,14 @@ module Hyrax::Migrator::Services
       end
     end
 
+    def find(predicate)
+      proc { |k| k[:predicate].casecmp(predicate).zero? }
+    end
+
     # Given an OD2 predicate, returns associated property data or nil
     def lookup(predicate)
       hash = crosswalk_hash
-      result = hash.select { |k| k[:predicate].casecmp(predicate).zero? }
+      result = hash.select(&find(predicate))
       return result.first unless result.empty?
 
       raise PredicateNotFoundError, predicate
@@ -73,15 +77,18 @@ module Hyrax::Migrator::Services
 
     # Returns a hash that maps OD2 predicates to OD2 properties and other data needed to process each field.
     def crosswalk_hash
-      @crosswalk_hash ||= crosswalk_data[:crosswalk] + crosswalk_overrides[:overrides]
+      unique = crosswalk_data.reject { |x| crosswalk_overrides.one?(&find(x[:predicate])) }
+      @crosswalk_hash ||= crosswalk_overrides + unique
     end
 
     def crosswalk_data
       @crosswalk_data ||= YAML.load_file(@config.crosswalk_metadata_file).deep_symbolize_keys
+      @crosswalk_data[:crosswalk]
     end
 
     def crosswalk_overrides
       @crosswalk_overrides ||= YAML.load_file(@config.crosswalk_overrides_file).deep_symbolize_keys
+      @crosswalk_overrides[:overrides]
     end
 
     def return_nil(_object)
