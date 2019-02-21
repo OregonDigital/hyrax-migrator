@@ -95,6 +95,12 @@ module Hyrax::Migrator::Services
       nil
     end
 
+    ##
+    # Generate the data necessary for a Rails nested attribute
+    def attributes_data(object)
+      { 'id' => object.to_s, '_destroy' => 0 }
+    end
+
     # Raise in lookup
     class PredicateNotFoundError < StandardError
     end

@@ -1,4 +1,8 @@
 crosswalk:
+  - property: format_attributes
+    predicate: http://purl.org/dc/terms/format
+    multiple: true
+    function: attributes_data
   - property: alternative
     predicate: http://purl.org/dc/terms/alternative
     multiple: true
@@ -430,9 +434,6 @@ crosswalk:
     multiple: true
   - property: extent
     predicate: http://purl.org/dc/terms/extent
-    multiple: true
-  - property: format
-    predicate: http://purl.org/dc/terms/format
     multiple: true
   - property: material
     predicate: http://purl.org/vra/material

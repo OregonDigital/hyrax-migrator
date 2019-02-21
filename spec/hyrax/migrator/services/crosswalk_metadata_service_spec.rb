@@ -145,4 +145,15 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       end
     end
   end
+
+  context 'with attributes_data function' do
+    let(:predicate_str) { 'http://purl.org/dc/terms/format' }
+    let(:predicate) { RDF::URI(predicate_str) }
+    let(:object) { RDF::URI('http://test/test') }
+    let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
+
+    it 'transforms the object using the function' do
+      expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://test/test' }]
+    end
+  end
 end
