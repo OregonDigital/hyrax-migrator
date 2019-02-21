@@ -33,7 +33,7 @@ module Hyrax::Migrator::Services
     end
 
     def attributes
-      @work.env[:attributes].merge(id: @work.pid)
+      @work.env[:attributes].slice(:work_members_attributes)
     end
   end
 end
