@@ -22,6 +22,9 @@ module Hyrax::Migrator::Actors
       end
     end
 
+    HAS_CHILD = 'Children added.'
+    NO_CHILD = 'No children to add.'
+
     def create(work)
       super
       list_children_initial
@@ -37,8 +40,13 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      @work.env[:attributes][:work_members_attributes] = @children unless @children.empty?
-      succeeded(aasm.current_state, "Work #{@work.pid} acquired children.", Hyrax::Migrator::Work::SUCCESS)
+      if @children.empty?
+        message = NO_CHILD
+      else
+        @work.env[:attributes][:work_members_attributes] = @children
+        message = HAS_CHILD
+      end
+      succeeded(aasm.current_state, "Work #{@work.pid} #{message}", Hyrax::Migrator::Work::SUCCESS)
     end
 
     def post_fail

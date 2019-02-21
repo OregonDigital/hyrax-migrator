@@ -24,6 +24,10 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
         actor.create(work)
         expect(work.aasm_state).to eq('list_children_succeeded')
       end
+      it 'sets the status message' do
+        actor.create(work)
+        expect(work.status_message).to eq("Work #{work.pid} Children added.")
+      end
       it 'calls the next actor' do
         expect(terminal).to receive(:create)
         actor.create(work)
@@ -45,6 +49,10 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
       it 'does not add to work.env[:attributes]' do
         actor.create(work)
         expect(work.env[:attributes]).not_to include(:work_members_attributes)
+      end
+      it 'sets the status message' do
+        actor.create(work)
+        expect(work.status_message).to eq("Work #{work.pid} No children to add.")
       end
     end
 
