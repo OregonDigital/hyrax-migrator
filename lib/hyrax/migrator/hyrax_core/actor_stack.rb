@@ -58,6 +58,7 @@ module Hyrax::Migrator
         @curation_concern ||= begin
           model = @model.constantize.find(@attributes['id'])
           model ||= @model.constantize.new
+          model
         end
       end
       # :nocov:
