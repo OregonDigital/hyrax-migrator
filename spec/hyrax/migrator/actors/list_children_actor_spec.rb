@@ -24,6 +24,10 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
         actor.create(work)
         expect(work.aasm_state).to eq('list_children_succeeded')
       end
+      it 'sets the status' do
+        actor.create(work)
+        expect(work.status).to eq('success')
+      end
       it 'sets the status message' do
         actor.create(work)
         expect(work.status_message).to eq("Work #{work.pid} Children added.")
@@ -46,7 +50,11 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
         actor.next_actor = terminal
       end
 
-      it 'updates the work' do
+      it 'sets the status' do
+        actor.create(work)
+        expect(work.status).to eq('success')
+      end
+      it 'updates the state' do
         actor.create(work)
         expect(work.aasm_state).to eq('list_children_succeeded')
       end
@@ -74,7 +82,7 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
         actor.next_actor = terminal
       end
 
-      it 'updates the work' do
+      it 'updates the status in the work' do
         actor.create(work)
         expect(work.aasm_state).to eq('list_children_failed')
       end
@@ -82,9 +90,17 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
         expect(terminal).not_to receive(:create)
         actor.create(work)
       end
+      it 'sets the status' do
+        actor.create(work)
+        expect(work.status).to eq('fail')
+      end
       it 'sets the status message' do
         actor.create(work)
         expect(work.status_message).to eq("Work #{work.pid} failed to acquire children.")
+      end
+      it 'logs the failure' do
+        expect(Rails.logger).to receive(:warn)
+        actor.create(work)
       end
     end
   end
