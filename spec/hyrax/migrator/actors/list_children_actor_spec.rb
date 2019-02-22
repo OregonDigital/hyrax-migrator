@@ -72,7 +72,33 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
       end
     end
 
-    context 'when list_children_service fails' do
+    context 'when list_children_service does not return a hash' do
+      before do
+        allow(actor).to receive(:config).and_return(config)
+        allow(Hyrax::Migrator::Services::ListChildrenService).to receive(:new).and_return(lcs)
+        allow(lcs).to receive(:list_children).and_return(nil)
+        actor.next_actor = terminal
+      end
+
+      it 'updates the status in the work' do
+        actor.create(work)
+        expect(work.aasm_state).to eq('list_children_failed')
+      end
+      it 'does not call the next actor' do
+        expect(terminal).not_to receive(:create)
+        actor.create(work)
+      end
+      it 'sets the status' do
+        actor.create(work)
+        expect(work.status).to eq('fail')
+      end
+      it 'sets the status message' do
+        actor.create(work)
+        expect(work.status_message).to eq("Work #{work.pid} failed to acquire children.")
+      end
+    end
+
+    context 'when list_children_service errors' do
       let(:error) { StandardError }
 
       before do
