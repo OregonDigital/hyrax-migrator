@@ -5,7 +5,7 @@ module Hyrax
     ##
     # The base ActiveJob class for the application
     class ApplicationJob < ActiveJob::Base
-      queue_as Hyrax::Migrator.queue_name
+      queue_as Hyrax::Migrator.config.queue_name
     end
   end
 end
