@@ -3,6 +3,9 @@
 module Hyrax::Migrator::Actors
   # Calls ListChildrenService to get children into work
   class ListChildrenActor < Hyrax::Migrator::Actors::AbstractActor
+    HAS_CHILD = 'Children added.'
+    NO_CHILD = 'No children to add.'
+
     aasm do
       state :list_children_initial, initial: true
       state :list_children_succeeded, :list_children_failed
@@ -21,9 +24,6 @@ module Hyrax::Migrator::Actors
                     to: :list_children_succeeded
       end
     end
-
-    HAS_CHILD = 'Children added.'
-    NO_CHILD = 'No children to add.'
 
     def create(work)
       super
