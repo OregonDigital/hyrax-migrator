@@ -37,7 +37,7 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      @work.env.merge(@hash)
+      @work.env[:attributes].merge!(@hash)
       succeeded(aasm.current_state, "Work #{@work.pid} acquired admin_set_id and any collections.", Hyrax::Migrator::Work::SUCCESS)
     end
 

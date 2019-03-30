@@ -20,7 +20,7 @@ module Hyrax::Migrator::Services
     private
 
     def admin_set(metadata)
-      return strip_id(metadata[:primarySet]) if metadata[:primarySet]
+      return strip_id(metadata[:primary_set]) if metadata[:primary_set]
 
       return strip_id(metadata[:institution].first) if metadata[:institution]
 
