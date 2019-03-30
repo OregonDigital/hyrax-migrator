@@ -5,7 +5,7 @@ require 'rdf'
 RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:crosswalk_metadata) do
     h = {}
-    h[:primarySet] = RDF::URI('http://oregondigital.org/resource/oregondigital:heavy-rocks')
+    h[:primary_set] = RDF::URI('http://oregondigital.org/resource/oregondigital:heavy-rocks')
     h[:set] = [RDF::URI('http://oregondigital.org/resource/oregondigital:little-dogs')]
     h[:set] += [RDF::URI('http://oregondigital.org/resource/oregondigital:heavy-rocks')]
     h[:institution] = [RDF::URI('http://dbpedia.org/resource/University-of-Oregon-State-University')]
@@ -19,27 +19,27 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:service) { described_class.new(work, config) }
 
   describe 'admin_set' do
-    context 'when a primarySet exists' do
-      it 'uses the primarySet' do
+    context 'when a primary_set exists' do
+      it 'uses the primary_set' do
         expect(service.send(:admin_set, crosswalk_metadata)).to eq 'heavy-rocks'
       end
     end
 
-    context 'when primarySet does not exist' do
+    context 'when primary_set does not exist' do
       it 'uses a fallback value' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet))).to eq 'University-of-Oregon-State-University'
+        expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set))).to eq 'University-of-Oregon-State-University'
       end
     end
 
-    context 'when primarySet and institution do not exist' do
+    context 'when primary_set and institution do not exist' do
       it 'uses a fallback value' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet, :institution))).to eq 'Hogwarts-Special-Collections-and-Archives'
+        expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution))).to eq 'Hogwarts-Special-Collections-and-Archives'
       end
     end
 
     context 'when none of the possible set values exist' do
       it 'uses a default value' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primarySet, :institution, :repository))).to eq 'admin/default'
+        expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution, :repository))).to eq 'admin/default'
       end
     end
   end
@@ -63,7 +63,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   describe 'strip_id' do
     context 'when given an rdf uri' do
       it 'returns an id' do
-        expect(service.send(:strip_id, crosswalk_metadata[:primarySet])).to eq 'heavy-rocks'
+        expect(service.send(:strip_id, crosswalk_metadata[:primary_set])).to eq 'heavy-rocks'
       end
     end
 
