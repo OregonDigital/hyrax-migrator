@@ -128,5 +128,21 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
         expect { service.upload_file_content }.to raise_error(StandardError, 'file not found')
       end
     end
+
+    context 'when upload service is :aws_s3 and upload_to_s3 fails with timeout' do
+      before do
+        config.upload_storage_service = :aws_s3
+      end
+
+      it 'raises timeout error' do
+        allow(Aws::S3::Client).to receive(:new) { s3_client }.and_raise(Aws::S3::Errors::Timeout)
+        expect { service.upload_file_content }.to raise_error(StandardError)
+      end
+
+      it 'raises not found error' do
+        allow(Aws::S3::Client).to receive(:new) { s3_client }.and_raise(Aws::S3::Errors::NotFound)
+        expect { service.upload_file_content }.to raise_error(StandardError)
+      end
+    end
   end
 end
