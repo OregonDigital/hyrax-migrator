@@ -56,8 +56,9 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
     context 'when the content file is successfully uploaded to the local file system' do
       before do
         allow(service).to receive(:upload_file_content).and_return(local_file_hash)
+        allow(actor).to receive(:uploaded_file).and_return(local_file_hash)
+        allow(Hyrax::Migrator::HyraxCore::UploadedFile).to receive(:new).and_return(hyrax_core_uploaded_file)
         allow(hyrax_core_uploaded_file).to receive(:create).and_return(hyrax_uploaded_file)
-        allow(actor).to receive(:hyrax_file_uploaded).and_return(hyrax_core_uploaded_file)
         actor.next_actor = terminal
       end
 

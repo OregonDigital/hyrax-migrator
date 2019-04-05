@@ -66,15 +66,10 @@ module Hyrax::Migrator::Actors
 
     def hyrax_file_uploaded
       @hyrax_file_uploaded ||= Hyrax::Migrator::HyraxCore::UploadedFile.new(
-        user: current_user,
+        user: user,
         uploaded_file_uri: @uploaded_file['local_file_uri'],
         uploaded_filename: @uploaded_file['local_filename']
       )
-    end
-
-    # TODO: move current_user to abstract actor
-    def current_user
-      @current_user = Hyrax::Migrator::HyraxCore::User.find(email: config.migration_user)
     end
   end
 end
