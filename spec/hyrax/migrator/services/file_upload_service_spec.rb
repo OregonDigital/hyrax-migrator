@@ -129,7 +129,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       end
     end
 
-    context 'when upload service is :aws_s3 and upload_to_s3 fails with timeout' do
+    context 'when upload service is :aws_s3 and upload_to_s3 fails with aws s3 errors' do
       before do
         config.upload_storage_service = :aws_s3
       end
