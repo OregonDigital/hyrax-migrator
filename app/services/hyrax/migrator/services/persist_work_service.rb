@@ -17,7 +17,7 @@ module Hyrax::Migrator::Services
     def persist_work
       actor_stack.create
     rescue StandardError => e
-      message = "failed persisting work #{@work.pid}, #{e.message}"
+      message = "failed persisting work #{@work.pid}, #{e.message} : #{e.backtrace}"
       Rails.logger.error message
       raise StandardError, message
     end
