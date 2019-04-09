@@ -39,12 +39,12 @@ RSpec.describe Hyrax::Migrator::Services::PersistWorkService do
       allow(actor_stack).to receive(:create).and_raise(error_message)
     end
 
-    it { expect { service.persist_work }.to raise_error StandardError, "failed persisting work #{pid}, #{error_message}" }
+    it { expect { service.persist_work }.to raise_error StandardError, /failed persisting work #{pid}, #{error_message}/ }
   end
 
   ##
   # Don't mock the Hyrax dependencies, but allow it to fail naturally because the class is out of scope.
   context 'without upstream dependencies functional' do
-    it { expect { service.persist_work }.to raise_error StandardError, "failed persisting work #{pid}, uninitialized constant Hyrax::CurationConcern" }
+    it { expect { service.persist_work }.to raise_error StandardError, /failed persisting work #{pid}, uninitialized constant Hyrax::CurationConcern/ }
   end
 end
