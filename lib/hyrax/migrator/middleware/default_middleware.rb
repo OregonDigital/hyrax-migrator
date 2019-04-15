@@ -11,7 +11,7 @@ module Hyrax
         ##
         # @param [Array[Hyrax::Migrator::AbstractActor]] actors - an array of actors set to process a work
         def initialize(actors)
-          @actor_stack ||= build_actor_stack(actors)
+          @actor_stack = build_actor_stack(actors)
         end
 
         ##
