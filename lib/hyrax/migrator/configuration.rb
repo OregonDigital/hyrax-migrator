@@ -20,7 +20,7 @@ module Hyrax::Migrator
 
     attr_writer :upload_storage_service
     def upload_storage_service
-      @upload_storage_service ||= if Rails.env.staging? || Rails.env.production?
+      @upload_storage_service ||= if Rails.env.production?
                                     :aws_s3
                                   else
                                     :file_system
@@ -85,6 +85,12 @@ module Hyrax::Migrator
     attr_writer :crosswalk_overrides_file
     def crosswalk_overrides_file
       @crosswalk_overrides_file ||= ''
+    end
+
+    # The admin sets crosswalk is used to map primary sets with admin sets in hyrax
+    attr_writer :crosswalk_admin_sets_file
+    def crosswalk_admin_sets_file
+      @crosswalk_admin_sets_file ||= ''
     end
 
     # The crosswalk file for looking up a model related to the metadata type URI for a work.
