@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     'README.md']
 
   s.add_dependency 'aasm'
+  s.add_dependency 'actionview', '>= 5.1.6.2'
   s.add_dependency 'aws-sdk-s3'
   s.add_dependency 'bagit'
   s.add_dependency 'haml'
