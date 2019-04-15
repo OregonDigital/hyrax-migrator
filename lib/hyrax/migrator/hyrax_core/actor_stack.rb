@@ -55,8 +55,11 @@ module Hyrax::Migrator
       end
 
       def curation_concern
-        # TODO: find or .new the model if the attributes have an id?
-        @curation_concern ||= @model.constantize.new
+        @curation_concern ||= begin
+          model = @model.constantize.find(@attributes['id'])
+          model ||= @model.constantize.new
+          model
+        end
       end
       # :nocov:
     end
