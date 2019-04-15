@@ -1,11 +1,11 @@
 version: '3'
 
 volumes:
-  ? redis-dev
+  redis-dev:
 
 networks:
-  ? external
-  ? internal
+  external:
+  internal:
 
 services:
   ##
@@ -21,13 +21,6 @@ services:
     # into the image AFTER the working directory is mounted.
     tmpfs:
       - /data/log
-    networks:
-      ? external
-      ? internal
-    expose:
-      - 3000
-  server: &server
-    <<: *app
     environment:
       - RAILS_ENV=development
       - RAILS_LOG_TO_STDOUT=1
@@ -38,13 +31,19 @@ services:
       - AWS_S3_BUCKET=awss3bucket
       - AWS_S3_APP_KEY=awss3key
       - AWS_S3_APP_SECRET=awsappsecret
+    networks:
+      external:
+      internal:
+  server: &server
+    <<: *app
     depends_on:
       - redis-dev
       - workers
-    command: >
-      bash -c "rm -f spec/dummy/tmp/pids/server.pid && bundle exec rails s"
+    command: bash -c "rm -f spec/dummy/tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0"
+    expose:
+      - 3000
   workers:
-    <<: *server
+    <<: *app
     command: bash -c "./build/install_gems.sh && bundle exec sidekiq -r /data/spec/dummy"
     depends_on:
       - redis-dev
@@ -72,7 +71,7 @@ services:
     image: redis:4-alpine
     command: redis-server
     networks:
-      ? internal
+      internal:
   redis-dev:
     <<: *redis
     volumes:
