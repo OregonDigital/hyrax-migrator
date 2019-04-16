@@ -1,5 +1,6 @@
 # frozen_string_literal:true
 
+require 'nokogiri'
 RSpec.describe Hyrax::Migrator::Services::VisibilityLookupService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:service) { described_class.new(work, config) }
@@ -36,6 +37,23 @@ RSpec.describe Hyrax::Migrator::Services::VisibilityLookupService do
       end
 
       it { expect { service.lookup_visibility }.to raise_error(StandardError, "could not find #{described_class::XML_NODE} in xml file") }
+    end
+  end
+
+  describe '#read_groups' do
+    context 'when the file is valid' do
+      let(:xml) { '<rightsMetadata><access type=\'read\'><group>public</group></access></rightsMetadata>' }
+      let(:nodes) { Nokogiri::XML(xml).search('group') }
+      let(:doc) { instance_double(Nokogiri::XML::Document) }
+
+      before do
+        allow(service).to receive(:doc).and_return(doc)
+        allow(doc).to receive(:search).and_return(nodes)
+      end
+
+      it 'extracts the groups' do
+        expect(service.send(:read_groups)).to eq(%w[public])
+      end
     end
   end
 
