@@ -38,4 +38,30 @@ RSpec.describe Hyrax::Migrator::Services::VisibilityLookupService do
       it { expect { service.lookup_visibility }.to raise_error(StandardError, "could not find #{described_class::XML_NODE} in xml file") }
     end
   end
+
+  describe '#lookup' do
+    context 'when the original group is public' do
+      let(:groups) { %w[public admin archivist] }
+
+      it 'returns open' do
+        expect(service.send(:lookup, groups)).to eq(visibility: 'open')
+      end
+    end
+
+    context 'when the original group is an institution' do
+      let(:groups) { %w[admin archivist University-of-Oregon] }
+
+      it 'returns authenticated' do
+        expect(service.send(:lookup, groups)).to eq(visibility: 'authenticated')
+      end
+    end
+
+    context 'when the original group is none of the above' do
+      let(:groups) { %w[admin archivist] }
+
+      it 'returns restricted' do
+        expect(service.send(:lookup, groups)).to eq(visibility: 'restricted')
+      end
+    end
+  end
 end
