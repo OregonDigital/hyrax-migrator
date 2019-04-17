@@ -8,6 +8,7 @@ RSpec.describe Hyrax::Migrator::Configuration do
   it { expect(conf.queue_name).to be_a String }
   it { expect(conf.logger).to be_a Logger }
   it { expect(conf.crosswalk_metadata_file).to be_a String }
+  it { expect(conf.crosswalk_admin_sets_file).to be_a String }
   it { expect(conf.model_crosswalk).to be_a String }
   it { expect(conf.migration_user).to be_a String }
 

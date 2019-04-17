@@ -31,6 +31,9 @@ Hyrax::Migrator.config do |config|
   # The metadata file that adds to/overrides predicates in crosswalk.yml
   config.crosswalk_overrides_file = File.join(Rails.root, '../fixtures/crosswalk_overrides.yml')
 
+  # The admin sets crosswalk used to map primary sets with admin sets in
+  config.crosswalk_admin_sets_file = File.join(Rails.root, '../fixtures/crosswalk_admin_sets.yml')
+
   # The service used to upload files ready for migration. It defaults to file_system for test and development. On staging and production, it defaults to aws_s3
   # config.upload_storage_service = if Rails.env.staging? || Rails.env.production?
   #                                   :aws_s3

@@ -18,20 +18,38 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(work, config) }
 
+  let(:hyrax_core_admin_set) { instance_double('Hyrax::Migrator::HyraxCore::AdminSet') }
+  let(:admin_set) { instance_double('AdminSet', id: '12345abcd', title: 'University', description: 'hello world') }
+
+  before do
+    config.crosswalk_admin_sets_file = File.join(Rails.root, '../fixtures/crosswalk_admin_sets.yml')
+    allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find_by_title).with('University').and_return(admin_set)
+  end
+
   describe 'admin_set' do
+    before do
+      allow(service).to receive(:admin_set_title).and_return('University')
+    end
+
     context 'when a primary_set exists' do
+      let(:admin_set) { instance_double('AdminSet', id: 'heavy-rocks', title: 'University', description: 'hello world') }
+
       it 'uses the primary_set' do
         expect(service.send(:admin_set, crosswalk_metadata)).to eq 'heavy-rocks'
       end
     end
 
     context 'when primary_set does not exist' do
+      let(:admin_set) { instance_double('AdminSet', id: 'University-of-Oregon-State-University', title: 'University', description: 'Hello world') }
+
       it 'uses a fallback value' do
         expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set))).to eq 'University-of-Oregon-State-University'
       end
     end
 
     context 'when primary_set and institution do not exist' do
+      let(:admin_set) { instance_double('AdminSet', id: 'Hogwarts-Special-Collections-and-Archives', title: 'University', description: 'hello world') }
+
       it 'uses a fallback value' do
         expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution))).to eq 'Hogwarts-Special-Collections-and-Archives'
       end
@@ -93,6 +111,23 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
       it 'returns a hash with two members' do
         response = service.acquire_set_ids
         expect(response.keys).to eq %w[admin_set_id member_of_collections_attributes]
+      end
+    end
+  end
+
+  describe 'admin_set_id' do
+    let(:admin_set) { instance_double('AdminSet', id: '12345abcd', title: 'Oregon State University', description: 'hello world') }
+
+    before do
+      crosswalk_metadata[:primary_set] = RDF::URI('http://oregondigital.org/resource/oregondigital:columbia-gorge')
+      crosswalk_metadata[:institution] = [RDF::URI('http://dbpedia.org/resource/Oregon-State-University')]
+      crosswalk_metadata[:repository] = [RDF::URI('http://dbpedia.org/resource/Test')]
+    end
+
+    context 'when called' do
+      it 'returns corresponding admin set id' do
+        allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find_by_title).with('Oregon State University').and_return(admin_set)
+        expect(service.send(:admin_set_id, crosswalk_metadata[:primary_set])).to eq '12345abcd'
       end
     end
   end
