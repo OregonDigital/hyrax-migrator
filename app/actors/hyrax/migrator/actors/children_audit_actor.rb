@@ -34,7 +34,7 @@ module Hyrax::Migrator::Actors
     private
 
     def process
-      if @work.env[:children].blank?
+      if @work.env[:work_members_attributes].blank?
         children_audit_succeeded
       else
         @result = service.audit
@@ -49,7 +49,7 @@ module Hyrax::Migrator::Actors
     #:nocov:
 
     def post_fail
-      message = "#{@result} of #{@work.env[:children].size} children are persisted."
+      message = "#{@result} of #{@work.env[:work_members_attributes].size} children are persisted."
       failed(aasm.current_state, "Work #{@work.pid}: #{message}", Hyrax::Migrator::Work::FAIL)
     end
 

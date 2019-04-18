@@ -9,7 +9,7 @@ RSpec.describe Hyrax::Migrator::Services::ChildrenAuditService do
 
   describe '#audit' do
     let(:env) do
-      { children: {
+      { work_members_attributes: {
         '0' => { 'id' => 'abcde1234' },
         '1' => { 'id' => 'abcde1235' },
         '2' => { 'id' => 'abcde1236' }

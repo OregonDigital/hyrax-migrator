@@ -8,7 +8,7 @@ RSpec.describe Hyrax::Migrator::Actors::ChildrenAuditActor do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:service) { double }
   let(:env) do
-    { children: {
+    { work_members_attributes: {
       '0' => { 'id' => 'abcde1234' },
       '1' => { 'id' => 'abcde1235' },
       '2' => { 'id' => 'abcde1236' }
@@ -21,11 +21,30 @@ RSpec.describe Hyrax::Migrator::Actors::ChildrenAuditActor do
   end
 
   describe '#create' do
-    context 'when the audit succeeds' do
+    context 'when the audit succeeds with children' do
       before do
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:audit).and_return(true)
         actor.next_actor = terminal
+      end
+
+      it 'updates the work' do
+        actor.create(work)
+        expect(work.aasm_state).to eq('children_audit_succeeded')
+      end
+
+      it 'calls the next actor' do
+        expect(terminal).to receive(:create)
+        actor.create(work)
+      end
+    end
+
+    context 'when the audit succeeds with no children' do
+      before do
+        allow(actor).to receive(:service).and_return(service)
+        allow(service).to receive(:audit).and_return(true)
+        actor.next_actor = terminal
+        work.env = {}
       end
 
       it 'updates the work' do

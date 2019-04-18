@@ -11,10 +11,10 @@ module Hyrax::Migrator::Services
 
     def audit
       total_exists = 0
-      @work.env[:children].each do |_k, val|
+      @work.env[:work_members_attributes].each do |_k, val|
         total_exists += 1 unless Hyrax::Migrator::HyraxCore::Asset.find(val['id']).blank?
       end
-      total_exists < @work.env[:children].size ? total_exists : true
+      total_exists < @work.env[:work_members_attributes].size ? total_exists : true
     end
   end
 end
