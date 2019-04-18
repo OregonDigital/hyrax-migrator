@@ -9,6 +9,7 @@ require 'hyrax/migrator/engine' if defined?(Rails)
 require 'hyrax/migrator/middleware'
 require 'hyrax/migrator/hyrax_core/actor_stack'
 require 'hyrax/migrator/hyrax_core/admin_set'
+require 'hyrax/migrator/hyrax_core/asset'
 require 'hyrax/migrator/hyrax_core/uploaded_file'
 require 'hyrax/migrator/hyrax_core/user'
 
