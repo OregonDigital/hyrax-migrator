@@ -42,9 +42,9 @@ module Hyrax::Migrator::Services
     end
 
     def admin_set_id(uri)
-      original_id = strip_id(uri)
-      title = admin_set_title(original_id)
-      title.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find_by_title(title).id : DEFAULT_ADMIN_SET_ID
+      primary_set_id = strip_id(uri)
+      id = match_admin_set_id(primary_set_id)
+      id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : DEFAULT_ADMIN_SET_ID
     end
 
     # Returns a data list that maps OD1 primary sets to OD2 amdin sets
@@ -53,9 +53,9 @@ module Hyrax::Migrator::Services
       @crosswalk_data[:crosswalk]
     end
 
-    def admin_set_title(primary_set_id)
+    def match_admin_set_id(primary_set_id)
       hash_match = crosswalk_data.detect { |data| data[:primary_set] == primary_set_id }
-      hash_match[:admin_set_title] if hash_match.present?
+      hash_match[:admin_set_id] if hash_match.present?
     end
 
     def strip_id(uri)

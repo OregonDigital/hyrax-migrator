@@ -14,8 +14,8 @@ module Hyrax::Migrator
       # Query AdminSet record by title
       # @input [String] - Title
       # :nocov:
-      def self.find_by_title(title)
-        ::AdminSet.where(title: title).first
+      def self.find(id)
+        ::AdminSet.find(id)
       end
       # :nocov:
     end
