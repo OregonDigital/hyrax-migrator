@@ -118,6 +118,5 @@ module Hyrax::Migrator
     def status_completed
       @status_completed ||= ''
     end
-
   end
 end
