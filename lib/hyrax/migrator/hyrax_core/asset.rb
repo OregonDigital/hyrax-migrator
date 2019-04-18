@@ -2,6 +2,8 @@
 
 module Hyrax::Migrator
   module HyraxCore
+    ##
+    # Allows the migrator to confirm that a given asset has been ingested.
     class Asset
       # :nocov:
       def self.find(id)
