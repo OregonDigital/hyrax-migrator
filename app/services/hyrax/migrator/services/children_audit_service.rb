@@ -12,7 +12,8 @@ module Hyrax::Migrator::Services
     def audit
       total_exists = 0
       @work.env[:work_members_attributes].each do |_k, val|
-        total_exists += 1 unless Hyrax::Migrator::HyraxCore::Asset.find(val['id']).blank?
+        child = Hyrax::Migrator::Work.find_by(pid: val['id'])
+        total_exists += 1 unless child.blank? || child.status != @config.status_completed
       end
       total_exists < @work.env[:work_members_attributes].size ? total_exists : true
     end

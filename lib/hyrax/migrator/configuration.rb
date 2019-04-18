@@ -112,5 +112,12 @@ module Hyrax::Migrator
     def migration_user
       @migration_user ||= nil
     end
+
+    # The status message to be used when a work is finished
+    attr_writer :status_completed
+    def status_completed
+      @status_completed ||= ''
+    end
+
   end
 end
