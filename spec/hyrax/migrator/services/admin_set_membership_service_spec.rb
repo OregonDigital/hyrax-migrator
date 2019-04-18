@@ -19,16 +19,16 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:service) { described_class.new(work, config) }
 
   let(:hyrax_core_admin_set) { instance_double('Hyrax::Migrator::HyraxCore::AdminSet') }
-  let(:admin_set) { instance_double('AdminSet', id: '12345abcd', title: 'University', description: 'hello world') }
+  let(:admin_set) { instance_double('AdminSet', id: 'osu', title: 'University', description: 'hello world') }
 
   before do
     config.crosswalk_admin_sets_file = File.join(Rails.root, '../fixtures/crosswalk_admin_sets.yml')
-    allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find_by_title).with('University').and_return(admin_set)
+    allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find).with(anything).and_return(admin_set)
   end
 
   describe 'admin_set' do
     before do
-      allow(service).to receive(:admin_set_title).and_return('University')
+      allow(service).to receive(:match_admin_set_id).and_return('heavy-rocks')
     end
 
     context 'when a primary_set exists' do
@@ -116,7 +116,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   end
 
   describe 'admin_set_id' do
-    let(:admin_set) { instance_double('AdminSet', id: '12345abcd', title: 'Oregon State University', description: 'hello world') }
+    let(:admin_set) { instance_double('AdminSet', id: 'osu', title: 'Oregon State University', description: 'hello world') }
 
     before do
       crosswalk_metadata[:primary_set] = RDF::URI('http://oregondigital.org/resource/oregondigital:columbia-gorge')
@@ -126,8 +126,8 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
     context 'when called' do
       it 'returns corresponding admin set id' do
-        allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find_by_title).with('Oregon State University').and_return(admin_set)
-        expect(service.send(:admin_set_id, crosswalk_metadata[:primary_set])).to eq '12345abcd'
+        allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find).with('osu').and_return(admin_set)
+        expect(service.send(:admin_set_id, crosswalk_metadata[:primary_set])).to eq 'osu'
       end
     end
   end
