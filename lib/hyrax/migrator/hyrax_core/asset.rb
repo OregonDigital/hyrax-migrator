@@ -5,7 +5,7 @@ module Hyrax::Migrator
     class Asset
       def self.find(id)
         ActiveFedora::Base.find(id)
-      rescue
+      rescue ActiveFedora::ObjectNotFoundError
         nil
       end
     end
