@@ -26,7 +26,7 @@ module Hyrax::Migrator::Services
       work = Hyrax::Migrator::Work.where(pid: pid).first
       return work if work
 
-      Hyrax::Migrator::Work.create(pid: pid, file_path: file_path)
+      Hyrax::Migrator::Work.create(pid: pid, file_path: file_path, env: { attributes: { id: pid } })
     end
   end
 end

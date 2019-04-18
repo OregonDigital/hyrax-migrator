@@ -14,6 +14,7 @@ RSpec.describe Hyrax::Migrator::Services::MigrateWorkService do
     let(:new_pid) { 'newonehere' }
 
     it { expect(service.work.pid).to eq new_pid }
+    it { expect(service.work.env[:attributes][:id]).to eq new_pid }
   end
 
   describe 'running the service' do
