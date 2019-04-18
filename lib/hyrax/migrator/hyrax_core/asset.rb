@@ -3,11 +3,13 @@
 module Hyrax::Migrator
   module HyraxCore
     class Asset
+      # :nocov:
       def self.find(id)
         ActiveFedora::Base.find(id)
       rescue ActiveFedora::ObjectNotFoundError
         nil
       end
+      # :nocov:
     end
   end
 end
