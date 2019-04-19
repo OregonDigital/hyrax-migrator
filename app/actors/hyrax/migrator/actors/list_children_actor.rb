@@ -43,7 +43,7 @@ module Hyrax::Migrator::Actors
       if @children.empty?
         message = NO_CHILD
       else
-        @work.env[:attributes][:work_members_attributes] = @children
+        @work.env[:work_members_attributes] = @children
         message = HAS_CHILD
       end
       succeeded(aasm.current_state, "Work #{@work.pid} #{message}", Hyrax::Migrator::Work::SUCCESS)

@@ -30,7 +30,7 @@ RSpec.describe Hyrax::Migrator::Actors::AddRelationshipsActor do
 
     context 'when the service succeeds' do
       before do
-        work.env[:attributes][:work_members_attributes] = { 'id' => 'blah' }
+        work.env[:work_members_attributes] = { '0' => { 'id' => 'blah' } }
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:add_relationships).and_return(true)
         actor.next_actor = terminal
@@ -59,7 +59,7 @@ RSpec.describe Hyrax::Migrator::Actors::AddRelationshipsActor do
 
     context 'when the service fails' do
       before do
-        work.env[:attributes][:work_members_attributes] = { 'id' => 'blah' }
+        work.env[:work_members_attributes] = { '0' => { 'id' => 'blah' } }
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:add_relationships).and_return(false)
         actor.next_actor = terminal
@@ -88,7 +88,7 @@ RSpec.describe Hyrax::Migrator::Actors::AddRelationshipsActor do
 
     context 'when the service raises an exception' do
       before do
-        work.env[:attributes][:work_members_attributes] = { 'id' => 'blah' }
+        work.env[:work_members_attributes] = { '0' => { 'id' => 'blah' } }
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:add_relationships).and_raise(StandardError)
         actor.next_actor = terminal

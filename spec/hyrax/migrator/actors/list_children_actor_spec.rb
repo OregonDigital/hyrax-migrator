@@ -102,7 +102,7 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
       end
       it 'adds to work.env[:attributes]' do
         actor.create(work)
-        expect(work.env[:attributes]).to include(:work_members_attributes)
+        expect(work.env).to include(:work_members_attributes)
       end
     end
 
@@ -130,9 +130,9 @@ RSpec.describe Hyrax::Migrator::Actors::ListChildrenActor do
         expect(terminal).to receive(:create)
         actor.create(work)
       end
-      it 'does not add to work.env[:attributes]' do
+      it 'does not add to work.env' do
         actor.create(work)
-        expect(work.env[:attributes]).not_to include(:work_members_attributes)
+        expect(work.env).not_to include(:work_members_attributes)
       end
     end
   end
