@@ -15,7 +15,7 @@ module Hyrax::Migrator
       # @input [String] - Title
       # :nocov:
       def self.find(id)
-        ::AdminSet.find(id)
+        ::AdminSet.find(id) if ::AdminSet.exists?(id)
       end
       # :nocov:
     end
