@@ -41,7 +41,8 @@ module Hyrax::Migrator::Actors
     private
 
     def post_success
-      @work.env[:attributes] = @attributes
+      @work.env[:attributes] ||= {}
+      @work.env[:attributes].merge!(@attributes)
       succeeded(aasm.current_state, "Work #{@work.pid} crosswalked metadata.", Hyrax::Migrator::Work::SUCCESS)
     end
 

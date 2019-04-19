@@ -8,7 +8,6 @@ RSpec.describe Hyrax::Migrator::Actors::CrosswalkMetadataActor do
   let(:work) { create(:work, pid: pid) }
   let(:pid) { 'abcde1234' }
   let(:config) { Hyrax::Migrator::Configuration.new }
-  let(:result_hash) { instance_double('hash') }
   let(:cms) { instance_double('Hyrax::Migrator::Services::CrosswalkMetadataService') }
 
   describe '#create' do
@@ -16,7 +15,7 @@ RSpec.describe Hyrax::Migrator::Actors::CrosswalkMetadataActor do
       before do
         allow(actor).to receive(:config).and_return(config)
         allow(Hyrax::Migrator::Services::CrosswalkMetadataService).to receive(:new).and_return(cms)
-        allow(cms).to receive(:crosswalk).and_return(result_hash)
+        allow(cms).to receive(:crosswalk).and_return({})
         actor.next_actor = terminal
       end
 

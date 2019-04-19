@@ -6,7 +6,7 @@ module Hyrax
     # The job responsible for initiating migrating a work
     class MigrateWorkJob < ApplicationJob
       def perform(args)
-        service = ::Services::MigrateWorkService.new(args)
+        service = Hyrax::Migrator::Services::MigrateWorkService.new(args)
         service.run
       end
     end

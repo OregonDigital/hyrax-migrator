@@ -56,9 +56,9 @@ module Hyrax::Migrator
 
       def curation_concern
         @curation_concern ||= begin
-          model = @model.constantize.find(@attributes['id'])
-          model ||= @model.constantize.new
-          model
+          @model.constantize.find(@attributes['id'] || @attributes[:id])
+                              rescue ActiveFedora::ObjectNotFoundError
+                                @model.constantize.new
         end
       end
       # :nocov:
