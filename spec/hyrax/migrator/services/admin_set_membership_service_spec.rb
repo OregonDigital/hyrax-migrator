@@ -9,13 +9,11 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     h[:repository] = [RDF::URI('http://dbpedia.org/resource/Hogwarts-Special-Collections-and-Archives')]
     h
   end
-  let(:metadata_set) { ['http://oregondigital.org/resource/oregondigital:little-dogs', 'http://oregondigital.org/resource/oregondigital:heavy-rocks'] }
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:pid) { '3t945r08v' }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(work, config) }
-
   let(:hyrax_core_admin_set) { instance_double('Hyrax::Migrator::HyraxCore::AdminSet') }
   let(:admin_set) { instance_double('AdminSet', id: 'osu', title: 'University', description: 'hello world') }
 
@@ -67,6 +65,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   describe 'collection_ids' do
     context 'when given one or more colls' do
       let(:result) { { '0' => { 'id' => 'little-dogs' }, '1' => { 'id' => 'heavy-rocks' } } }
+      let(:metadata_set) { ['http://oregondigital.org/resource/oregondigital:little-dogs', 'http://oregondigital.org/resource/oregondigital:heavy-rocks'] }
 
       before do
         allow(service).to receive(:metadata_set).and_return(metadata_set)
@@ -118,8 +117,13 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
         work.env[:crosswalk_metadata] = crosswalk_metadata
       end
 
-      it 'returns a hash with two members' do
+      it 'returns a hash with three members' do
         response = service.acquire_set_ids
+        expect(response.keys).to eq %w[ids metadata_set metadata_primary_set]
+      end
+
+      it 'returns a hash of ids with two members' do
+        response = service.acquire_set_ids['ids']
         expect(response.keys).to eq %w[admin_set_id member_of_collections_attributes]
       end
     end
@@ -127,16 +131,16 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
   describe 'admin_set_id' do
     let(:admin_set) { instance_double('AdminSet', id: 'osu', title: 'Oregon State University', description: 'hello world') }
+    let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-gorge' }
 
     before do
-      crosswalk_metadata[:primary_set] = RDF::URI('http://oregondigital.org/resource/oregondigital:columbia-gorge')
       crosswalk_metadata[:institution] = [RDF::URI('http://dbpedia.org/resource/Oregon-State-University')]
       crosswalk_metadata[:repository] = [RDF::URI('http://dbpedia.org/resource/Test')]
     end
 
     context 'when called' do
       it 'returns corresponding admin set id' do
-        expect(service.send(:admin_set_id, crosswalk_metadata[:primary_set])).to eq 'osu'
+        expect(service.send(:admin_set_id, metadata_primary_set)).to eq 'osu'
       end
     end
   end

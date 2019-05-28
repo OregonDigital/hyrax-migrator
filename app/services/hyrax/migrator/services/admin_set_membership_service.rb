@@ -18,8 +18,12 @@ module Hyrax::Migrator::Services
 
     def acquire_set_ids
       result = {}
-      result['admin_set_id'] = admin_set(@work.env[:attributes])
-      result['member_of_collections_attributes'] = collection_ids
+      result['ids'] = {
+        'admin_set_id' => admin_set(@work.env[:attributes]),
+        'member_of_collections_attributes' => collection_ids
+      }
+      result['metadata_set'] = metadata_set
+      result['metadata_primary_set'] = metadata_primary_set
       result
     end
 
@@ -39,15 +43,6 @@ module Hyrax::Migrator::Services
       Hyrax::Migrator::Services::CreateGraphService.call(@data_dir)
     end
 
-    def metadata_primary_set
-      primary_set = @graph.statements.detect { |s| s.predicate.to_s.casecmp(PRIMARY_SET_PREDICATE).zero? }
-      primary_set.object.to_s if primary_set.present?
-    end
-
-    def metadata_set
-      @graph.statements.select { |s| s.predicate.to_s.casecmp(SET_PREDICATE).zero? }.map { |r| r.object.to_s }
-    end
-
     def collection_ids
       result = {}
       return result if metadata_set.blank?
@@ -56,6 +51,15 @@ module Hyrax::Migrator::Services
         result[index.to_s] = { 'id' => strip_id(s) }
       end
       result
+    end
+
+    def metadata_primary_set
+      primary_set = @graph.statements.detect { |s| s.predicate.to_s.casecmp(PRIMARY_SET_PREDICATE).zero? }
+      primary_set.object.to_s if primary_set.present?
+    end
+
+    def metadata_set
+      @graph.statements.select { |s| s.predicate.to_s.casecmp(SET_PREDICATE).zero? }.map { |r| r.object.to_s }
     end
 
     def admin_set_id(uri)
