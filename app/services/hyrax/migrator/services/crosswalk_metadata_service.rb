@@ -6,9 +6,6 @@ require 'rdf/ntriples'
 module Hyrax::Migrator::Services
   # Called by the CrosswalkMetadataActor to map OD1 metadata to OD2
   class CrosswalkMetadataService
-    include RDF
-    NT_FILE = 'descmetadata.nt'
-
     def initialize(work, migrator_config)
       @work = work
       @data_dir = File.join(work.working_directory, 'data')
@@ -30,18 +27,7 @@ module Hyrax::Migrator::Services
 
     # Load the nt file and return graph
     def create_graph
-      RDF::Graph.load(nt_file)
-    end
-
-    # Find and return the ntriple file
-    def nt_file
-      files = Dir.entries(@data_dir)
-      file = files.find { |f| f.downcase.end_with?(NT_FILE) }
-      raise StandardError, "could not find ntriple file in #{@data_dir}" unless file
-
-      File.join(@data_dir, file)
-    rescue Errno::ENOENT
-      raise StandardError, "data directory #{@data_dir} not found"
+      Hyrax::Migrator::Services::CreateGraphService.call(@data_dir)
     end
 
     # Given property data and an object, adds them to result hash

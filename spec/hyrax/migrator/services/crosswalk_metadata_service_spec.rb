@@ -34,26 +34,6 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     allow(RDF::Graph).to receive(:load).and_return(graph)
   end
 
-  describe 'nt_file' do
-    context 'when there is a file with a valid path' do
-      it 'finds the file' do
-        expect(service.send(:nt_file)).to eq("#{file_path}/data/#{pid}_descMetadata.nt")
-      end
-    end
-
-    context 'when it cant find the file' do
-      let(:error) { StandardError }
-
-      before do
-        work.file_path = '/some_path'
-      end
-
-      it 'raises an error' do
-        expect { service.send(:nt_file) }.to raise_error(error)
-      end
-    end
-  end
-
   describe 'assemble_hash' do
     context 'when given a property and an object' do
       it 'adds the property and object to the result' do

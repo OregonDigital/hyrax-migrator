@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 require 'rdf'
+require 'byebug'
 
 RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:crosswalk_metadata) do
     h = {}
-    h[:primary_set] = RDF::URI('http://oregondigital.org/resource/oregondigital:heavy-rocks')
-    h[:set] = [RDF::URI('http://oregondigital.org/resource/oregondigital:little-dogs')]
-    h[:set] += [RDF::URI('http://oregondigital.org/resource/oregondigital:heavy-rocks')]
     h[:institution] = [RDF::URI('http://dbpedia.org/resource/University-of-Oregon-State-University')]
     h[:repository] = [RDF::URI('http://dbpedia.org/resource/Hogwarts-Special-Collections-and-Archives')]
     h
   end
+  let(:metadata_set) { ['http://oregondigital.org/resource/oregondigital:little-dogs', 'http://oregondigital.org/resource/oregondigital:heavy-rocks'] }
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:pid) { '3t945r08v' }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
@@ -56,6 +55,10 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     end
 
     context 'when none of the possible set values exist' do
+      before do
+        allow(service).to receive(:metadata_primary_set).and_return(nil)
+      end
+
       it 'uses a default value' do
         expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution, :repository))).to eq 'admin/default'
       end
@@ -66,14 +69,22 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     context 'when given one or more colls' do
       let(:result) { { '0' => { 'id' => 'little-dogs' }, '1' => { 'id' => 'heavy-rocks' } } }
 
+      before do
+        allow(service).to receive(:metadata_set).and_return(metadata_set)
+      end
+
       it 'returns an hash of the ids' do
-        expect(service.send(:collection_ids, crosswalk_metadata)).to eq(result)
+        expect(service.send(:collection_ids)).to eq(result)
       end
     end
 
     context 'when there are no colls' do
+      before do
+        allow(service).to receive(:metadata_set).and_return([])
+      end
+
       it 'returns an empty hash' do
-        expect(service.send(:collection_ids, crosswalk_metadata.except(:set))).to eq({})
+        expect(service.send(:collection_ids)).to eq({})
       end
     end
   end
@@ -81,7 +92,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   describe 'strip_id' do
     context 'when given an rdf uri' do
       it 'returns an id' do
-        expect(service.send(:strip_id, crosswalk_metadata[:primary_set])).to eq 'heavy-rocks'
+        expect(service.send(:strip_id, crosswalk_metadata[:institution].first)).to eq 'University-of-Oregon-State-University'
       end
     end
 
@@ -126,7 +137,6 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
     context 'when called' do
       it 'returns corresponding admin set id' do
-        allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find).with('osu').and_return(admin_set)
         expect(service.send(:admin_set_id, crosswalk_metadata[:primary_set])).to eq 'osu'
       end
     end
