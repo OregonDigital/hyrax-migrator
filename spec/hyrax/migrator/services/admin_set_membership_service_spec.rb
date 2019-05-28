@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rdf'
-require 'byebug'
 
 RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
   let(:crosswalk_metadata) do
