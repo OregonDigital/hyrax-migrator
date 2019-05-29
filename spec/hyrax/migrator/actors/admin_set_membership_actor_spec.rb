@@ -8,7 +8,10 @@ RSpec.describe Hyrax::Migrator::Actors::AdminSetMembershipActor do
   let(:work) { create(:work, pid: pid) }
   let(:pid) { 'abcde1234' }
   let(:config) { Hyrax::Migrator::Configuration.new }
-  let(:result_hash) { { admin_set_id: 'default/admin' } }
+  let(:set_ids) { { admin_set_id: 'default/admin' } }
+  let(:metadata_set) { ['http://oregondigital.org/resource/oregondigital:little-dogs', 'http://oregondigital.org/resource/oregondigital:heavy-rocks'] }
+  let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-gorge' }
+  let(:result_hash) { { 'ids' => set_ids, 'metadata_set' => metadata_set, 'metadata_primary_set' => metadata_primary_set } }
   let(:asms) { instance_double('Hyrax::Migrator::Services::AdminSetMembershipService') }
 
   describe '#create' do

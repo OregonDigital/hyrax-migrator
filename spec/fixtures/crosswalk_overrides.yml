@@ -4,6 +4,6 @@ overrides:
     multiple: true
   - predicate: http://opaquenamespace.org/ns/fullText
     function: return_nil
-  - property: rightsHolder
-    predicate: http://opaquenamespace.org/right/rightsHolder
+  - property: rights_holder
+    predicate: http://opaquenamespace.org/ns/rightsHolder
     multiple: true

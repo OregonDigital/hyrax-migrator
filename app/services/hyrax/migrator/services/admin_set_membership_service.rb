@@ -6,23 +6,31 @@ module Hyrax::Migrator::Services
   # A service to pull ids out of set-related fields for admin_set and collection memberships
   class AdminSetMembershipService
     DEFAULT_ADMIN_SET_ID = 'admin/default'
+    PRIMARY_SET_PREDICATE = 'http://opaquenamespace.org/ns/primarySet'
+    SET_PREDICATE = 'http://opaquenamespace.org/ns/set'
 
     def initialize(work, migrator_config)
       @work = work
       @config = migrator_config
+      @data_dir = File.join(work.working_directory, 'data')
+      @graph = create_graph
     end
 
     def acquire_set_ids
       result = {}
-      result['admin_set_id'] = admin_set(@work.env[:attributes])
-      result['member_of_collections_attributes'] = collection_ids(@work.env[:attributes])
+      result['ids'] = {
+        'admin_set_id' => admin_set(@work.env[:attributes]),
+        'member_of_collections_attributes' => collection_ids
+      }
+      result['metadata_set'] = metadata_set
+      result['metadata_primary_set'] = metadata_primary_set
       result
     end
 
     private
 
     def admin_set(metadata)
-      return admin_set_id(metadata[:primary_set]) if metadata[:primary_set]
+      return admin_set_id(metadata_primary_set) if metadata_primary_set.present?
 
       return admin_set_id(metadata[:institution].first) if metadata[:institution]
 
@@ -31,14 +39,27 @@ module Hyrax::Migrator::Services
       DEFAULT_ADMIN_SET_ID
     end
 
-    def collection_ids(metadata)
-      result = {}
-      return result if metadata[:set].blank?
+    def create_graph
+      Hyrax::Migrator::Services::CreateGraphService.call(@data_dir)
+    end
 
-      metadata[:set].each_with_index do |s, index|
+    def collection_ids
+      result = {}
+      return result if metadata_set.blank?
+
+      metadata_set.each_with_index do |s, index|
         result[index.to_s] = { 'id' => strip_id(s) }
       end
       result
+    end
+
+    def metadata_primary_set
+      primary_set = @graph.statements.detect { |s| s.predicate.to_s.casecmp(PRIMARY_SET_PREDICATE).zero? }
+      primary_set.object.to_s if primary_set.present?
+    end
+
+    def metadata_set
+      @graph.statements.select { |s| s.predicate.to_s.casecmp(SET_PREDICATE).zero? }.map { |r| r.object.to_s }
     end
 
     def admin_set_id(uri)
