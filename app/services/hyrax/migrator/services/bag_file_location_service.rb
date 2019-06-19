@@ -27,7 +27,7 @@ module Hyrax::Migrator::Services
       @aws_s3_url_availability = migrator_config.aws_s3_url_availability
     end
 
-    # returns a hash of locations 
+    # returns a hash of locations
     def bags_to_ingest
       if @ingest_storage_service == :aws_s3
         remote_locations
@@ -47,12 +47,15 @@ module Hyrax::Migrator::Services
     end
 
     def remote_bags(batch_name)
-      ingest_bucket = aws_s3_resource.bucket(aws_s3_ingest_bucket)
       zip_url_bags = []
-      ingest_bucket.objects(prefix: batch_name).each do |obj|
+      aws_s3_objects(batch_name).each do |obj|
         zip_url_bags << obj.presigned_url(:get, expires_in: aws_s3_url_availability) if obj.key.end_with? '.zip'
       end
       zip_url_bags
+    end
+
+    def aws_s3_objects(batch_name)
+      aws_s3_resource.bucket(aws_s3_ingest_bucket).objects(prefix: batch_name)
     end
 
     def aws_s3_resource
