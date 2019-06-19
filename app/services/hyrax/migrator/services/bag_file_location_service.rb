@@ -11,8 +11,8 @@ module Hyrax::Migrator::Services
                 :aws_s3_app_key, :aws_s3_app_secret, :aws_s3_url_availability,
                 :aws_s3_ingest_bucket, :aws_s3_region, :ingest_storage_service
 
-    # @param config [Hyrax::Migrator::Configuration]
     # @param batch_dir_names [String Array]
+    # @param config [Hyrax::Migrator::Configuration]
     def initialize(batch_dir_names, migrator_config)
       @ingest_storage_service = migrator_config.ingest_storage_service
       # batch_dir_names
@@ -58,6 +58,7 @@ module Hyrax::Migrator::Services
       aws_s3_resource.bucket(aws_s3_ingest_bucket).objects(prefix: batch_name)
     end
 
+    # TODO: Refector aws_s3 methods to a service or driver like library
     def aws_s3_resource
       Aws::S3::Resource.new(client: aws_s3_client)
     end
