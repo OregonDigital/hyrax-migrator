@@ -26,9 +26,11 @@ services:
       - RAILS_LOG_TO_STDOUT=1
       - REDIS_HOST=redis-dev
       - REDIS_PORT='6379'
+      - INGEST_LOCAL_PATH=/data/tmp
       - BROWSEEVERYTHING_FILESYSTEM_PATH=/data/tmp
       - AWS_S3_REGION=awss3region
       - AWS_S3_BUCKET=awss3bucket
+      - AWS_S3_INGEST_BUCKET=awss3ingestbucket
       - AWS_S3_APP_KEY=awss3key
       - AWS_S3_APP_SECRET=awsappsecret
     networks:
@@ -54,9 +56,11 @@ services:
       - RAILS_LOG_TO_STDOUT=1
       - REDIS_HOST=redis-test
       - REDIS_PORT='6379'
+      - INGEST_LOCAL_PATH=/data/tmp
       - BROWSEEVERYTHING_FILESYSTEM_PATH=/data/tmp
       - AWS_S3_REGION=awss3region
       - AWS_S3_BUCKET=awss3bucket
+      - AWS_S3_INGEST_BUCKET=awss3ingestbucket
       - AWS_S3_APP_KEY=awss3key
       - AWS_S3_APP_SECRET=awsappsecret
     depends_on:

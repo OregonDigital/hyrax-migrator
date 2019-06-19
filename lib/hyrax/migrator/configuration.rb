@@ -32,6 +32,26 @@ module Hyrax::Migrator
       @file_system_path ||= ENV['BROWSEEVERYTHING_FILESYSTEM_PATH']
     end
 
+    attr_writer :ingest_storage_service
+    def ingest_storage_service
+      @ingest_storage_service ||= if Rails.env.production?
+                                    :aws_s3
+                                  else
+                                    :file_system
+                                  end
+    end
+
+    attr_writer :ingest_local_path
+    def ingest_local_path
+      @ingest_local_path ||= ENV['INGEST_LOCAL_PATH']
+    end
+
+    # bucket used for batch ingest
+    attr_writer :aws_s3_ingest_bucket
+    def aws_s3_ingest_bucket
+      @aws_s3_ingest_bucket ||= ENV['AWS_S3_INGEST_BUCKET']
+    end
+
     attr_writer :aws_s3_app_key
     def aws_s3_app_key
       @aws_s3_app_key ||= ENV['AWS_S3_APP_KEY']
@@ -42,6 +62,7 @@ module Hyrax::Migrator
       @aws_s3_app_secret ||= ENV['AWS_S3_APP_SECRET']
     end
 
+    # bucket used primaraly for uploads
     attr_writer :aws_s3_bucket
     def aws_s3_bucket
       @aws_s3_bucket ||= ENV['AWS_S3_BUCKET']
