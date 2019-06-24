@@ -40,7 +40,13 @@ module Hyrax::Migrator::Actors
       @work.env[:attributes].merge!(@hash['ids'])
       @work.env[:primary_set] = @hash['metadata_primary_set']
       @work.env[:set] = @hash['metadata_set']
+      cleanup_attributes
       succeeded(aasm.current_state, "Work #{@work.pid} acquired admin_set_id and any collections.", Hyrax::Migrator::Work::SUCCESS)
+    end
+
+    def cleanup_attributes
+      @work.env[:attributes].delete(:primary_set)
+      @work.env[:attributes].delete(:set)
     end
 
     def post_fail

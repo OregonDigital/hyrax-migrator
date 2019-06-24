@@ -12,7 +12,6 @@ module Hyrax::Migrator
       # @see https://github.com/samvera/hyrax/blob/master/app/models/hyrax/uploaded_file.rb
       def initialize(args)
         @user = args[:user]
-        @uploaded_file_uri = args[:uploaded_file_uri]
         @uploaded_filename = args[:uploaded_filename]
       end
 
@@ -34,7 +33,7 @@ module Hyrax::Migrator
       ## No coverage for Hyrax application integration to eliminate dependencies
       # :nocov:
       def create_uploaded_file
-        Hyrax::UploadedFile.create(user: @user, file_set_uri: @uploaded_file_uri, file: local_file)
+        Hyrax::UploadedFile.create(user: @user, file: local_file)
       end
 
       def local_file

@@ -43,7 +43,13 @@ module Hyrax::Migrator::Actors
     def post_success
       @work.env[:attributes] ||= {}
       @work.env[:attributes].merge!(@attributes)
+      cleanup_attributes
       succeeded(aasm.current_state, "Work #{@work.pid} crosswalked metadata.", Hyrax::Migrator::Work::SUCCESS)
+    end
+
+    def cleanup_attributes
+      @work.env[:attributes].delete(:primary_set)
+      @work.env[:attributes].delete(:set)
     end
 
     def post_fail

@@ -67,7 +67,6 @@ module Hyrax::Migrator::Actors
     def hyrax_file_uploaded
       @hyrax_file_uploaded ||= Hyrax::Migrator::HyraxCore::UploadedFile.new(
         user: user,
-        uploaded_file_uri: @uploaded_file['local_file_uri'],
         uploaded_filename: @uploaded_file['local_filename']
       )
     end
