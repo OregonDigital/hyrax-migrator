@@ -6,9 +6,6 @@ require 'rdf/ntriples'
 module Hyrax::Migrator::Services
   # Called by the CrosswalkMetadataActor to map OD1 metadata to OD2
   class CrosswalkMetadataService
-    PRIMARY_SET_PREDICATE = 'http://opaquenamespace.org/ns/primarySet'
-    SET_PREDICATE = 'http://opaquenamespace.org/ns/set'
-
     def initialize(work, migrator_config)
       @work = work
       @data_dir = File.join(work.working_directory, 'data')
@@ -19,8 +16,6 @@ module Hyrax::Migrator::Services
     def crosswalk
       graph = create_graph
       graph.statements.each do |statement|
-        next if excluded_predicates.include? statement.predicate.to_s
-
         data = lookup(statement.predicate.to_s)
         processed_obj = process(data, statement.object)
         assemble_hash(data, processed_obj)
@@ -29,10 +24,6 @@ module Hyrax::Migrator::Services
     end
 
     private
-
-    def excluded_predicates
-      [PRIMARY_SET_PREDICATE, SET_PREDICATE]
-    end
 
     # Load the nt file and return graph
     def create_graph
