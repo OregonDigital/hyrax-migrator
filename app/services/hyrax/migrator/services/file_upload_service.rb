@@ -57,7 +57,7 @@ module Hyrax
       end
 
       def local_file_obj
-        { 'local_filename' => dest_local_file, 'local_file_uri' => URI.join('file:///', dest_local_file) }
+        { 'local_filename' => dest_local_file }
       end
 
       def make_path_for(file)

@@ -114,6 +114,42 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       end
     end
 
+    context 'when there is an nt with set and primary_set to process' do
+      let(:set_statement) do
+        RDF::Statement.new(
+          RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234'),
+          RDF::URI('http://opaquenamespace.org/ns/set'),
+          RDF::URI('http://oregondigital.org/resource/oregondigital:osu-scarc')
+        )
+      end
+
+      let(:primary_set_statement) do
+        RDF::Statement.new(
+          RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234'),
+          RDF::URI('http://opaquenamespace.org/ns/primarySet'),
+          RDF::URI('http://oregondigital.org/resource/oregondigital:osu-baseball')
+        )
+      end
+
+      let(:creator_statement) { RDF::Statement.new(RDF::URI(rdfsubject), RDF::URI(predicate), RDF::URI(object)) }
+
+      let(:graph) do
+        g = RDF::Graph.new
+        g << set_statement
+        g << primary_set_statement
+        g << creator_statement
+        g
+      end
+
+      it 'excludes :set from result hash' do
+        expect(service.crosswalk[:set]).to be_nil
+      end
+
+      it 'excludes :primary_set from result hash' do
+        expect(service.crosswalk[:primary_set]).to be_nil
+      end
+    end
+
     context 'when processing uses the nil function' do
       before do
         graph << RDF::Statement(rdfsubject, predicate2, object2)

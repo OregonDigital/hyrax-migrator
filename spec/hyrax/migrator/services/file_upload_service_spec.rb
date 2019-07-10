@@ -23,7 +23,6 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       let(:dest_filename) { File.join(config.file_system_path, basename_content_file) }
       let(:dest_filename_obj) do
         {
-          'local_file_uri' => URI.join('file:///', dest_filename),
           'local_filename' => dest_filename
         }
       end

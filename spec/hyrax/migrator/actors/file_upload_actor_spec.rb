@@ -22,8 +22,7 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
   end
   let(:local_file_hash) do
     {
-      'local_filename' => local_filename,
-      'local_file_uri' => URI.join('file:///', local_filename)
+      'local_filename' => local_filename
     }
   end
 
@@ -57,7 +56,7 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
       before do
         allow(service).to receive(:upload_file_content).and_return(local_file_hash)
         allow(actor).to receive(:user).and_return(current_user)
-        allow(Hyrax::Migrator::HyraxCore::UploadedFile).to receive(:new).with(hash_including(user: actor.user, uploaded_file_uri: local_file_hash['local_file_uri'], uploaded_filename: local_file_hash['local_filename'])).and_return(hyrax_core_uploaded_file)
+        allow(Hyrax::Migrator::HyraxCore::UploadedFile).to receive(:new).with(hash_including(user: actor.user, uploaded_filename: local_file_hash['local_filename'])).and_return(hyrax_core_uploaded_file)
         allow(hyrax_core_uploaded_file).to receive(:create).and_return(hyrax_uploaded_file)
         actor.next_actor = terminal
       end

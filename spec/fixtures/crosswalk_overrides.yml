@@ -4,6 +4,10 @@ overrides:
     multiple: true
   - predicate: http://opaquenamespace.org/ns/fullText
     function: return_nil
+  - predicate: http://opaquenamespace.org/ns/primarySet
+    function: return_nil
+  - predicate: http://opaquenamespace.org/ns/set
+    function: return_nil
   - property: rights_holder
     predicate: http://opaquenamespace.org/ns/rightsHolder
     multiple: true
