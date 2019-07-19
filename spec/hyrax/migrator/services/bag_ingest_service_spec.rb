@@ -9,11 +9,14 @@ RSpec.describe Hyrax::Migrator::Services::BagIngestService do
   let(:service) { described_class.new(batch_dir_names, config) }
   let(:location_service) { instance_double('Hyrax::Migrator::Services::BagFileLocationService') }
   let(:all_bags_dir) { File.join(Rails.root, '..', 'fixtures') }
+  let(:bag1) { File.join(all_bags_dir, batch_name, 'df65vc341.zip') }
+  let(:bag2) { File.join(all_bags_dir, batch_name, 'df65vc936.zip') }
+  let(:bag3) { File.join(all_bags_dir, batch_name, 'df70bm35k.zip') }
 
   before do
     allow(Hyrax::Migrator::Services::BagFileLocationService).to receive(:new).and_return(location_service)
     allow(location_service).to receive(:bags_to_ingest).and_return(
-      'batch1' => ['/data/tmp/batch1/df70bm35k.zip', '/data/tmp/batch1/df65vc341.zip', '/data/tmp/batch1/df65vc936.zip']
+      'batch1' => [bag1, bag2, bag3]
     )
     config.ingest_local_path = all_bags_dir
     config.ingest_storage_service = :file_system
