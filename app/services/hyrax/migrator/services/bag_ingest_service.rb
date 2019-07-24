@@ -31,7 +31,7 @@ module Hyrax::Migrator::Services
     end
 
     def bag_file_location_service
-      Hyrax::Migrator::Services::BagFileLocationService.new(input_batch_names, config: migrator_config)
+      Hyrax::Migrator::Services::BagFileLocationService.new(input_batch_names, migrator_config)
     end
   end
 end
