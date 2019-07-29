@@ -11,3 +11,6 @@ overrides:
   - property: rights_holder
     predicate: http://opaquenamespace.org/ns/rightsHolder
     multiple: true
+  - property: material
+    predicate: http://opaquenamespace.org/ns/vra/material
+    multiple: true

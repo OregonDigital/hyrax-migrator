@@ -10,11 +10,11 @@ jobs:
       - run:
           name: Update Debian Packages
           command: |
-            echo "deb http://http.debian.net/debian stretch-backports main" | sudo tee -a /etc/apt/sources.list
-            sudo apt-get update -qq
+            echo "deb http://http.debian.net/debian stretch main" | sudo tee -a /etc/apt/sources.list
+            sudo apt-get update --fix-missing -qq
             sudo apt-get upgrade -qq
             sudo apt-get install -y -f software-properties-common build-essential nodejs make apt-utils
-            sudo apt-get install -t stretch-backports -y openjdk-8-jre-headless ca-certificates-java
+            sudo apt-get install -t stretch -y openjdk-8-jre-headless ca-certificates-java
             sudo apt-get install -y openjdk-8-jre openjdk-8-jdk openjdk-8-jdk-headless
       - checkout
       - restore_cache:
