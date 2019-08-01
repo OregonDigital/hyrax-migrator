@@ -139,5 +139,11 @@ module Hyrax::Migrator
     def status_completed
       @status_completed ||= ''
     end
+
+    # A switch to temporarily disable flagging unmapped predicates
+    attr_writer :skip_field_mode
+    def skip_field_mode
+      @skip_field_mode ||= false
+    end
   end
 end
