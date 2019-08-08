@@ -10,6 +10,7 @@ module Hyrax::Migrator::Services
       @work = work
       @data_dir = File.join(work.working_directory, 'data')
       @config = migrator_config
+      @skip_field_mode = migrator_config.skip_field_mode
     end
 
     # returns result hash
@@ -17,6 +18,8 @@ module Hyrax::Migrator::Services
       graph = create_graph
       graph.statements.each do |statement|
         data = lookup(statement.predicate.to_s)
+        next if data.nil?
+
         processed_obj = process(data, statement.object)
         assemble_hash(data, processed_obj)
       end
@@ -53,6 +56,10 @@ module Hyrax::Migrator::Services
       result = hash.select(&find(predicate))
       return result.first unless result.empty?
 
+      if @skip_field_mode
+        Rails.logger.warn "Predicate not found: #{predicate} during crosswalk for #{@work.pid}"
+        return nil
+      end
       raise PredicateNotFoundError, predicate
     end
 

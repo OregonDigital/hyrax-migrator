@@ -90,6 +90,20 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
         expect { service.send(:lookup, bad_predicate) }.to raise_error(error)
       end
     end
+
+    context 'when given a predicate that is not in the config and skip_field_mode is true' do
+      let(:bad_predicate) { 'http://example.org/ns/iDontExist' }
+
+      before { config.skip_field_mode = true }
+
+      it 'logs a warning' do
+        expect(Rails.logger).to receive(:warn)
+        service.send(:lookup, bad_predicate)
+      end
+      it 'returns nil' do
+        expect(service.send(:lookup, bad_predicate)).to eq(nil)
+      end
+    end
   end
 
   describe 'process' do

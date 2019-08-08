@@ -11,6 +11,7 @@ RSpec.describe Hyrax::Migrator::Configuration do
   it { expect(conf.crosswalk_admin_sets_file).to be_a String }
   it { expect(conf.model_crosswalk).to be_a String }
   it { expect(conf.migration_user).to be_a String }
+  it { expect(conf.skip_field_mode).to be_in([true, false]) }
 
   context 'when registering a model' do
     before do
