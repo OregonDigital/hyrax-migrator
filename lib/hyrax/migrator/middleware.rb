@@ -21,7 +21,7 @@ module Hyrax
       # @return [Hyrax::Migrator::Middleware::Configuration]
       # @see Hyrax::Migrator::Middleware::Configuration for options
       def self.config(&block)
-        @config ||= Hyrax::Migrator::Middleware::Configuration.new
+        @config = Hyrax::Migrator::Middleware::Configuration.new
 
         yield @config if block
 
@@ -32,7 +32,7 @@ module Hyrax
       # Provide the default middleware initialized with the actor_stack from configuration
       # @return [Hyrax::Migrator::Middleware::DefaultMiddleware]
       def self.default
-        Hyrax::Migrator::Middleware::DefaultMiddleware.new(@config.actor_stack)
+        Hyrax::Migrator::Middleware::DefaultMiddleware.new(config.actor_stack)
       end
     end
   end
