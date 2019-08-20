@@ -46,7 +46,6 @@ module Hyrax::Migrator
       @ingest_local_path ||= ENV['INGEST_LOCAL_PATH']
     end
 
-    # bucket used for batch ingest
     attr_writer :aws_s3_ingest_bucket
     def aws_s3_ingest_bucket
       @aws_s3_ingest_bucket ||= ENV['AWS_S3_INGEST_BUCKET']

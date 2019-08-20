@@ -19,8 +19,8 @@ module Hyrax::Migrator::Services
     def acquire_set_ids
       result = {}
       result['ids'] = {
-        'admin_set_id' => admin_set(@work.env[:attributes]),
-        'member_of_collections_attributes' => collection_ids
+        admin_set_id: admin_set(@work.env[:attributes]),
+        member_of_collections_attributes: collection_ids
       }
       result['metadata_set'] = metadata_set
       result['metadata_primary_set'] = metadata_primary_set
@@ -30,13 +30,16 @@ module Hyrax::Migrator::Services
     private
 
     def admin_set(metadata)
-      return admin_set_id(metadata_primary_set) if metadata_primary_set.present?
+      return admin_set_id_from_primary_set(metadata_primary_set) if metadata_primary_set.present?
 
-      return admin_set_id(metadata[:institution].first) if metadata[:institution]
+      return admin_set_id_from_institution(metadata[:institution].first) if metadata[:institution]
 
-      return admin_set_id(metadata[:repository].first) if metadata[:repository]
+      log_and_raise("Primary Set and Institution not found for #{@work.pid}")
+    end
 
-      DEFAULT_ADMIN_SET_ID
+    def log_and_raise(message)
+      Rails.logger.warn(message)
+      raise StandardError, message
     end
 
     def create_graph
@@ -62,20 +65,29 @@ module Hyrax::Migrator::Services
       @graph.statements.select { |s| s.predicate.to_s.casecmp(SET_PREDICATE).zero? }.map { |r| r.object.to_s }
     end
 
-    def admin_set_id(uri)
+    def admin_set_id_from_primary_set(uri)
       primary_set_id = strip_id(uri)
-      id = match_admin_set_id(primary_set_id)
+      id = match_primary_set(primary_set_id)
       id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : DEFAULT_ADMIN_SET_ID
     end
 
-    # Returns a data list that maps OD1 primary sets to OD2 amdin sets
-    def crosswalk_data
-      @crosswalk_data ||= YAML.load_file(@config.crosswalk_admin_sets_file).deep_symbolize_keys
-      @crosswalk_data[:crosswalk]
+    def admin_set_id_from_institution(uri)
+      id = match_institution(uri)
+      id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : DEFAULT_ADMIN_SET_ID
     end
 
-    def match_admin_set_id(primary_set_id)
-      hash_match = crosswalk_data.detect { |data| data[:primary_set] == primary_set_id }
+    # Returns a data list that maps OD1 primary sets and institutions to OD2 amdin sets
+    def crosswalk_data
+      @crosswalk_data ||= YAML.load_file(@config.crosswalk_admin_sets_file).deep_symbolize_keys
+    end
+
+    def match_primary_set(primary_set_id)
+      hash_match = crosswalk_data[:primary_set_crosswalk].detect { |data| data[:primary_set] == primary_set_id }
+      hash_match[:admin_set_id] if hash_match.present?
+    end
+
+    def match_institution(uri)
+      hash_match = crosswalk_data[:institution_crosswalk].detect { |data| data[:institution_uri] == uri }
       hash_match[:admin_set_id] if hash_match.present?
     end
 

@@ -24,7 +24,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
   describe 'admin_set' do
     before do
-      allow(service).to receive(:match_admin_set_id).and_return('heavy-rocks')
+      allow(service).to receive(:match_primary_set).and_return('heavy-rocks')
     end
 
     context 'when a primary_set exists' do
@@ -35,10 +35,10 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
       end
     end
 
-    context 'when primary_set does not exist' do
+    context 'when primary_set does not exist but institution does exist' do
       let(:admin_set) { instance_double('AdminSet', id: 'University-of-Oregon-State-University', title: 'University', description: 'Hello world') }
 
-      it 'uses a fallback value' do
+      it 'uses a fallback from institution metadata' do
         expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set))).to eq 'University-of-Oregon-State-University'
       end
     end
@@ -46,18 +46,12 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     context 'when primary_set and institution do not exist' do
       let(:admin_set) { instance_double('AdminSet', id: 'Hogwarts-Special-Collections-and-Archives', title: 'University', description: 'hello world') }
 
-      it 'uses a fallback value' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution))).to eq 'Hogwarts-Special-Collections-and-Archives'
-      end
-    end
-
-    context 'when none of the possible set values exist' do
       before do
         allow(service).to receive(:metadata_primary_set).and_return(nil)
       end
 
-      it 'uses a default value' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution, :repository))).to eq 'admin/default'
+      it 'raises error with pid' do
+        expect { service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution)) }.to raise_error(StandardError, 'Primary Set and Institution not found for 3t945r08v')
       end
     end
   end
@@ -124,23 +118,37 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
       it 'returns a hash of ids with two members' do
         response = service.acquire_set_ids['ids']
-        expect(response.keys).to eq %w[admin_set_id member_of_collections_attributes]
+        expect(response.keys).to eq %i[admin_set_id member_of_collections_attributes]
       end
     end
   end
 
-  describe 'admin_set_id' do
+  describe 'admin_set_id_from_primary_set' do
     let(:admin_set) { instance_double('AdminSet', id: 'osu', title: 'Oregon State University', description: 'hello world') }
     let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-gorge' }
 
     before do
       crosswalk_metadata[:institution] = [RDF::URI('http://dbpedia.org/resource/Oregon-State-University')]
-      crosswalk_metadata[:repository] = [RDF::URI('http://dbpedia.org/resource/Test')]
     end
 
     context 'when called' do
       it 'returns corresponding admin set id' do
-        expect(service.send(:admin_set_id, metadata_primary_set)).to eq 'osu'
+        expect(service.send(:admin_set_id_from_primary_set, metadata_primary_set)).to eq 'osu'
+      end
+    end
+  end
+
+  describe 'admin_set_id_from_institution' do
+    let(:admin_set) { instance_double('AdminSet', id: 'uo', title: 'University of Oregon', description: 'hola mundo') }
+    let(:metadata_institution) { 'http://dbpedia.org/resource/University_of_Oregon' }
+
+    before do
+      crosswalk_metadata[:institution] = [RDF::URI('http://dbpedia.org/resource/University_of_Oregon')]
+    end
+
+    context 'when called' do
+      it 'returns corresponding admin set id' do
+        expect(service.send(:admin_set_id_from_institution, metadata_institution)).to eq 'uo'
       end
     end
   end
