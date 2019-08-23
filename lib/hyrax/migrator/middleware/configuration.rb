@@ -18,6 +18,10 @@ module Hyrax
             Hyrax::Migrator::Actors::BagValidatorActor,
             Hyrax::Migrator::Actors::CrosswalkMetadataActor,
             Hyrax::Migrator::Actors::ModelLookupActor,
+            Hyrax::Migrator::Actors::AdminSetMembershipActor,
+            Hyrax::Migrator::Actors::VisibilityLookupActor,
+            Hyrax::Migrator::Actors::FileIdentityActor,
+            Hyrax::Migrator::Actors::FileUploadActor,
             Hyrax::Migrator::Actors::PersistWorkActor,
             Hyrax::Migrator::Actors::TerminalActor
           ]
