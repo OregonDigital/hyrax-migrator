@@ -1,5 +1,6 @@
 # frozen_string_literal:true
 
+# rubocop:disable Metrics/MethodLength
 module Hyrax
   module Migrator
     module Middleware
@@ -30,3 +31,4 @@ module Hyrax
     end
   end
 end
+# rubocop:disable Metrics/MethodLength
