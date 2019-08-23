@@ -31,4 +31,4 @@ module Hyrax
     end
   end
 end
-# rubocop:disable Metrics/MethodLength
+# rubocop:enable Metrics/MethodLength
