@@ -54,9 +54,12 @@ module Hyrax::Migrator
         @actor_environment = Hyrax::Actors::Environment.new(curation_concern, @user.ability, @attributes)
       end
 
+      ## id is needed for create, but will cause updates to fail.
       def curation_concern
         @curation_concern ||= begin
-          @model.constantize.find(@attributes['id'] || @attributes[:id])
+          cc = @model.constantize.find(@attributes['id'] || @attributes[:id])
+          @attributes['id'] ? @attributes.delete('id') : @attributes.delete(:id)
+          cc
                               rescue ActiveFedora::ObjectNotFoundError
                                 @model.constantize.new
         end
