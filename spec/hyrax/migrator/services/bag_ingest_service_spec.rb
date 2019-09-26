@@ -28,15 +28,36 @@ RSpec.describe Hyrax::Migrator::Services::BagIngestService do
   end
 
   describe '#ingest' do
+    before do
+      ActiveJob::Base.queue_adapter = :test
+      allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).with(anything).and_return(false)
+    end
+
     context 'when ingest_storage_service is :file_system' do
       before do
         config.ingest_storage_service = :file_system
-        ActiveJob::Base.queue_adapter = :test
       end
 
       it 'enqueues one job for each bag in batch_name for migration' do
         service.ingest
         expect(Hyrax::Migrator::Jobs::MigrateWorkJob).to have_been_enqueued.exactly(3).times
+      end
+    end
+
+    context 'when ingest_storage_service is :file_system and one asset already exists' do
+      before do
+        config.ingest_storage_service = :file_system
+        allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).with('df65vc341').and_return(true)
+      end
+
+      it 'logs a warning' do
+        expect(Rails.logger).to receive(:warn)
+        service.ingest
+      end
+
+      it 'skips one migrate work job' do
+        service.ingest
+        expect(Hyrax::Migrator::Jobs::MigrateWorkJob).to have_been_enqueued.exactly(2).times
       end
     end
   end
