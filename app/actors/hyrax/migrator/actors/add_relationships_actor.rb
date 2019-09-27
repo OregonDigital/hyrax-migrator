@@ -43,7 +43,7 @@ module Hyrax::Migrator::Actors
 
     def call_service
       @message = HAS_CHILD
-      work.env[:attributes][:work_members_attributes] = work.env.delete :work_members_attributes
+      work.env[:attributes][:work_members_attributes] = work.env[:work_members_attributes]
       add_relationships_initial
       update_work(aasm.current_state)
       service.add_relationships ? add_relationships_succeeded : add_relationships_failed

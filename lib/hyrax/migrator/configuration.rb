@@ -133,12 +133,6 @@ module Hyrax::Migrator
       @migration_user ||= nil
     end
 
-    # The status message to be used when a work is finished
-    attr_writer :status_completed
-    def status_completed
-      @status_completed ||= ''
-    end
-
     # A switch to temporarily disable flagging unmapped predicates
     attr_writer :skip_field_mode
     def skip_field_mode

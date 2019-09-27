@@ -18,8 +18,7 @@ RSpec.describe Hyrax::Migrator::Services::ChildrenAuditService do
     let(:asset) { double }
 
     before do
-      config.status_completed = 'So done!'
-      allow(asset).to receive(:status).and_return(config.status_completed)
+      allow(asset).to receive(:status).and_return(Hyrax::Migrator::Work::SUCCESS)
       work.env = env
     end
 

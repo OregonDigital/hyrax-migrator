@@ -33,7 +33,12 @@ module Hyrax::Migrator::Services
     end
 
     def attributes
-      @work.env[:attributes].slice(:work_members_attributes)
+      attrs = @work.env[:attributes].slice(:work_members_attributes).merge(id: @work.pid)
+      attrs.merge(ordered_member_ids: ordered_member_ids)
+    end
+
+    def ordered_member_ids
+      @work.env[:attributes][:work_members_attributes].map { |_k, v| v['id'] }
     end
   end
 end
