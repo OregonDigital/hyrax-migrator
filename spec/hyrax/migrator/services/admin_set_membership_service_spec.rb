@@ -22,24 +22,29 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     allow(Hyrax::Migrator::HyraxCore::AdminSet).to receive(:find).with(anything).and_return(admin_set)
   end
 
-  describe 'admin_set' do
+  describe 'admin_set_id' do
     before do
       allow(service).to receive(:match_primary_set).and_return('heavy-rocks')
     end
 
     context 'when a primary_set exists' do
-      let(:admin_set) { instance_double('AdminSet', id: 'heavy-rocks', title: 'University', description: 'hello world') }
+      let(:admin_set) { instance_double('AdminSet', id: 'heavy-rocks', title: 'test', description: 'hello world') }
 
       it 'uses the primary_set' do
-        expect(service.send(:admin_set, crosswalk_metadata)).to eq 'heavy-rocks'
+        expect(service.send(:admin_set_id)).to eq 'heavy-rocks'
       end
     end
 
     context 'when primary_set does not exist but institution does exist' do
-      let(:admin_set) { instance_double('AdminSet', id: 'University-of-Oregon-State-University', title: 'University', description: 'Hello world') }
+      before do
+        allow(service).to receive(:metadata_primary_set).and_return(nil)
+        allow(service).to receive(:metadata_institution).and_return('http://dbpedia.org/resource/University_of_Oregon')
+      end
+
+      let(:admin_set) { instance_double('AdminSet', id: 'uo', title: 'University', description: 'Hello world') }
 
       it 'uses a fallback from institution metadata' do
-        expect(service.send(:admin_set, crosswalk_metadata.except(:primary_set))).to eq 'University-of-Oregon-State-University'
+        expect(service.send(:admin_set_id)).to eq 'uo'
       end
     end
 
@@ -48,10 +53,11 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
       before do
         allow(service).to receive(:metadata_primary_set).and_return(nil)
+        allow(service).to receive(:metadata_institution).and_return(nil)
       end
 
       it 'raises error with pid' do
-        expect { service.send(:admin_set, crosswalk_metadata.except(:primary_set, :institution)) }.to raise_error(StandardError, 'Primary Set and Institution not found for 3t945r08v')
+        expect { service.send(:admin_set_id) }.to raise_error(StandardError, 'Primary Set and Institution not found for 3t945r08v')
       end
     end
   end
@@ -113,7 +119,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
       it 'returns a hash with three members' do
         response = service.acquire_set_ids
-        expect(response.keys).to eq %w[ids metadata_set metadata_primary_set]
+        expect(response.keys).to eq %w[ids metadata_set metadata_primary_set metadata_institution]
       end
 
       it 'returns a hash of ids with two members' do
