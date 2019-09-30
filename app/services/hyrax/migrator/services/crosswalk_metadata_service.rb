@@ -97,7 +97,7 @@ module Hyrax::Migrator::Services
       Rails.logger.warn "Invalid URI #{object} found in crosswalk of #{@work.pid}"
       return nil if @skip_field_mode
 
-      raise URI::InvalidURIERROR, object.to_s
+      raise URI::InvalidURIError, object.to_s
     end
 
     def valid_uri(uri)

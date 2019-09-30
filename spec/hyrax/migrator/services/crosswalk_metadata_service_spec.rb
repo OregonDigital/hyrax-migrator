@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rdf'
+require 'uri'
 
 RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:graph) do
@@ -184,6 +185,25 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
     it 'transforms the object using the function' do
       expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://test/test' }]
+    end
+
+    context 'when object is a string rather than a uri and skip_field_mode is true' do
+      let(:object) { 'blah blah' }
+
+      before { config.skip_field_mode = true }
+
+      it 'handles it by returning nil' do
+        expect(service.crosswalk[:format_attributes]).to eq [nil]
+      end
+    end
+
+    context 'when object is a string rather than a uri in production' do
+      let(:object) { 'blah blah' }
+      let(:error) { URI::InvalidURIError }
+
+      it 'raises an error' do
+        expect { service.send(:crosswalk)[:format_attributes] }.to raise_error(error)
+      end
     end
   end
 end
