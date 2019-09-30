@@ -8,6 +8,7 @@ module Hyrax::Migrator::Services
     DEFAULT_ADMIN_SET_ID = 'admin/default'
     PRIMARY_SET_PREDICATE = 'http://opaquenamespace.org/ns/primarySet'
     SET_PREDICATE = 'http://opaquenamespace.org/ns/set'
+    INSTITUTION_PREDICATE = 'http://opaquenamespace.org/ns/contributingInstitution'
 
     def initialize(work, migrator_config)
       @work = work
@@ -19,20 +20,21 @@ module Hyrax::Migrator::Services
     def acquire_set_ids
       result = {}
       result['ids'] = {
-        admin_set_id: admin_set(@work.env[:attributes]),
+        admin_set_id: admin_set_id,
         member_of_collections_attributes: collection_ids
       }
       result['metadata_set'] = metadata_set
       result['metadata_primary_set'] = metadata_primary_set
+      result['metadata_institution'] = metadata_institution
       result
     end
 
     private
 
-    def admin_set(metadata)
+    def admin_set_id
       return admin_set_id_from_primary_set(metadata_primary_set) if metadata_primary_set.present?
 
-      return admin_set_id_from_institution(metadata[:institution].first) if metadata[:institution]
+      return admin_set_id_from_institution(metadata_institution) if metadata_institution.present?
 
       log_and_raise("Primary Set and Institution not found for #{@work.pid}")
     end
@@ -59,6 +61,11 @@ module Hyrax::Migrator::Services
     def metadata_primary_set
       primary_set = @graph.statements.detect { |s| s.predicate.to_s.casecmp(PRIMARY_SET_PREDICATE).zero? }
       primary_set.object.to_s if primary_set.present?
+    end
+
+    def metadata_institution
+      institution = @graph.statements.detect { |s| s.predicate.to_s.casecmp(INSTITUTION_PREDICATE).zero? }
+      institution.object.to_s if institution.present?
     end
 
     def metadata_set
