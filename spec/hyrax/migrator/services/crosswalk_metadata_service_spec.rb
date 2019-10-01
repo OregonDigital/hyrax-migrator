@@ -193,7 +193,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       before { config.skip_field_mode = true }
 
       it 'handles it by returning nil' do
-        expect(service.crosswalk[:format_attributes]).to eq [nil]
+        expect(service.crosswalk).to eq nil
       end
     end
 
@@ -202,7 +202,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       let(:error) { URI::InvalidURIError }
 
       it 'raises an error' do
-        expect { service.send(:crosswalk)[:format_attributes] }.to raise_error(error)
+        expect { service.send(:crosswalk) }.to raise_error(error)
       end
     end
   end

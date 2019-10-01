@@ -22,6 +22,8 @@ module Hyrax::Migrator::Services
         next if data.nil?
 
         processed_obj = process(data, statement.object)
+        next if processed_obj.nil?
+
         assemble_hash(data, processed_obj)
       end
       @result
