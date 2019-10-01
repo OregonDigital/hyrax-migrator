@@ -2,6 +2,7 @@
 
 require 'rdf'
 require 'rdf/ntriples'
+require 'uri'
 
 module Hyrax::Migrator::Services
   # Called by the CrosswalkMetadataActor to map OD1 metadata to OD2
@@ -21,6 +22,8 @@ module Hyrax::Migrator::Services
         next if data.nil?
 
         processed_obj = process(data, statement.object)
+        next if processed_obj.nil?
+
         assemble_hash(data, processed_obj)
       end
       @result
@@ -91,7 +94,16 @@ module Hyrax::Migrator::Services
     ##
     # Generate the data necessary for a Rails nested attribute
     def attributes_data(object)
-      { 'id' => object.to_s, '_destroy' => 0 }
+      return { 'id' => object.to_s, '_destroy' => 0 } unless valid_uri(object.to_s).nil?
+
+      Rails.logger.warn "Invalid URI #{object} found in crosswalk of #{@work.pid}"
+      return nil if @skip_field_mode
+
+      raise URI::InvalidURIError, object.to_s
+    end
+
+    def valid_uri(uri)
+      uri =~ URI.regexp(%w[http https])
     end
 
     # Raise in lookup
