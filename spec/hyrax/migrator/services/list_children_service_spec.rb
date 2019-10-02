@@ -27,6 +27,15 @@ RSpec.describe Hyrax::Migrator::Services::ListChildrenService do
       end
     end
 
+    context 'when the object is not an oregondigital resource uri' do
+      let(:resource1) { '_:g11112223333444455555' }
+      let(:resource2) { '_:g66666777778888899999' }
+
+      it 'skips it' do
+        expect(service.list_children).to be_empty
+      end
+    end
+
     context 'when there are no children' do
       before do
         work.env[:attributes] = {}
