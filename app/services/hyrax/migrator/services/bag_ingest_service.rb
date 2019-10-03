@@ -17,13 +17,13 @@ module Hyrax::Migrator::Services
     def ingest
       # run job for each bag within batch_name
       location_service.bags_to_ingest.each do |_batch_name, bag_locations|
-        bag_locations.each do |file_path|
+        bag_locations.each_with_index do |file_path, index|
           pid = parse_pid(file_path)
           if Hyrax::Migrator::HyraxCore::Asset.exists?(pid)
             Rails.logger.warn "Work #{pid} already exists, skipping MigrateWorkJob"
             next
           end
-          Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(pid: pid, file_path: file_path)
+          Hyrax::Migrator::Jobs::MigrateWorkJob.set(wait: index.to_i.seconds).perform_later(pid: pid, file_path: file_path)
         end
       end
     end
