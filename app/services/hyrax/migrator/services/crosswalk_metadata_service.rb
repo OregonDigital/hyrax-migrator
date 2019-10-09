@@ -102,6 +102,23 @@ module Hyrax::Migrator::Services
       raise URI::InvalidURIError, object.to_s
     end
 
+    def replaces_uris
+      [{ old_uri: 'http://opaquenamespace.org/ns/rights/rr-f', new_uri: 'http://rightsstatements.org/vocab/InC/1.0/' }]
+    end
+
+    ##
+    # Temporary modification to rights rr-f
+    # related issue https://github.com/OregonDigital/hyrax-migrator/issues/70
+    def attributes_replaces_data(object)
+      old_uri = 'http://opaquenamespace.org/ns/rights/rr-f'
+      find_new_uri = replaces_uris.select { |u| u[:old_uri] == old_uri }
+      new_uri = find_new_uri.first[:new_uri] if find_new_uri.present?
+
+      return new_uri if object.to_s == old_uri
+
+      return object.to_s unless valid_uri(object.to_s).nil?
+    end
+
     def valid_uri(uri)
       uri =~ URI.regexp(%w[http https])
     end
