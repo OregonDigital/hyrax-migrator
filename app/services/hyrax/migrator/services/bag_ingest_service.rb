@@ -8,10 +8,12 @@ module Hyrax::Migrator::Services
 
     # @param batch_dir_names [String Array]
     # @param config [Hyrax::Migrator::Configuration]
-    def initialize(input_batch_names, migrator_config)
+    # @param options hash for passing args to the MigrateWorkService
+    def initialize(input_batch_names, migrator_config, options = nil)
       @migrator_config = migrator_config
       @input_batch_names = input_batch_names
       @location_service = bag_file_location_service
+      @options = options
     end
 
     def ingest
@@ -23,12 +25,18 @@ module Hyrax::Migrator::Services
             Rails.logger.warn "Work #{pid} already exists, skipping MigrateWorkJob"
             next
           end
-          Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(pid: pid, file_path: file_path)
+          Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(args(pid, file_path))
         end
       end
     end
 
     private
+
+    def args(pid, file_path)
+      args = { pid: pid, file_path: file_path }
+      args.merge! @options unless @options.nil?
+      args
+    end
 
     def parse_pid(file)
       File.basename(file, File.extname(file))
