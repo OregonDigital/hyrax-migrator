@@ -6,6 +6,7 @@ module Hyrax::Migrator::Services
     def initialize(args)
       @pid = args[:pid]
       @file_path = args[:file_path]
+      @args = args
     end
 
     def run
@@ -17,7 +18,7 @@ module Hyrax::Migrator::Services
     end
 
     def middleware
-      @middleware ||= Hyrax::Migrator::Middleware.default
+      @middleware ||= create_middleware
     end
 
     private
@@ -27,6 +28,12 @@ module Hyrax::Migrator::Services
       return work if work
 
       Hyrax::Migrator::Work.create(pid: pid, file_path: file_path, env: { attributes: { id: pid } })
+    end
+
+    def create_middleware
+      return Hyrax::Migrator::Middleware.default if @args[:middleware_config].blank?
+
+      Hyrax::Migrator::Middleware.custom(Hyrax::Migrator::Serializers::MiddlewareConfigurationSeralizer.deserialize(@args[:middleware_config]))
     end
   end
 end
