@@ -35,4 +35,20 @@ RSpec.describe Hyrax::Migrator::Services::MigrateWorkService do
       service.run
     end
   end
+
+  describe 'running the service with a custom config' do
+    let(:service) { described_class.new(pid: pid, file_path: file_path, middleware_config: middleware_config) }
+    let(:middleware_config) { { actor_stack: ['Hyrax::Migrator::Actors::BagValidatorActor'] } }
+    let(:config) do
+      c = Hyrax::Migrator::Middleware::Configuration.new
+      c.actor_stack = [Hyrax::Migrator::Actors::BagValidatorActor]
+      c
+    end
+    let(:middleware) { Hyrax::Migrator::Middleware.custom(config) }
+
+    it 'calls the custom middleware' do
+      expect(service).to receive(:middleware).and_return(middleware)
+      service.run
+    end
+  end
 end
