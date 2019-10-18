@@ -33,7 +33,7 @@ module Hyrax::Migrator::Services
     def create_middleware
       return Hyrax::Migrator::Middleware.default if @args[:middleware_config].blank?
 
-      Hyrax::Migrator::Middleware.custom(Hyrax::Migrator::Serializers::MiddlewareConfigurationSeralizer.deserialize(@args[:middleware_config]))
+      Hyrax::Migrator::Middleware.custom(Hyrax::Migrator::Serializers::MiddlewareConfigurationSerializer.deserialize(@args[:middleware_config]))
     end
   end
 end
