@@ -2,27 +2,31 @@
 
 module Hyrax::Migrator::Serializers
   # Serialize/deserialize MiddlewareConfiguration so that it can be passed through a MigrateWorkJob to MigrateWorkService
-  module MiddlewareConfigurationSerializer
-    def self.serialize(configuration)
-      arr = []
-      configuration.actor_stack.each do |actor|
-        arr << actor.to_s
+  class MiddlewareConfigurationSerializer
+    class << self
+      def serialize(configuration)
+        arr = []
+        configuration.actor_stack.each do |actor|
+          arr << actor.to_s
+        end
+        { actor_stack: arr }
       end
-      { actor_stack: arr }
-    end
 
-    def self.deserialize(hash)
-      Hyrax::Migrator::Configuration.new.actor_stack = actor_stack(hash)
-    end
-
-    private
-
-    def actor_stack(hash)
-      actor_stack = []
-      hash[:actor_stack].each do |actor|
-        actor_stack << actor.constantize
+      def deserialize(hash)
+        config = Hyrax::Migrator::Middleware::Configuration.new
+        config.actor_stack = actors(hash)
+        config
       end
-      actor_stack
+
+      private
+
+      def actors(hash)
+        arr = []
+        hash[:actor_stack].each do |actor|
+          arr << actor.constantize
+        end
+        arr
+      end
     end
   end
 end
