@@ -34,6 +34,10 @@ module Hyrax
       def self.default
         Hyrax::Migrator::Middleware::DefaultMiddleware.new(config.actor_stack)
       end
+
+      def self.custom(config)
+        Hyrax::Migrator::Middleware::DefaultMiddleware.new(config.actor_stack)
+      end
     end
   end
 end
