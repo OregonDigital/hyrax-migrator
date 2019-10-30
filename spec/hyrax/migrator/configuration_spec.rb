@@ -26,8 +26,8 @@ RSpec.describe Hyrax::Migrator::Configuration do
       Rails.env.stub(:production?) { true }
     end
 
-    it { expect(conf.upload_storage_service).to be :aws_s3 }
-    it { expect(conf.ingest_storage_service).to be :aws_s3 }
+    it { expect(conf.upload_storage_service).to be :file_system }
+    it { expect(conf.ingest_storage_service).to be :file_system }
   end
 
   context 'when rails env is not production' do
