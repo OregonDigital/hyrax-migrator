@@ -20,11 +20,13 @@ module Hyrax::Migrator
 
     attr_writer :upload_storage_service
     def upload_storage_service
-      @upload_storage_service ||= if Rails.env.production?
-                                    :aws_s3
-                                  else
-                                    :file_system
-                                  end
+      @upload_storage_service ||= :file_system
+
+      # @upload_storage_service ||= if Rails.env.production?
+      #                               :aws_s3
+      #                             else
+      #                               :file_system
+      #                             end
     end
 
     attr_writer :file_system_path
@@ -34,11 +36,13 @@ module Hyrax::Migrator
 
     attr_writer :ingest_storage_service
     def ingest_storage_service
-      @ingest_storage_service ||= if Rails.env.production?
-                                    :aws_s3
-                                  else
-                                    :file_system
-                                  end
+      @ingest_storage_service ||= :file_system
+
+      # @ingest_storage_service ||= if Rails.env.production?
+      #                               :aws_s3
+      #                             else
+      #                               :file_system
+      #                             end
     end
 
     attr_writer :ingest_local_path
