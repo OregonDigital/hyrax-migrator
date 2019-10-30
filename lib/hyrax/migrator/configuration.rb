@@ -22,11 +22,11 @@ module Hyrax::Migrator
     def upload_storage_service
       @upload_storage_service = :file_system
 
-#      @upload_storage_service ||= if Rails.env.production?
-#                                    :aws_s3
-#                                  else
-#                                    :file_system
-#                                  end
+      # @upload_storage_service ||= if Rails.env.production?
+      #                               :aws_s3
+      #                             else
+      #                               :file_system
+      #                             end
     end
 
     attr_writer :file_system_path
