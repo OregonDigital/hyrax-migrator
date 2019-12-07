@@ -51,17 +51,34 @@ module Hyrax::Migrator::Actors
     def handle_uploaded_file(uploaded_file)
       return [uploaded_file] if uploaded_file['url'].present?
 
+      return uploaded_file if uploaded_file['local_filename'].blank?
+
       local_file_uploaded = hyrax_file_uploaded.create
       [local_file_uploaded.id] if local_file_uploaded
     end
 
     def post_success
       if @uploaded_file['url'].present?
-        @work.env[:attributes][:remote_files] = @handled_uploaded_files
+        remote_upload_succeeded
+      elsif @uploaded_file['local_filename'].present?
+        local_upload_succeeded
       else
-        @work.env[:attributes][:uploaded_files] = @handled_uploaded_files
+        succeeded_state("Skipping file upload for #{@work.pid}. No content found.")
       end
-      succeeded(aasm.current_state, "Work #{@work.pid} uploaded #{@handled_uploaded_files}.", Hyrax::Migrator::Work::SUCCESS)
+    end
+
+    def remote_upload_succeeded
+      @work.env[:attributes][:remote_files] = @handled_uploaded_files
+      succeeded_state("Work #{@work.pid} uploaded #{@handled_uploaded_files}.")
+    end
+
+    def local_upload_succeeded
+      @work.env[:attributes][:uploaded_files] = @handled_uploaded_files
+      succeeded_state("Work #{@work.pid} uploaded #{@handled_uploaded_files}.")
+    end
+
+    def succeeded_state(message)
+      succeeded(aasm.current_state, message, Hyrax::Migrator::Work::SUCCESS)
     end
 
     def hyrax_file_uploaded
