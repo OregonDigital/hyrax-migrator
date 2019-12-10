@@ -137,6 +137,12 @@ module Hyrax::Migrator
       @migration_user ||= nil
     end
 
+    # A switch to skip content files during file uploads
+    attr_writer :content_file_can_be_nil
+    def content_file_can_be_nil
+      @content_file_can_be_nil ||= false
+    end
+
     # A switch to temporarily disable flagging unmapped predicates
     attr_writer :skip_field_mode
     def skip_field_mode

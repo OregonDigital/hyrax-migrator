@@ -101,8 +101,8 @@ module Hyrax
         Aws::Credentials.new(@aws_s3_app_key, @aws_s3_app_secret)
       end
 
-      def log_and_skip(message)
-        Rails.logger.warn "could not find a content file in #{message}"
+      def log_and_skip(data_dir)
+        Rails.logger.warn "could not find a content file in #{data_dir}"
         nil
       end
 
