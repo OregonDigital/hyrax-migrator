@@ -58,7 +58,7 @@ module Hyrax::Migrator::Actors
     end
 
     def handle_no_content_found(file_hash)
-      if config.content_file_can_be_nil == true
+      if config.content_file_can_be_nil.to_s == 'true'
         Rails.logger.warn "Skipping file upload for #{@work.pid}. No content found."
         return file_hash
       end
