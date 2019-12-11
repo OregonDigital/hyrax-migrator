@@ -40,24 +40,27 @@ module Hyrax
       private
 
       def upload_to_file_system
-        bytes_copied = copy_local_file
+        content = content_file
+        return local_file_obj(nil) unless content.present?
+
+        bytes_copied = copy_local_file(content)
         raise StandardError, "Expected #{File.size(dest_local_file)} bytes, received #{bytes_copied} bytes" unless File.size(dest_local_file) == bytes_copied
 
-        local_file_obj
+        local_file_obj(dest_local_file)
       rescue StandardError => e
         log_and_raise("FileUploadService upload_to_file_system error: #{e.message} : #{e.backtrace}")
       end
 
-      def copy_local_file
-        IO.copy_stream(content_file, make_path_for(dest_local_file))
+      def copy_local_file(content)
+        IO.copy_stream(content, make_path_for(dest_local_file))
       end
 
       def dest_local_file
         File.join(file_system_path, File.basename(content_file))
       end
 
-      def local_file_obj
-        { 'local_filename' => dest_local_file }
+      def local_file_obj(filename)
+        { 'local_filename' => filename }
       end
 
       def make_path_for(file)
@@ -98,10 +101,15 @@ module Hyrax
         Aws::Credentials.new(@aws_s3_app_key, @aws_s3_app_secret)
       end
 
+      def log_and_skip(data_dir)
+        Rails.logger.warn "could not find a content file in #{data_dir}"
+        nil
+      end
+
       def content_file
         files = Dir.entries(@data_dir)
         file = files.find { |f| f.downcase.include?(CONTENT_FILE) }
-        raise StandardError, "could not find a content file in #{@data_dir}" unless file
+        return log_and_skip(@data_dir) unless file
 
         File.join(@data_dir, file)
       rescue Errno::ENOENT

@@ -25,6 +25,11 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
       'local_filename' => local_filename
     }
   end
+  let(:missing_local_file) do
+    {
+      'local_filename' => nil
+    }
+  end
 
   before do
     allow(actor).to receive(:config).and_return(config)
@@ -71,6 +76,51 @@ RSpec.describe Hyrax::Migrator::Actors::FileUploadActor do
       end
       it 'calls the next actor' do
         expect(terminal).to receive(:create)
+        actor.create(work)
+      end
+    end
+
+    context 'when the content file is missing and content_file_can_be_nil is true' do
+      before do
+        allow(service).to receive(:upload_file_content).and_return(missing_local_file)
+        allow(actor).to receive(:user).and_return(current_user)
+        config.content_file_can_be_nil = true
+        actor.next_actor = terminal
+      end
+
+      it 'updates the work' do
+        actor.create(work)
+        expect(work.aasm_state).to eq('file_upload_succeeded')
+      end
+      it 'skips file upload' do
+        actor.create(work)
+        expect(work.env[:attributes][:uploaded_files]).to be_nil
+      end
+      it 'calls the next actor' do
+        expect(terminal).to receive(:create)
+        actor.create(work)
+      end
+    end
+
+    context 'when the content file is missing and content_file_can_be_nil is false' do
+      let(:error) { StandardError }
+
+      before do
+        allow(service).to receive(:upload_file_content).and_return(missing_local_file)
+        allow(actor).to receive(:user).and_return(current_user)
+        config.content_file_can_be_nil = false
+        actor.next_actor = terminal
+      end
+
+      it 'updates the work' do
+        actor.create(work)
+        expect(work.aasm_state).to eq('file_upload_failed')
+      end
+      it 'raises file not found error' do
+        expect { actor.send(:handle_uploaded_file, missing_local_file) }.to raise_error(error)
+      end
+      it 'does not call the next actor' do
+        expect(terminal).not_to receive(:create)
         actor.create(work)
       end
     end

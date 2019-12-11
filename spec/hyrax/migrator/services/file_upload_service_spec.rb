@@ -64,8 +64,13 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
         stub_const('Hyrax::Migrator::Services::FileUploadService::CONTENT_FILE', 'invalid')
       end
 
-      it 'raises file not found error' do
-        expect { service.send(:content_file) }.to raise_error(StandardError, "could not find a content file in #{work.file_path}/data")
+      it 'logs a warning' do
+        expect(Rails.logger).to receive(:warn)
+        service.send(:content_file)
+      end
+
+      it 'returns nil' do
+        expect(service.send(:content_file)).to be_nil
       end
     end
 
