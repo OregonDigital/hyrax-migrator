@@ -4,7 +4,7 @@ module Hyrax
   module Migrator::Jobs
     ##
     # The job responsible for bulk approving
-    class BulkApproveJob < ApplicationJob
+    class BulkApproveJob < Hyrax::Migrator::ApplicationJob
       def perform(args)
         bulk_approve(args)
       end
