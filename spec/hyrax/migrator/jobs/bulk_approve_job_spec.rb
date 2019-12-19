@@ -16,7 +16,7 @@ RSpec.describe Hyrax::Migrator::Jobs::BulkApproveJob, type: :job do
   end
 
   context 'with approve_everything' do
-    let!(:job) { described_class.perform_later }
+    let!(:job) { described_class.perform_later(collection_id: nil) }
 
     it { expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 1 }
   end
