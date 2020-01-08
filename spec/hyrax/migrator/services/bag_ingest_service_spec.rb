@@ -44,10 +44,24 @@ RSpec.describe Hyrax::Migrator::Services::BagIngestService do
       end
     end
 
-    context 'when ingest_storage_service is :file_system and one asset already exists' do
+    context 'when ingest_storage_service is :file_system and one asset already exists and migration status is fail' do
       before do
         config.ingest_storage_service = :file_system
         allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).with('df65vc341').and_return(true)
+        Hyrax::Migrator::Work.create(pid: 'df65vc341', status: Hyrax::Migrator::Work::FAIL)
+      end
+
+      it 'runs all three migrate work jobs' do
+        service.ingest
+        expect(Hyrax::Migrator::Jobs::MigrateWorkJob).to have_been_enqueued.exactly(3).times
+      end
+    end
+
+    context 'when ingest_storage_service is :file_system and one asset already exists and migration status is success' do
+      before do
+        config.ingest_storage_service = :file_system
+        allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).with('df65vc341').and_return(true)
+        Hyrax::Migrator::Work.create(pid: 'df65vc341', status: Hyrax::Migrator::Work::SUCCESS)
       end
 
       it 'logs a warning' do
