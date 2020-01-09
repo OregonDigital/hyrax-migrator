@@ -21,7 +21,7 @@ module Hyrax::Migrator::Services
       location_service.bags_to_ingest.each do |_batch_name, bag_locations|
         bag_locations.each do |file_path|
           pid = parse_pid(file_path)
-          if Hyrax::Migrator::HyraxCore::Asset.exists?(pid)
+          if Hyrax::Migrator::HyraxCore::Asset.exists?(pid) && migrator_success?(pid)
             Rails.logger.warn "Work #{pid} already exists, skipping MigrateWorkJob"
             next
           end
@@ -36,6 +36,10 @@ module Hyrax::Migrator::Services
       args = { pid: pid, file_path: file_path }
       args.merge! @options unless @options.nil?
       args
+    end
+
+    def migrator_success?(pid)
+      Hyrax::Migrator::Work.find_by(pid: pid, status: Hyrax::Migrator::Work::SUCCESS).present?
     end
 
     def parse_pid(file)
