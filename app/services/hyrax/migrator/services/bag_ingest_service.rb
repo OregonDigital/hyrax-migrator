@@ -39,7 +39,7 @@ module Hyrax::Migrator::Services
     end
 
     def migrator_success?(pid)
-      Hyrax::Migrator::Work.find_by(pid: pid, status: 'success').present?
+      Hyrax::Migrator::Work.find_by(pid: pid, status: Hyrax::Migrator::Work::SUCCESS).present?
     end
 
     def parse_pid(file)
