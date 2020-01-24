@@ -148,5 +148,10 @@ module Hyrax::Migrator
     def skip_field_mode
       @skip_field_mode ||= false
     end
+
+    attr_writer :fields_map
+    def fields_map
+      @fields_map ||= ''
+    end
   end
 end
