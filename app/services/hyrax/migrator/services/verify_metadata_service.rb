@@ -12,7 +12,7 @@ module Hyrax::Migrator::Services
     end
 
     def item
-      @item ||= ActiveFedora::Base.find(@work.pid)
+      @item ||= Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
     end
     
     # pull metadata for asset in OD2
@@ -43,23 +43,23 @@ module Hyrax::Migrator::Services
     
     def colls
       colls = []
-      @item.member_of_collections.each do |coll|
+      item.member_of_collections.each do |coll|
         colls << coll.id
       end
       colls
     end
     
-    def verify
+    def verify_metadata
       errors = []
-      old_profile['fields'].each do |k, val|
+      original_profile['fields'].each do |k, val|
         next if val.blank?
         
         new_field = map_fields['fields'][k]
-        if new_profile[:fields][new_field].blank?
+        if @new_profile[:fields][new_field].blank?
           errors << "Unable to verify #{k} in #{pid}."
         else
           val.each do |v|
-            test = old_profile['fields'][k].kind_of?(Array) ? new_profile[:fields][new_field].include?(v.to_s) : new_profile[:fields][new_field] == v.to_s
+            test = original_profile['fields'][k].kind_of?(Array) ? @new_profile[:fields][new_field].include?(v.to_s) : @new_profile[:fields][new_field] == v.to_s
             errors << "Unable to verify #{k} in #{pid}." unless test
           end
         end
