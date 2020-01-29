@@ -99,8 +99,8 @@ fields:
   source:	source
   language:	language
   publisher:	publisher
-  placeOfPublication:	place_of_publication
-  od_repository:	od_repository
+  placeOfPublication:	publication_place
+  od_repository:	repository
   localCollectionID:	local_collection_id
   localCollectionName:	local_collection_name
   seriesName:	series_name
