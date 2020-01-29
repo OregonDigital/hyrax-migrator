@@ -98,8 +98,8 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       before { config.skip_field_mode = true }
 
       it 'logs a warning' do
-        expect(Rails.logger).to receive(:warn)
         service.send(:lookup, bad_predicate)
+        expect(service.instance_variable_get(:@errors).size).to eq 1
       end
       it 'returns nil' do
         expect(service.send(:lookup, bad_predicate)).to eq(nil)

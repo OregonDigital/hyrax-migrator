@@ -12,6 +12,7 @@ module Hyrax::Migrator::Services
       @data_dir = File.join(work.working_directory, 'data')
       @config = migrator_config
       @skip_field_mode = migrator_config.skip_field_mode
+      @errors = []
     end
 
     # returns result hash
@@ -26,6 +27,7 @@ module Hyrax::Migrator::Services
 
         assemble_hash(data, processed_obj)
       end
+      @result[:errors] = @errors unless @errors.empty? || @result.blank?
       @result
     end
 
@@ -60,7 +62,7 @@ module Hyrax::Migrator::Services
       return result.first unless result.empty?
 
       if @skip_field_mode
-        Rails.logger.warn "Predicate not found: #{predicate} during crosswalk for #{@work.pid}"
+        @errors << "Predicate not found: #{predicate} during crosswalk for #{@work.pid}"
         return nil
       end
       raise PredicateNotFoundError, predicate
@@ -96,7 +98,7 @@ module Hyrax::Migrator::Services
     def attributes_data(object)
       return { 'id' => object.to_s, '_destroy' => 0 } unless valid_uri(object.to_s).nil?
 
-      Rails.logger.warn "Invalid URI #{object} found in crosswalk of #{@work.pid}"
+      @errors << "Invalid URI #{object} found in crosswalk of #{@work.pid}"
       return nil if @skip_field_mode
 
       raise URI::InvalidURIError, object.to_s
