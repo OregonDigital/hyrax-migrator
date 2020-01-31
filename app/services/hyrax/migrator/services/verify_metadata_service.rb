@@ -6,9 +6,9 @@ module Hyrax::Migrator::Services
   ##
   # A service to compare metadata from the source asset and the migrated asset
   class VerifyMetadataService
-    def initialize(migrator_work, migrator_config)
+    def initialize(migrator_work, migrator_config, profile_dir = nil)
       @work = migrator_work
-      @data_dir = File.join(@work.working_directory, 'data')
+      @profile_dir = profile_dir.nil? ? File.join(@work.working_directory, 'data') : profile_dir
       @config = migrator_config
       @new_profile = new_profile
     end
@@ -87,7 +87,7 @@ module Hyrax::Migrator::Services
     end
 
     def original_profile
-      @original_profile ||= YAML.load_file(File.join(@data_dir, "#{@work.pid}_profile.yml"))
+      @original_profile ||= YAML.load_file(File.join(@profile_dir, "#{@work.pid}_profile.yml"))
     end
 
     def map_fields

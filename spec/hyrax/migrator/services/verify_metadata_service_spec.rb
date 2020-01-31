@@ -5,13 +5,12 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
     let(:migrator_work) { double }
     let(:hyrax_work) { double }
     let(:config) { Hyrax::Migrator::Configuration.new }
-    let(:service) { described_class.new(migrator_work, config) }
+    let(:service) { described_class.new(migrator_work, config, 'spec/fixtures/data') }
     let(:pid) { 'df70jh899' }
     let(:set) { double }
     let(:sets) { [set] }
 
     before do
-      allow(migrator_work).to receive(:working_directory).and_return('spec/fixtures')
       allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:find).and_return(hyrax_work)
       allow(hyrax_work).to receive(:as_json).and_return(json)
       allow(hyrax_work).to receive(:member_of_collections).and_return(sets)
