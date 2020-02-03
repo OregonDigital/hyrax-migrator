@@ -1,0 +1,23 @@
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/title> "Interview with Kyle Crowther, University of Oregon Veterans" .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://id.loc.gov/vocabulary/relators/ive> <http://opaquenamespace.org/ns/creator/CrowtherKyle> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://id.loc.gov/vocabulary/relators/ivr> <http://opaquenamespace.org/ns/creator/ReedGordon> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://id.loc.gov/vocabulary/relators/ivr> <http://opaquenamespace.org/ns/creator/RiggsBridget> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/description> "Interview with Kyle Crowther discussing his experiences serving in the Army National Guard." .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/description> "Interview conducted at Vero Expresso, Eugene, OR." .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/contents> <http://oregondigital.org/resource/oregondigital:df72jn000> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/contents> <http://oregondigital.org/resource/oregondigital:df72jn018> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/militaryHighestRank> "E5" .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/militaryOccupation> "Infantry 11B" .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/subject> <http://id.loc.gov/authorities/subjects/sh85067568> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/subject> <http://id.loc.gov/authorities/subjects/sh85142973> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/militaryBranch> <http://id.loc.gov/authorities/names/n50064765> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/identifier> "ua167_crowther_kyle_interview" .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/rights> <http://rightsstatements.org/vocab/InC/1.0/> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/language> <http://id.loc.gov/vocabulary/iso639-2/eng> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/type> <http://purl.org/dc/dcmitype/Collection> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/format> <https://w3id.org/spar/mediatype/application/xml> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/set> <http://oregondigital.org/resource/oregondigital:uo-veterans> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/primarySet> <http://oregondigital.org/resource/oregondigital:uo-veterans> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://opaquenamespace.org/ns/contributingInstitution> <http://dbpedia.org/resource/University_of_Oregon> .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/created> "2016-03-06" .
+<http://oregondigital.org/resource/oregondigital:df72jn67c> <http://purl.org/dc/terms/replaces> <http://oregondigital.org/u?/uo-veterans,318> .
