@@ -2,6 +2,7 @@
 
 require 'rdf'
 require 'uri'
+require 'hyrax/migrator/crosswalk_metadata'
 
 RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:graph) do
