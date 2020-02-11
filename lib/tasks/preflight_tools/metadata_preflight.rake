@@ -6,16 +6,15 @@
 # To use: rake preflight_tools:metadata_preflight workdir=/data1/batch/some_dir pidlist=list.txt
 # If verbose=true then the attributes will be displayed
 
-require 'hyrax/migrator/crosswalk_metadata'
-
 namespace :preflight_tools do
   desc 'for migration preflight check of metadata'
   task metadata_preflight: :environment do
+    require 'hyrax/migrator/crosswalk_metadata'
     init
     pids.each do |pid|
       @errors << "Working on #{pid}..."
       attributes = crosswalk(GenericAsset.find(pid))
-      verbose(attributes) if ENV.include? 'verbose'
+      verbose_display(pid, attributes) if ENV.include? 'verbose'
     end
     write_errors
     @report.close
@@ -27,6 +26,7 @@ def pids
   File.readlines(File.join(@work_dir, ENV['pidlist'])).each do |line|
     pids << line.strip
   end
+  pids
 end
 
 def init
@@ -45,7 +45,8 @@ def crosswalk_file
   File.join(@work_dir, 'crosswalk.yml')
 end
 
-def verbose(attributes)
+def verbose_display(pid, attributes)
+  puts "Attributes for #{pid}..."
   attributes.each do |attr|
     puts attr.to_s
   end
@@ -69,12 +70,12 @@ def crosswalk(item)
 
     @service.assemble_hash(data, processed_obj)
   end
-  @result
+  @service.result
 end
 
 # Load the nt file and return graph
 def create_graph(item)
-  RDF::Graph.load(item.datastreams['descMetadata'])
+  item.datastreams['descMetadata'].graph
 end
 
 # Given an OD2 predicate, returns associated property data or nil

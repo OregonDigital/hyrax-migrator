@@ -7,6 +7,7 @@ require 'uri'
 module Hyrax::Migrator
   # Methods for mapping OD1 metadata to OD2
   class CrosswalkMetadata
+    attr_reader :result
     def initialize(crosswalk_metadata_file, crosswalk_overrides_file)
       @crosswalk_metadata_file = crosswalk_metadata_file
       @crosswalk_overrides_file = crosswalk_overrides_file

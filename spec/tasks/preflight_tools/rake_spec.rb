@@ -17,6 +17,8 @@ RSpec.describe 'preflight_tools rake tasks' do
   describe 'preflight_tools:metadata_preflight' do
     let(:work) { double }
     let(:nt) { 'spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt' }
+    let(:datastreams) { double }
+    let(:datastream) { double }
     let(:graph) { RDF::Graph.load(nt) }
     let(:run_rake_task) do
       ENV['work_dir'] = 'spec/fixtures'
@@ -27,8 +29,9 @@ RSpec.describe 'preflight_tools rake tasks' do
     before do
       load_rake_environment [File.expand_path('../../../lib/tasks/preflight_tools/metadata_preflight.rake', __dir__), File.expand_path('../../../lib/hyrax/migrator/crosswalk_metadata.rb', __dir__)]
       allow(GenericAsset).to receive(:find).and_return(work)
-      allow(work).to receive(:datastreams).and_return(nt)
-      allow(RDF::Graph).to receive(:load).and_return(graph)
+      allow(work).to receive(:datastreams).and_return(datastreams)
+      allow(datastreams).to receive(:[]).with('descMetadata').and_return(datastream)
+      allow(datastream).to receive(:graph).and_return(graph)
       run_rake_task
     end
 
