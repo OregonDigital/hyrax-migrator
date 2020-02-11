@@ -15,16 +15,7 @@ module Hyrax::Migrator::Services
 
     # returns result hash
     def crosswalk
-      graph = create_graph
-      graph.statements.each do |statement|
-        data = lookup(statement.predicate.to_s)
-        next if data.nil?
-
-        processed_obj = process(data, statement.object)
-        next if processed_obj.nil?
-
-        assemble_hash(data, processed_obj)
-      end
+      super
       @result[:errors] = @errors unless @errors.empty? || @result.blank?
       @result
     end
