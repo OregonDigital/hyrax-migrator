@@ -7,14 +7,11 @@ module Hyrax
   module Migrator::Services
     # Service used to upload a given content file to s3 or the file system
     class FileUploadService
-      attr_reader :data_dir, :work_file_path, :file_system_path,
-                  :aws_s3_app_key, :aws_s3_app_secret,
-                  :aws_s3_bucket, :aws_s3_region, :upload_storage_service,
-                  :aws_s3_url_availability
+      attr_reader :data_dir, :work_file_path, :file_system_path, :aws_s3_app_key,
+                  :aws_s3_app_secret, :aws_s3_bucket, :aws_s3_region,
+                  :upload_storage_service, :aws_s3_url_availability
 
       CONTENT_FILE = '_content'
-      SHA1 = 'sha1'
-      MD5 = 'md5'
 
       # @param work_file_path [String]
       # @param migrator_config [Hyrax::Migrator::Configuration]
@@ -40,8 +37,7 @@ module Hyrax
 
       private
 
-      # TODO: implement abstract class or refactor this service serving as
-      # interface for future storage services like Amazon S3 and others.
+      # TODO: implement abstract class or refactor this service serving as interface for future storage services like Amazon S3 and others.
       def upload_to_file_system
         content = content_file
         return local_file_obj(nil) unless content.present?
@@ -65,15 +61,15 @@ module Hyrax
         sha1_checksum = Digest::SHA1.file(content).hexdigest
         md5_checksum = Digest::MD5.file(content).hexdigest
 
-        raise StandardError, 'Content does not match precomputed checksums.' unless sha1_checksum == content_checksum(SHA1) && md5_checksum == content_checksum(MD5)
+        raise StandardError, 'Content does not match precomputed checksums.' unless sha1_checksum == content_checksum('sha1') && md5_checksum == content_checksum('md5')
       end
 
       def content_checksum(encoding)
         case encoding
-        when SHA1
-          content_identity_checksums.detect { |c| c[:checksum_encoding] == SHA1 }.try(:[], :checksum)
-        when MD5
-          content_identity_checksums.detect { |c| c[:checksum_encoding] == MD5 }.try(:[], :checksum)
+        when 'sha1'
+          content_identity_checksums.detect { |c| c[:checksum_encoding] == 'sha1' }.try(:[], :checksum)
+        when 'md5'
+          content_identity_checksums.detect { |c| c[:checksum_encoding] == 'md5' }.try(:[], :checksum)
         end
       end
 
