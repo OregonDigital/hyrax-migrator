@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'byebug'
+
 RSpec.describe Hyrax::Migrator::Services::FileUploadService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:work_file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
@@ -47,13 +49,36 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       end
     end
 
-    context 'when upload service is :file_system and copy_local_file fails' do
+    context 'when upload service is :file_system and copy_local_file fails with mismatched bytes copied' do
       before do
         config.upload_storage_service = :file_system
-        allow(service).to receive(:copy_local_file).and_return 0
+        allow(File).to receive(:size).and_return 0
       end
 
       it 'raises file not found error' do
+        expect { service.upload_file_content }.to raise_error(StandardError)
+      end
+    end
+
+    context 'when upload service is :file_system and copy_local_file fails with checksum validation error' do
+      let(:invalid_checksum_data) do
+        [{
+          file_name: '3t945r08v_content.jpeg',
+          checksum: 'invalid',
+          checksum_encoding: 'md5'
+        }, {
+          file_name: '3t945r08v_content.jpeg',
+          checksum: 'invalid',
+          checksum_encoding: 'sha1'
+        }]
+      end
+
+      before do
+        config.upload_storage_service = :file_system
+        allow(service).to receive(:content_identity_checksums).and_return invalid_checksum_data
+      end
+
+      it 'raises error' do
         expect { service.upload_file_content }.to raise_error(StandardError)
       end
     end
