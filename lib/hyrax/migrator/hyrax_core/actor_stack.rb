@@ -23,7 +23,11 @@ module Hyrax::Migrator
       # Cause the Hyrax actor stack to ingest this work
       # @return [Boolean] - true if create was successful, false if failed
       def create
-        actor.create(actor_environment)
+        status = actor.create(actor_environment)
+
+        raise StandardError, curation_concern.errors.full_messages.join(' ') if status == false
+
+        status
       rescue StandardError => e
         logger.error(e.message)
         raise e
