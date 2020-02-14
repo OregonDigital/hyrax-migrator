@@ -20,11 +20,6 @@ RSpec.describe 'preflight_tools rake tasks' do
     let(:datastreams) { double }
     let(:datastream) { double }
     let(:graph) { RDF::Graph.load(nt) }
-    let(:run_rake_task) do
-      ENV['work_dir'] = 'spec/fixtures'
-      ENV['pidlist'] = 'pidlist'
-      Rake.application.invoke_task 'preflight_tools:metadata_preflight'
-    end
 
     before do
       load_rake_environment [File.expand_path('../../../lib/tasks/preflight_tools/metadata_preflight.rake', __dir__), File.expand_path('../../../lib/hyrax/migrator/crosswalk_metadata.rb', __dir__)]
@@ -32,7 +27,8 @@ RSpec.describe 'preflight_tools rake tasks' do
       allow(work).to receive(:datastreams).and_return(datastreams)
       allow(datastreams).to receive(:[]).with('descMetadata').and_return(datastream)
       allow(datastream).to receive(:graph).and_return(graph)
-      run_rake_task
+      ENV['work_dir'] = 'spec/fixtures'
+      ENV['pidlist'] = 'pidlist'
     end
 
     after do
@@ -44,8 +40,20 @@ RSpec.describe 'preflight_tools rake tasks' do
 
     context 'when there are errors' do
       it 'writes them to a file' do
+        run_task('preflight_tools:metadata_preflight')
         file = Dir.glob('spec/fixtures/report_*')
         expect(IO.read(file.first)).to include('Predicate not found')
+      end
+    end
+
+    context 'when there are valid attributes and verbose is true' do
+      before do
+        ENV['verbose'] = 'true'
+      end
+
+      it 'displays them' do
+        stdio = run_task('preflight_tools:metadata_preflight')
+        expect(stdio).to include('Attributes')
       end
     end
   end
