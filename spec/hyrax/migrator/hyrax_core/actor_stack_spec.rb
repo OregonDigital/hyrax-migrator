@@ -35,7 +35,7 @@ RSpec.describe Hyrax::Migrator::HyraxCore::ActorStack do
         allow(actor).to receive(:create).and_return(false)
       end
 
-      it { expect(actor_stack.create).to eq false }
+      it { expect { actor_stack.create }.to raise_error }
     end
   end
 
