@@ -173,6 +173,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
     it 'transforms the object using the function' do
       expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://test/test' }]
     end
+
     context 'when object is a string rather than a uri' do
       let(:object) { 'blah blah' }
 
