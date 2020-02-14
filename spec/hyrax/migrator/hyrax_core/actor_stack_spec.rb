@@ -32,10 +32,10 @@ RSpec.describe Hyrax::Migrator::HyraxCore::ActorStack do
 
     context 'when it fails' do
       before do
-        allow(actor).to receive(:create).and_return(false)
+        allow(actor).to receive(:create).and_raise('fail')
       end
 
-      it { expect { actor_stack.create }.to raise_error }
+      it { expect { actor_stack.create }.to raise_error('fail') }
     end
   end
 
