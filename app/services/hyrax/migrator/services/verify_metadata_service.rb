@@ -17,11 +17,17 @@ module Hyrax::Migrator::Services
       @item ||= Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
     end
 
+    def content
+      fs = item.file_sets.first
+      fs.original_file.content unless fs.blank?
+    end
+
     # pull metadata for asset in OD2
     def new_profile
       result_hash = {}
       result_hash[:colls] = colls
       result_hash[:fields] = fields
+      result_hash[:checksums] = checksums
       result_hash[:admin_set] = item.admin_set_id
       result_hash
     end
@@ -34,6 +40,15 @@ module Hyrax::Migrator::Services
         fields[field] = val.respond_to?(:to_a) ? field_array(val) : extract(val)
       end
       fields
+    end
+
+    def checksums
+      checksums = {}
+      checksums['SHA1hex'] = Digest::SHA1.hexdigest content
+      checksums['SHA1base64'] = Digest::SHA1.base64digest content
+      checksums['MD5hex'] = Digest::MD5.hexdigest content
+      checksums['MD5base64'] = Digest::MD5.base64digest content
+      checksums
     end
 
     def field_array(val)
@@ -58,6 +73,19 @@ module Hyrax::Migrator::Services
         next if val.blank?
 
         errors += process_vals(key, val)
+      end
+      errors
+    rescue StandardError => e
+      puts e.message
+    end
+
+    def verify_content
+      errors = []
+
+      original_profile['checksums'].each do |key, val|
+        next if val.blank?
+
+        errors << "Content does not match precomputed #{key} checksums for #{@work.pid}. Source: #{val.first} Migrated: #{@new_profile[:checksums][key]}" unless val.first == @new_profile[:checksums][key]
       end
       errors
     rescue StandardError => e
