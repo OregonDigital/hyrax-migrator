@@ -111,6 +111,8 @@ module Hyrax::Migrator::Services
     ##
     # Temporary modification to rights rr-f
     # related issue https://github.com/OregonDigital/hyrax-migrator/issues/70
+    # TODO: This method can be removed once remediation rr-f is done
+    # :nocov:
     def attributes_replaces_data(object)
       old_uri = 'http://opaquenamespace.org/ns/rights/rr-f'
       find_new_uri = replaces_uris.select { |u| u[:old_uri] == old_uri }
@@ -120,6 +122,7 @@ module Hyrax::Migrator::Services
 
       return object.to_s unless valid_uri(object.to_s).nil?
     end
+    # :nocov:
 
     def valid_uri(uri)
       uri =~ URI.regexp(%w[http https])
