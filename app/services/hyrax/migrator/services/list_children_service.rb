@@ -11,7 +11,6 @@ module Hyrax::Migrator::Services
       @work = work
       @data_dir = File.join(work.working_directory, 'data')
       @config = migrator_config
-      @graph = create_graph
     end
 
     def list_children
@@ -25,12 +24,19 @@ module Hyrax::Migrator::Services
       children
     end
 
+    # Using reader instead of graph to preserve order
     def contents
-      @graph.statements.select { |s| s.predicate.to_s.casecmp(CONTENTS_PREDICATE).zero? }.map { |r| r.object.to_s }
+      results = []
+      RDF::Reader.open(nt_path) do |reader|
+        reader.each_statement do |s|
+          results << s.object.to_s if s.predicate.to_s.casecmp(CONTENTS_PREDICATE).zero?
+        end
+      end
+      results
     end
 
-    def create_graph
-      Hyrax::Migrator::Services::CreateGraphService.call(@data_dir)
+    def nt_path
+      "#{@data_dir}/#{@work.pid}_descMetadata.nt"
     end
   end
 end

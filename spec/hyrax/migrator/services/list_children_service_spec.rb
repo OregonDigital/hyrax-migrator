@@ -26,10 +26,10 @@ RSpec.describe Hyrax::Migrator::Services::ListChildrenService do
     end
 
     context 'when there are no children' do
-      let(:graph) { RDF::Graph.load('spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt') }
+      let(:path) { 'spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt' }
 
       before do
-        allow(Hyrax::Migrator::Services::CreateGraphService).to receive(:call).and_return(graph)
+        allow(service).to receive(:nt_path).and_return(path)
       end
 
       it 'returns an empty hash' do
