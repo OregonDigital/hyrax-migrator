@@ -20,7 +20,7 @@ RSpec.describe Hyrax::Migrator::Services::ListChildrenService do
 
   describe 'list_children' do
     context 'when there are children' do
-      #temporarily skip this while we get security updates in
+      # temporarily skip this while we get security updates in
       xit 'puts them in a hash, in order' do
         expect(service.list_children).to eq(result_hash)
       end
