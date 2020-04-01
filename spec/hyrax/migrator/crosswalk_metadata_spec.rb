@@ -102,6 +102,8 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
 
   describe 'crosswalk' do
     before do
+      graph << RDF::Statement.new(rdf_subject, RDF::URI('http://badpredicate.org'),RDF::Literal('bad'))
+      graph << RDF::Statement.new(rdf_subject, predicate, RDF::Literal('still bad'))
       allow(service).to receive(:create_graph).and_return(graph)
     end
 
@@ -109,6 +111,21 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
       it 'processes the statements and returns a result hash' do
         response = service.crosswalk
         expect(response[:creator]).to eq([object.to_s])
+      end
+    end
+
+    context 'when there is no value for a predicate' do
+      it 'skips it' do
+        response = service.crosswalk
+        expect(response).to eq([object.to_s])
+      end
+    end
+
+    context 'when there is no value returned from process' do
+      it 'skips it' do
+        response = service.crosswalk
+        expect(response[:creator]).to eq([object.to_s])
+        end
       end
     end
 
