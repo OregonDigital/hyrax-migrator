@@ -7,28 +7,23 @@ require 'hyrax/migrator/crosswalk_metadata'
 RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:graph) do
     g = RDF::Graph.new
-    s = RDF::Statement.new(RDF::URI(rdfsubject), RDF::URI(predicate), RDF::URI(object))
+    s = RDF::Statement.new(rdfsubject, predicate, rdfobject)
     g << s
     g
   end
   let(:rdfsubject) { RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234') }
-  let(:predicate_str) { 'http://purl.org/dc/elements/1.1/creator' }
+
+  let(:predicate_str) { 'http://purl.org/dc/terms/format' }
   let(:predicate) { RDF::URI(predicate_str) }
-  let(:object) { RDF::URI('http://id.loc.gov/authorities/names/nr93013379') }
-  let(:data) { { property: 'creator', predicate: predicate_str, multiple: true } }
+  let(:rdfobject) { RDF::URI('http://formats_r_us.org/thing') }
+  let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
   let(:config) { Hyrax::Migrator::Configuration.new }
-  let(:pid) { '3t945r08v' }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
+  let(:service) { described_class.new(work, config) }
+  let(:pid) { '3t945r08v' }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
   let(:work) { create(:work, pid: pid, file_path: file_path) }
-  let(:service) { described_class.new(work, config) }
-  let(:result_hash) { { creator: [object.to_s] } }
-  let(:predicate2_str) { 'http://opaquenamespace.org/ns/fullText' }
-  let(:object2) { RDF::Literal('my little pony') }
-  let(:data2) { { predicate: predicate2_str, function: 'return_nil' } }
-  let(:predicate2) { RDF::URI(predicate2_str) }
-  let(:data3) { { property: 'resource_type', predicate: 'http://my_little_pred', multiple: false } }
 
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
@@ -36,174 +31,66 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     allow(RDF::Graph).to receive(:load).and_return(graph)
   end
 
-  describe 'assemble_hash' do
-    context 'when given a property and an object' do
-      it 'adds the property and object to the result' do
-        service.send(:assemble_hash, data, object.to_s)
-        expect(service.instance_variable_get(:@result)).to eq(result_hash)
-      end
-    end
-
-    context 'when given a property that takes only single values' do
-      it 'does not put the object in an array' do
-        service.send(:assemble_hash, data3, object2.to_s)
-        expect(service.instance_variable_get(:@result)[:resource_type]).not_to be(Array)
-      end
-    end
-  end
-
-  describe 'crosswalk_hash' do
-    context 'when the lookup files exist' do
-      it 'loads the OD2 properties into an array of hashes' do
-        expect(service.send(:crosswalk_hash)).to include(data)
-      end
-      it 'loads the override predicates into the array of hashes' do
-        expect(service.send(:crosswalk_hash)).to include(data2)
-      end
-    end
-
-    context 'when a predicate is in both files' do
-      let(:overrides) { [{ property: 'rights-statement', predicate: 'http://purl.org/dc/terms/rights', multiple: false }] }
-
-      before do
-        allow(service).to receive(:crosswalk_overrides).and_return(overrides)
-      end
-
-      it 'favors overrides' do
-        p = service.send(:find, 'http://purl.org/dc/terms/rights')
-        result = service.send(:crosswalk_hash)
-        expect(result.select(&p).size).to eq(1)
-      end
-    end
-  end
-
   describe 'lookup' do
-    context 'when given a predicate' do
-      it 'returns the associated property hash' do
-        expect(service.send(:lookup, predicate_str)).to eq data
-      end
-    end
+    let(:predicate) { RDF::URI('http://badpredicates.org/ns/bad') }
+    let(:error) { Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError }
 
-    context 'when given a predicate that is not in the config' do
-      let(:bad_predicate) { 'http://example.org/ns/iDontExist' }
-      let(:error) { Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError }
-
+    context 'when the result is nil' do
       it 'raises an error' do
-        expect { service.send(:lookup, bad_predicate) }.to raise_error(error)
+        expect { service.send(:lookup, predicate.to_s) }.to raise_error(error)
       end
-    end
 
-    context 'when given a predicate that is not in the config and skip_field_mode is true' do
-      let(:bad_predicate) { 'http://example.org/ns/iDontExist' }
+      context 'when skip_field_mode is enabled' do
+        before do
+          config.skip_field_mode = true
+          service.send(:lookup, predicate.to_s)
+        end
 
-      before { config.skip_field_mode = true }
-
-      it 'logs a warning' do
-        service.send(:lookup, bad_predicate)
-        expect(service.instance_variable_get(:@errors).size).to eq 1
-      end
-      it 'returns nil' do
-        expect(service.send(:lookup, bad_predicate)).to eq(nil)
-      end
-    end
-  end
-
-  describe 'process' do
-    context 'when given a property hash that does not contain a function' do
-      it 'returns the object' do
-        expect(service.send(:process, data, object)).to eq(object.to_s)
-      end
-    end
-
-    context 'when given a property hash that does have a function' do
-      it 'modifies the object' do
-        expect(service.send(:process, data2, object2)).to eq(nil)
+        it 'reports the error' do
+          expect(service.instance_variable_get(:@errors).size).to eq 1
+        end
       end
     end
   end
 
   describe 'crosswalk' do
-    context 'when there is an nt to process' do
-      it 'processes the statements and returns a result hash' do
-        response = service.crosswalk
-        expect(response[:creator]).to eq([object.to_s])
+    context 'when there is valid metadata' do
+      it 'returns results' do
+        expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://formats_r_us.org/thing' }]
       end
     end
 
-    context 'when there is an nt with set and primary_set to process' do
-      let(:set_statement) do
-        RDF::Statement.new(
-          RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234'),
-          RDF::URI('http://opaquenamespace.org/ns/set'),
-          RDF::URI('http://oregondigital.org/resource/oregondigital:osu-scarc')
-        )
-      end
+    context 'when there are errors' do
+      let(:predicate) { RDF::URI('http://badpredicates.org/ns/bad') }
 
-      let(:primary_set_statement) do
-        RDF::Statement.new(
-          RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234'),
-          RDF::URI('http://opaquenamespace.org/ns/primarySet'),
-          RDF::URI('http://oregondigital.org/resource/oregondigital:osu-baseball')
-        )
-      end
-
-      let(:creator_statement) { RDF::Statement.new(RDF::URI(rdfsubject), RDF::URI(predicate), RDF::URI(object)) }
-
-      let(:graph) do
-        g = RDF::Graph.new
-        g << set_statement
-        g << primary_set_statement
-        g << creator_statement
-        g
-      end
-
-      it 'excludes :set from result hash' do
-        expect(service.crosswalk[:set]).to be_nil
-      end
-
-      it 'excludes :primary_set from result hash' do
-        expect(service.crosswalk[:primary_set]).to be_nil
-      end
-    end
-
-    context 'when processing uses the nil function' do
-      before do
-        graph << RDF::Statement(rdfsubject, predicate2, object2)
-      end
-
-      it 'keeps calm and carries on' do
-        response = service.crosswalk
-        expect(response.keys).to eq([:creator])
+      it 'reports them' do
+        service.crosswalk
+      rescue Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError
+        result = service.instance_variable_get(:@result)
+        expect(result[:errors].size).to eq 1
       end
     end
   end
 
-  context 'with attributes_data function' do
-    let(:predicate_str) { 'http://purl.org/dc/terms/format' }
-    let(:predicate) { RDF::URI(predicate_str) }
-    let(:object) { RDF::URI('http://test/test') }
-    let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
+  describe 'attributes_data' do
+    let(:rdfobject) { RDF::Literal('blah blah') }
+    let(:error) { URI::InvalidURIError }
 
-    it 'transforms the object using the function' do
-      expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://test/test' }]
+    it 'raises an error' do
+      expect { service.send(:attributes_data, rdfobject) }.to raise_error(error)
     end
 
-    context 'when object is a string rather than a uri and skip_field_mode is true' do
-      let(:object) { 'blah blah' }
-
-      before { config.skip_field_mode = true }
-
-      it 'handles it by returning nil' do
-        expect(service.crosswalk).to eq nil
+    context 'when skip field mode is enabled' do
+      before do
+        config.skip_field_mode = true
       end
-    end
 
-    context 'when object is a string rather than a uri in production' do
-      let(:object) { 'blah blah' }
-      let(:error) { URI::InvalidURIError }
-
-      it 'raises an error' do
-        expect { service.send(:crosswalk) }.to raise_error(error)
+      it 'adds errors to the result' do
+        service.send(:attributes_data, rdfobject)
+        expect(service.instance_variable_get(:@errors).size).to eq 1
+      end
+      it 'returns nil' do
+        expect(service.send(:attributes_data, rdfobject)).to eq nil
       end
     end
   end
