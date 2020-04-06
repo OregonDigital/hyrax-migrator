@@ -10,13 +10,15 @@ module Hyrax::Migrator::Services
       @skip_field_mode = migrator_config.skip_field_mode
       @crosswalk_metadata_file = @config.crosswalk_metadata_file
       @crosswalk_overrides_file = @config.crosswalk_overrides_file
+      @result = {}
       @errors = []
     end
 
     # returns result hash
     def crosswalk
       super
-      @result[:errors] = @errors unless @errors.empty? || @result.blank?
+    ensure
+      @result[:errors] = @errors unless @errors.empty?
       @result
     end
 
@@ -32,10 +34,9 @@ module Hyrax::Migrator::Services
       result = super
       return result unless result.nil?
 
-      if @skip_field_mode
-        @errors << "Predicate not found: #{predicate} during crosswalk for #{@work.pid}"
-        return nil
-      end
+      @errors << "Predicate not found: #{predicate} during crosswalk for #{@work.pid}"
+      return nil if @skip_field_mode
+
       raise PredicateNotFoundError, predicate
     end
 
