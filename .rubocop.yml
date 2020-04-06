@@ -57,5 +57,8 @@ RSpec/LetSetup:
 RSpec/MessageSpies:
   Enabled: false
 
+RSpec/NestedGroups:
+  Enabled: false
+
 Metrics/LineLength:
   Enabled: false
