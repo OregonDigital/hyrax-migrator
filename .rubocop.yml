@@ -83,3 +83,6 @@ RSpec/MessageSpies:
 
 Layout/LineLength:
   Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
