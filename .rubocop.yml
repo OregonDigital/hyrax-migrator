@@ -13,6 +13,7 @@ AllCops:
     - 'bin/**/*'
     - 'Gemfile'
     - 'Rakefile'
+    - 'spec/support/rake.rb'
 
 Metrics/BlockLength:
   ExcludedMethods: ['included']
@@ -53,6 +54,7 @@ RSpec/DescribeClass:
   Exclude:
     - 'spec/system/**/*'
     - 'spec/views/**/*'
+    - 'spec/tasks/**/*'
 
 RSpec/LetSetup:
   Enabled: false
