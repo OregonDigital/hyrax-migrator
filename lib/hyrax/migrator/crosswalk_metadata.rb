@@ -4,18 +4,15 @@ require 'rdf'
 require 'rdf/ntriples'
 require 'uri'
 
-module Hyrax::Migrator::Services
-  # Called by the CrosswalkMetadataActor to map OD1 metadata to OD2
-  class CrosswalkMetadataService
-    def initialize(work, migrator_config)
-      @work = work
-      @data_dir = File.join(work.working_directory, 'data')
-      @config = migrator_config
-      @skip_field_mode = migrator_config.skip_field_mode
-      @errors = []
+module Hyrax::Migrator
+  # Methods for mapping OD1 metadata to OD2
+  class CrosswalkMetadata
+    attr_reader :result
+    def initialize(crosswalk_metadata_file, crosswalk_overrides_file)
+      @crosswalk_metadata_file = crosswalk_metadata_file
+      @crosswalk_overrides_file = crosswalk_overrides_file
     end
 
-    # returns result hash
     def crosswalk
       graph = create_graph
       graph.statements.each do |statement|
@@ -27,15 +24,7 @@ module Hyrax::Migrator::Services
 
         assemble_hash(data, processed_obj)
       end
-      @result[:errors] = @errors unless @errors.empty? || @result.blank?
       @result
-    end
-
-    private
-
-    # Load the nt file and return graph
-    def create_graph
-      Hyrax::Migrator::Services::CreateGraphService.call(@data_dir)
     end
 
     # Given property data and an object, adds them to result hash
@@ -51,6 +40,8 @@ module Hyrax::Migrator::Services
       end
     end
 
+    def create_graph; end
+
     def find(predicate)
       proc { |k| k[:predicate].casecmp(predicate).zero? }
     end
@@ -60,12 +51,6 @@ module Hyrax::Migrator::Services
       hash = crosswalk_hash
       result = hash.select(&find(predicate))
       return result.first unless result.empty?
-
-      if @skip_field_mode
-        @errors << "Predicate not found: #{predicate} during crosswalk for #{@work.pid}"
-        return nil
-      end
-      raise PredicateNotFoundError, predicate
     end
 
     # Given property data and an OD1 object, returns either the object, or a modified object
@@ -80,12 +65,12 @@ module Hyrax::Migrator::Services
     end
 
     def crosswalk_data
-      @crosswalk_data ||= YAML.load_file(@config.crosswalk_metadata_file).deep_symbolize_keys
+      @crosswalk_data ||= YAML.load_file(@crosswalk_metadata_file).deep_symbolize_keys
       @crosswalk_data[:crosswalk]
     end
 
     def crosswalk_overrides
-      @crosswalk_overrides ||= YAML.load_file(@config.crosswalk_overrides_file).deep_symbolize_keys
+      @crosswalk_overrides ||= YAML.load_file(@crosswalk_overrides_file).deep_symbolize_keys
       @crosswalk_overrides[:overrides]
     end
 
@@ -97,11 +82,6 @@ module Hyrax::Migrator::Services
     # Generate the data necessary for a Rails nested attribute
     def attributes_data(object)
       return { 'id' => object.to_s, '_destroy' => 0 } unless valid_uri(object.to_s).nil?
-
-      @errors << "Invalid URI #{object} found in crosswalk of #{@work.pid}"
-      return nil if @skip_field_mode
-
-      raise URI::InvalidURIError, object.to_s
     end
 
     ##
@@ -130,26 +110,6 @@ module Hyrax::Migrator::Services
     rescue ArgumentError
       raise DateTimeDataError, object
     end
-
-    ##
-    # Temporary modification to rights rr-f
-    # related issue https://github.com/OregonDigital/hyrax-migrator/issues/70
-    # TODO: This method can be removed once remediation rr-f is done
-    # :nocov:
-    def attributes_replaces_data(object)
-      old_uri = 'http://opaquenamespace.org/ns/rights/rr-f'
-      find_new_uri = replaces_uris.select { |u| u[:old_uri] == old_uri }
-      new_uri = find_new_uri.first[:new_uri] if find_new_uri.present?
-
-      return new_uri if object.to_s == old_uri
-
-      return object.to_s unless valid_uri(object.to_s).nil?
-    end
-
-    def replaces_uris
-      [{ old_uri: 'http://opaquenamespace.org/ns/rights/rr-f', new_uri: 'http://rightsstatements.org/vocab/InC/1.0/' }]
-    end
-    # :nocov:
 
     def valid_uri(uri)
       uri =~ URI.regexp(%w[http https])
