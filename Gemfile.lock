@@ -7,7 +7,7 @@ PATH
       aws-sdk-s3
       bagit
       haml
-      rails (~> 5.2)
+      rails (>= 5.1.6)
       rdf
       rubyzip
       sidekiq
@@ -113,7 +113,7 @@ GEM
     jmespath (1.4.0)
     json (2.2.0)
     link_header (0.0.8)
-    loofah (2.4.0)
+    loofah (2.5.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -233,7 +233,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.10)
     tins (1.20.2)
-    tzinfo (1.2.6)
+    tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode-display_width (1.5.0)
     validatable (1.6.7)
