@@ -104,8 +104,31 @@ module Hyrax::Migrator::Services
       raise URI::InvalidURIError, object.to_s
     end
 
-    def replaces_uris
-      [{ old_uri: 'http://opaquenamespace.org/ns/rights/rr-f', new_uri: 'http://rightsstatements.org/vocab/InC/1.0/' }]
+    ##
+    # Return datetime object from date string. Acceptable formats:
+    # mm/dd/yyyy, and yyyy-mm-dd. Return original if not valid.
+    #
+    # Examples:
+    #
+    # datetime_data("10/28/2014")
+    #   => Tue, 28 Oct 2014 00:00:00 +0000
+    # datetime_data("2014-10-28")
+    #   => Tue, 28 Oct 2014 00:00:00 +0000
+    def datetime_data(object)
+      return object unless object.present?
+
+      DateTime.strptime(object, '%Y-%m-%d')
+    rescue ArgumentError => e
+      rescue_and_retry_datetime(object, e)
+    end
+
+    # This method tries parsing the date with additional formats
+    def rescue_and_retry_datetime(object, error)
+      raise DateTimeDataError, object unless error.message == 'invalid date'
+
+      DateTime.strptime(object, '%m/%d/%Y')
+    rescue ArgumentError
+      raise DateTimeDataError, object
     end
 
     ##
@@ -122,10 +145,18 @@ module Hyrax::Migrator::Services
 
       return object.to_s unless valid_uri(object.to_s).nil?
     end
+
+    def replaces_uris
+      [{ old_uri: 'http://opaquenamespace.org/ns/rights/rr-f', new_uri: 'http://rightsstatements.org/vocab/InC/1.0/' }]
+    end
     # :nocov:
 
     def valid_uri(uri)
       uri =~ URI.regexp(%w[http https])
+    end
+
+    # Raise in datetime_data when error found or format is unsupported
+    class DateTimeDataError < StandardError
     end
 
     # Raise in lookup
