@@ -206,4 +206,30 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       end
     end
   end
+
+  context 'with datetime_data function' do
+    let(:predicate_str) { 'http://purl.org/dc/terms/dateSubmitted' }
+    let(:object) { '2014-10-28' }
+
+    it 'converts the object in format yyyy-mm-dd to valid datetime value' do
+      expect(service.crosswalk[:date_uploaded]).to eq 'Tue, 28 Oct 2014 00:00:00 +0000'
+    end
+
+    context 'when object is a different format yyyy-mm-dd' do
+      let(:object) { '10/28/2014' }
+
+      it 'converts the object in format mm/dd/yyyy to valid datetime value' do
+        expect(service.crosswalk[:date_uploaded]).to eq 'Tue, 28 Oct 2014 00:00:00 +0000'
+      end
+    end
+
+    context 'when object is a string with invalid format' do
+      let(:object) { 'invalid format' }
+      let(:error) { Hyrax::Migrator::Services::CrosswalkMetadataService::DateTimeDataError }
+
+      it 'raises an error' do
+        expect { service.send(:crosswalk) }.to raise_error(error)
+      end
+    end
+  end
 end
