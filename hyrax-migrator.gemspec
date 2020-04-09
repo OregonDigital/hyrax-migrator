@@ -23,11 +23,11 @@ Gem::Specification.new do |s|
     'README.md']
 
   s.add_dependency 'aasm'
-  s.add_dependency 'actionview', '~> 5.2'
+  s.add_dependency 'actionview', '>= 5.1.6.2'
   s.add_dependency 'aws-sdk-s3'
   s.add_dependency 'bagit'
   s.add_dependency 'haml'
-  s.add_dependency 'rails', '>= 5.1.6'
+  s.add_dependency 'rails', '~> 5.1.6'
   s.add_dependency 'rdf'
   s.add_dependency 'rubyzip'
   s.add_dependency 'sidekiq'
