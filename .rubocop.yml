@@ -1,4 +1,6 @@
-require: rubocop-rspec
+require:
+ - rubocop-rails
+ - rubocop-rspec
 
 AllCops:
   TargetRubyVersion: 2.5
@@ -38,6 +40,12 @@ Style/SingleLineBlockParams:
 Rails/ApplicationJob:
   Enabled: false
 
+Rails/FilePath:
+  Enabled: false
+
+RSpec/EmptyLineAfterExample:
+  Enabled: false
+
 Rails/ApplicationRecord:
   Enabled: false
 
@@ -49,11 +57,29 @@ RSpec/DescribeClass:
 RSpec/LetSetup:
   Enabled: false
 
+Rails/Blank:
+  Enabled: false
+
+Rails/Present:
+  Enabled: false
+
+Rails/Output:
+  Enabled: false
+
+Rails/RakeEnvironment:
+  Enabled: false
+
+RSpec/LeakyConstantDeclaration:
+  Enabled: false
+
+Lint/NonDeterministicRequireOrder:
+  Enabled: false
+
 # # By default RSpec/MessageSpies has the following:
 # #   Prefer have_received for setting message expectations. Setup form as a spy using allow or instance_spy.
 # # The default assumes EnforcedStyle is 'have_received'. Most of our specs are 'receive'
 RSpec/MessageSpies:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
