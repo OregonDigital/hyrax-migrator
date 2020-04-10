@@ -212,14 +212,14 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     let(:object) { '2014-10-28' }
 
     it 'converts the object in format yyyy-mm-dd to valid datetime value' do
-      expect(service.crosswalk[:date_uploaded]).to eq 'Tue, 28 Oct 2014 00:00:00 +0000'
+      expect(service.crosswalk[:date_uploaded]).to eq '2014-10-28T00:00:00+00:00'
     end
 
     context 'when object is a different format yyyy-mm-dd' do
       let(:object) { '10/28/2014' }
 
       it 'converts the object in format mm/dd/yyyy to valid datetime value' do
-        expect(service.crosswalk[:date_uploaded]).to eq 'Tue, 28 Oct 2014 00:00:00 +0000'
+        expect(service.crosswalk[:date_uploaded]).to eq '2014-10-28T00:00:00+00:00'
       end
     end
 
