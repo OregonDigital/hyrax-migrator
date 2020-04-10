@@ -117,7 +117,7 @@ module Hyrax::Migrator::Services
     def datetime_data(object)
       return object unless object.present?
 
-      DateTime.strptime(object, '%Y-%m-%d')
+      DateTime.strptime(object, '%Y-%m-%d').to_s
     rescue ArgumentError => e
       rescue_and_retry_datetime(object, e)
     end
@@ -126,7 +126,7 @@ module Hyrax::Migrator::Services
     def rescue_and_retry_datetime(object, error)
       raise DateTimeDataError, object unless error.message == 'invalid date'
 
-      DateTime.strptime(object, '%m/%d/%Y')
+      DateTime.strptime(object, '%m/%d/%Y').to_s
     rescue ArgumentError
       raise DateTimeDataError, object
     end
