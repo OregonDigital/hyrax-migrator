@@ -6,7 +6,7 @@ require 'pry'
 require 'rdf'
 require 'uri'
 require 'rdf/ntriples'
-require 'hyrax/migrator/crosswalk_metadata'
+require 'hyrax/migrator/crosswalk_metadata_preflight'
 
 # OD1 assets
 class GenericAsset
@@ -15,6 +15,7 @@ end
 
 RSpec.describe 'preflight_tools rake tasks' do
   include ActiveJob::TestHelper
+
   describe 'preflight_tools:metadata_preflight' do
     let(:work) { double }
     let(:nt) { 'spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt' }
@@ -23,7 +24,7 @@ RSpec.describe 'preflight_tools rake tasks' do
     let(:graph) { RDF::Graph.load(nt) }
 
     before do
-      load_rake_environment [File.expand_path('../../../lib/tasks/preflight_tools/metadata_preflight.rake', __dir__), File.expand_path('../../../lib/hyrax/migrator/crosswalk_metadata.rb', __dir__)]
+      load_rake_environment [File.expand_path('../../../lib/tasks/preflight_tools/metadata_preflight.rake', __dir__), File.expand_path('../../../lib/hyrax/migrator/crosswalk_metadata_preflight.rb', __dir__)]
       allow(GenericAsset).to receive(:find).and_return(work)
       allow(work).to receive(:datastreams).and_return(datastreams)
       allow(datastreams).to receive(:[]).with('descMetadata').and_return(datastream)
@@ -54,7 +55,7 @@ RSpec.describe 'preflight_tools rake tasks' do
 
       it 'displays them' do
         stdio = run_task('preflight_tools:metadata_preflight')
-        expect(stdio).to include('Attributes')
+        expect(stdio).to include('title')
       end
     end
   end
