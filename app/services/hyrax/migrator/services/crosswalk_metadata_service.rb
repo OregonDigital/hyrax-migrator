@@ -25,7 +25,7 @@ module Hyrax::Migrator::Services
     private
 
     # Load the nt file and return graph
-    def create_graph
+    def graph
       Hyrax::Migrator::Services::CreateGraphService.call(@data_dir)
     end
 
