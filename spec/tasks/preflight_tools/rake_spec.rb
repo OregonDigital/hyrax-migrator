@@ -8,6 +8,7 @@ require 'uri'
 require 'rdf/ntriples'
 require 'hyrax/migrator/crosswalk_metadata'
 
+# OD1 assets
 class GenericAsset
   def self.find(pid); end
 end

@@ -8,13 +8,13 @@ module Hyrax::Migrator
   # Methods for mapping OD1 metadata to OD2
   class CrosswalkMetadata
     attr_reader :result
+    attr_accessor :graph
     def initialize(crosswalk_metadata_file, crosswalk_overrides_file)
       @crosswalk_metadata_file = crosswalk_metadata_file
       @crosswalk_overrides_file = crosswalk_overrides_file
     end
 
     def crosswalk
-      graph = create_graph
       graph.statements.each do |statement|
         data = lookup(statement.predicate.to_s)
         next if data.nil?
@@ -39,8 +39,6 @@ module Hyrax::Migrator
         @result[data[:property].to_sym] = object
       end
     end
-
-    def create_graph; end
 
     def find(predicate)
       proc { |k| k[:predicate].casecmp(predicate).zero? }

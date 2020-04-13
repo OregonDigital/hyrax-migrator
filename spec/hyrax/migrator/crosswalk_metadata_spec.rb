@@ -102,7 +102,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
 
   describe 'crosswalk' do
     before do
-      allow(service).to receive(:create_graph).and_return(graph)
+      service.graph = graph
     end
 
     context 'when there is an nt to process' do
@@ -115,7 +115,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
     context 'when there is no value for a predicate' do
       before do
         graph << RDF::Statement.new(rdfsubject, RDF::URI('http://badpredicate.org'), RDF::Literal('bad'))
-        allow(service).to receive(:create_graph).and_return(graph)
+        service.graph = graph
       end
 
       it 'skips it' do
@@ -130,7 +130,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
 
       before do
         graph << RDF::Statement.new(rdfsubject, predicate2, RDF::Literal('still bad'))
-        allow(service).to receive(:create_graph).and_return(graph)
+        service.graph = graph
       end
 
       it 'skips it' do
@@ -194,7 +194,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
     let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
 
     before do
-      allow(service).to receive(:create_graph).and_return(graph)
+      service.graph = graph
     end
 
     it 'transforms the object using the function' do
@@ -217,7 +217,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
     let(:data) { { property: 'dateSubmitted', predicate: predicate_str, multiple: true, function: 'datetime_data' } }
 
     before do
-      allow(service).to receive(:create_graph).and_return(graph)
+      service.graph = graph
     end
 
     it 'converts the object in format yyyy-mm-dd to valid datetime value' do
