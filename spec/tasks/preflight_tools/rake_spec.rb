@@ -34,7 +34,7 @@ RSpec.describe 'preflight_tools rake tasks' do
     end
 
     after do
-      time = Time.now.strftime('%Y%m%d')
+      time = Time.zone.now.strftime('%Y%m%d')
       Dir.glob("spec/fixtures/report_#{time}*").each do |f|
         File.delete(f)
       end

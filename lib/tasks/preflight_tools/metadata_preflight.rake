@@ -35,7 +35,7 @@ end
 
 def init
   @work_dir = ENV['work_dir']
-  datetime_today = Time.now.strftime('%Y%m%d%H%M%S') # "20171021125903"
+  datetime_today = Time.zone.now.strftime('%Y%m%d%H%M%S') # "20171021125903"
   @report = File.open(File.join(@work_dir, "report_#{datetime_today}.txt"), 'w')
   @service = Hyrax::Migrator::CrosswalkMetadataPreflight.new(crosswalk_file, crosswalk_overrides_file)
   @errors = []
