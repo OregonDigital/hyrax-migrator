@@ -8,6 +8,8 @@ module Hyrax::Migrator
     attr_accessor :pid, :errors, :result
     def initialize(crosswalk_metadata_file, crosswalk_overrides_file)
       super
+      @errors = []
+      @result = {}
     end
 
     # returns result hash
