@@ -29,6 +29,7 @@ module Hyrax::Migrator::Services
       result_hash[:fields] = fields
       result_hash[:checksums] = checksums
       result_hash[:admin_set] = item.admin_set_id
+      result_hash[:derivatives_info] = derivatives_service.migrated_info
       result_hash
     end
 
@@ -90,6 +91,14 @@ module Hyrax::Migrator::Services
       errors
     rescue StandardError => e
       puts e.message
+    end
+
+    def verify_derivatives
+      derivatives_service.verify
+    end
+
+    def derivatives_service
+      Hyrax::Migrator::Services::VerifyDerivativesService.new(@work, @original_profile)
     end
 
     def process_vals(key, val)
