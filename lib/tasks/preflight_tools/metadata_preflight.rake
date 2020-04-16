@@ -3,7 +3,7 @@
 # Requires a work dir with copies of crosswalk and overrides yml files
 # Also a list of pids in the work_dir, one pid per line
 # Will write a report of any errors found to the work dir
-# To use: rake preflight_tools:metadata_preflight workdir=/data1/batch/some_dir pidlist=list.txt
+# To use: rake preflight_tools:metadata_preflight work_dir=/data1/batch/some_dir pidlist=list.txt
 # If verbose=true then the attributes will be displayed
 
 namespace :preflight_tools do
@@ -12,13 +12,18 @@ namespace :preflight_tools do
     require 'hyrax/migrator/crosswalk_metadata_preflight'
     init
     pids.each do |pid|
-      @errors << "Working on #{pid}..."
-      @service.graph = create_graph(GenericAsset.find(pid))
-      @service.errors = []
-      @service.result = {}
-      @result = @service.crosswalk
-      @errors.concat @result[:errors]
-      verbose_display(pid, @result.except(:errors)) if ENV.include? 'verbose'
+      begin
+        @errors << "Working on #{pid}..."
+        @service.graph = create_graph(GenericAsset.find(pid))
+        @service.errors = []
+        @service.result = {}
+        @result = @service.crosswalk
+        @errors.concat @result[:errors]
+        verbose_display(pid, @result.except(:errors)) if ENV.include? 'verbose'
+      rescue StandardError => e
+        @errors << "Could not check #{pid}, error message: #{e.message}"
+        next
+      end
     end
     write_errors
     @report.close
