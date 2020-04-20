@@ -12,6 +12,7 @@ require 'hyrax/migrator/hyrax_core/admin_set'
 require 'hyrax/migrator/hyrax_core/asset'
 require 'hyrax/migrator/hyrax_core/uploaded_file'
 require 'hyrax/migrator/hyrax_core/user'
+require 'hyrax/migrator/crosswalk_metadata'
 
 module Hyrax
   ##

@@ -13,6 +13,7 @@ AllCops:
     - 'bin/**/*'
     - 'Gemfile'
     - 'Rakefile'
+    - 'spec/support/rake.rb'
 
 Metrics/BlockLength:
   ExcludedMethods: ['included']
@@ -34,6 +35,10 @@ Style/CollectionMethods:
 Style/ClassAndModuleChildren:
   Enabled: false
 
+Style/RedundantBegin:
+  Exclude:
+    - 'lib/tasks/preflight_tools/metadata_preflight.rake'
+
 Style/SingleLineBlockParams:
   Enabled: false
 
@@ -53,6 +58,7 @@ RSpec/DescribeClass:
   Exclude:
     - 'spec/system/**/*'
     - 'spec/views/**/*'
+    - 'spec/tasks/**/*'
 
 RSpec/LetSetup:
   Enabled: false
@@ -82,4 +88,7 @@ RSpec/MessageSpies:
   Enabled: false
 
 Layout/LineLength:
+  Enabled: false
+
+RSpec/NestedGroups:
   Enabled: false

@@ -2,9 +2,9 @@
 
 require 'rdf'
 require 'uri'
-require 'hyrax/migrator/crosswalk_metadata'
+require 'hyrax/migrator/crosswalk_metadata_preflight'
 
-RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
+RSpec.describe Hyrax::Migrator::CrosswalkMetadataPreflight do
   let(:graph) do
     g = RDF::Graph.new
     s = RDF::Statement.new(rdfsubject, predicate, rdfobject)
@@ -20,35 +20,24 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
-  let(:service) { described_class.new(work, config) }
-  let(:pid) { '3t945r08v' }
-  let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
-  let(:work) { create(:work, pid: pid, file_path: file_path) }
+  let(:service) { described_class.new(crosswalk_metadata_file, crosswalk_overrides_file) }
 
   before do
-    config.crosswalk_metadata_file = crosswalk_metadata_file
-    config.crosswalk_overrides_file = crosswalk_overrides_file
-    allow(RDF::Graph).to receive(:load).and_return(graph)
+    service.graph = graph
+    service.errors = []
+    service.result = {}
   end
 
   describe 'lookup' do
     let(:predicate) { RDF::URI('http://badpredicates.org/ns/bad') }
-    let(:error) { Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError }
+
+    before do
+      service.send(:lookup, predicate)
+    end
 
     context 'when the result is nil' do
-      it 'raises an error' do
-        expect { service.send(:lookup, predicate.to_s) }.to raise_error(error)
-      end
-
-      context 'when skip_field_mode is enabled' do
-        before do
-          config.skip_field_mode = true
-          service.send(:lookup, predicate.to_s)
-        end
-
-        it 'reports the error' do
-          expect(service.instance_variable_get(:@errors).size).to eq 1
-        end
+      it 'reports the error' do
+        expect(service.instance_variable_get(:@errors).size).to eq 1
       end
     end
   end
@@ -65,7 +54,6 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
       it 'reports them' do
         service.crosswalk
-      rescue Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError
         result = service.instance_variable_get(:@result)
         expect(result[:errors].size).to eq 1
       end
@@ -74,17 +62,8 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
   describe 'attributes_data' do
     let(:rdfobject) { RDF::Literal('blah blah') }
-    let(:error) { URI::InvalidURIError }
 
-    it 'raises an error' do
-      expect { service.send(:attributes_data, rdfobject) }.to raise_error(error)
-    end
-
-    context 'when skip field mode is enabled' do
-      before do
-        config.skip_field_mode = true
-      end
-
+    context 'when there is a string' do
       it 'adds errors to the result' do
         service.send(:attributes_data, rdfobject)
         expect(service.instance_variable_get(:@errors).size).to eq 1
