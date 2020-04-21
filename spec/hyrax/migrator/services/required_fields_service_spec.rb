@@ -12,7 +12,7 @@ RSpec.describe Hyrax::Migrator::Services::RequiredFieldsService do
     hash = {}
     hash[:title] = ['Conjunction Junction']
     hash[:identifier] = ['123456']
-    hash[:type_attributes] = [RDF::URI('http://purl.org/dc/dcmitype/Audio')]
+    hash[:resource_type] = [RDF::URI('http://purl.org/dc/dcmitype/Audio')]
     hash[:rights_statement] = [RDF::URI('http://rightsstatments.org/vocab/InC/1.0/')]
     hash
   end
