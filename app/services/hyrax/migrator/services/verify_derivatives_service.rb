@@ -9,6 +9,7 @@ module Hyrax::Migrator::Services
     def initialize(asset_item, original_profile)
       @work = asset_item
       @original_profile = original_profile
+      @verification_errors = []
     end
 
     # Given derivatives info from the original profile, verify that the derivatives
@@ -26,7 +27,7 @@ module Hyrax::Migrator::Services
       puts e.message
     end
 
-    # Return error (String) if found, otherwise return nil if no errors
+    # Return error list Array
     def verify_file_set(object)
       fsc = file_set.class
 
@@ -39,54 +40,65 @@ module Hyrax::Migrator::Services
       end
     end
 
-    def all_derivative_paths(file_set)
-      Hyrax::Migrator::HyraxCore::DerivativePath.new(file_set).all_paths
-    end
-
     def check_pdf_derivatives(file_set)
-      # check thumbnail exists?
-      # check page count (it should match page count from OD1)
-      #
-      # TODO: return errors if any
+      check_thumbnail(file_set)
+      check_page_count(file_set)
     end
 
     def check_office_document_derivatives(file_set)
-      # check thumbnail exists?
-      # check extracted_text exists?
-      # check page count (it should match page count from OD1)
-      #
-      # TODO: return errors if any
+      check_thumbnail(file_set)
+      check_extracted_content(file_set)
+      check_page_count(file_set)
     end
 
     def check_audio_derivatives(file_set)
-      # check thumbnail exists?
-      # check mp3 exists?
-      # check ogg exists?
-      #
-      # TODO: return errors if any
+      check_thumbnail(file_set)
+      check_file_type(file_set, 'mp3')
+      check_file_type(file_set, 'ogg')
     end
 
     def check_video_derivatives(file_set)
-      # check thumbnail exists?
-      # check webm exists?
-      # check mp4 exists?
-      #
-      # TODO: return errors if any
+      check_thumbnail(file_set)
+      check_file_type(file_set, 'webm')
+      check_file_type(file_set, 'mp4')
     end
 
     def check_image_derivatives(file_set)
-      # check thumbnail (jpg) exists?
-      # check zoomable (jp2) exists?
-      #
-      # TODO: return errors if any
+      check_thumbnail(file_set)
+      check_file_type(file_set, 'jp2')
+    end
+
+    def all_derivative_basenames(file_set)
+      Hyrax::Migrator::HyraxCore::DerivativePath.new(file_set).all_paths.map { |f| File.basename(f) }
+    end
+
+    def check_thumbnail(file_set)
+      has_thumbnail = all_derivative_basenames(file_set).select { |b| b.match 'thumbnail' }.present?
+      @verification_errors << "Missing thumbnail in #{item.id}, file_set #{file_set.id}." unless has_thumbnail == true
+    end
+
+    def check_page_count(file_set)
+      original_count = @original_profile['derivatives_info']['page_count']
+      new_count = derivatives_for_reference(file_set, 'jp2').count
+      @verification_errors << "Page count does not match for work #{item.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
+    end
+
+    def check_extracted_content(file_set)
+      @verification_errors << 'Missing extracted text' unless file_set.extracted_text.present?
+    end
+
+    def check_file_type(file_set, extension)
+      @verification_errors << "Missing #{extension} derivative." unless derivatives_for_reference(file_set, extension).present?
+    end
+
+    def derivatives_for_reference(file_set, extension)
+      all_derivative_basenames(file_set).select { |b| File.extname(b) == ".#{extension}" }
     end
 
     ## Return derivatives info for the migrated asset (OD2)
     # @return hash (with derivatives info)
     def migrated_info
-      original_info = @original_profile['derivatives_info']
-
-      # TODO: return array of hashes (one for each file_set)
+      # TODO: refactor and return array of hashes (one for each file_set)
       # @work.file_sets.each do |file_set|
       #   {
       #     has_thumbnail: true,
