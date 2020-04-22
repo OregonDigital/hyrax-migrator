@@ -6,109 +6,108 @@ module Hyrax::Migrator::Services
   ##
   # A service to verify that derivatives for the content exist for the migrated asset
   class VerifyDerivativesService
-    def initialize(migrator_work, original_profile)
-      @work = migrator_work
+    def initialize(asset_item, original_profile)
+      @work = asset_item
       @original_profile = original_profile
     end
 
     # Given derivatives info from the original profile, verify that the derivatives
     # were successfully created after migrating the new asset
     def verify
-      #
-      # Verification options/psedocode
-      #
-      # Example:
-      # pid = 'fx71bn65n'
-      #
-      # OD1:
-      #
-      # asset = GenericAsset.find("oregondigital:#{pid}")
-      # asset.datastreams.to_a.map { |d| d.second }.select { |d| d.controlGroup == "E" }.map { |d| d.dsid }
-      # => ["thumbnail", "content_ocr", "page-2", "page-3", ...]
-      #
-      # OD2:
-      # w = ActiveFedora::Base.find("fx71bn65n")
-      # fsd = OregonDigital::FileSetDerivativesService.new(w.file_sets.first)
-      # fsd.sorted_derivative_urls('thumbnail')
-      # => ["file:///data/tmp/shared/derivatives/td/96/k2/48/x-thumbnail.jpeg"]
-      #
-      # option (1)
-      #
-      # for each derivative filename in sorted_derivatives_url do
-      #   case mime_type
-      #     when pdf_mime_types             then check_pdf_derivatives(filename)
-      #     when office_document_mime_types then check_office_document_derivatives(filename)
-      #     when audio_mime_types           then check_audio_derivatives(filename)
-      #     when video_mime_types           then check_video_derivatives(filename)
-      #     when image_mime_types           then check_image_derivatives(filename)
-      #   end
-      # end
-      #
-      # option (2)
-      #
-      # find CreateDerivativesJobs and filter by pid/arguments, then query
-      # sidekiq to find out if they are succcessful.
-      #
-      #
+      errors = []
+
+      @work.file_sets.each do |file_set|
+        result = verify_file_set(file_set)
+        errors << result if result.present?
+      end
+
+      errors
+    rescue StandardError => e
+      puts e.message
     end
 
-    # def check_pdf_derivatives(filename)
-    #
-    #   check thumbnail exists?
-    #
-    #   check page count (it should match page count from OD1)
-    #     page_count = OregonDigital::Derivatives::Image::Utils.page_count(filename)
-    #
-    #   return true
-    # end
-    #
-    #
-    # def check_office_document_derivatives(filename)
-    #
-    #   check thumbnail exists?
-    #   check extracted_text exists?
-    #
-    #   check page count (it should match page count from OD1)
-    #     page_count = OregonDigital::Derivatives::Image::Utils.page_count(filename)
-    #
-    #   return true
-    # end
-    #
-    # def check_audio_derivatives(filename)
-    #
-    #   check thumbnail exists?
-    #   check mp3 exists?
-    #   check ogg exists?
-    #
-    #   return true
-    # end
-    #
-    # def check_video_derivatives(filename)
-    #
-    #   check thumbnail exists?
-    #   check webm exists?
-    #   check mp4 exists?
-    #
-    #   return true
-    # end
-    #
-    # def check_image_derivatives(filename)
-    #
-    #   check thumbnail (jpg) exists?
-    #   check zoomable (jp2) exists?
-    #
-    #   return true
-    # end
-    #
+    # Return error (String) if found, otherwise return nil if no errors
+    def verify_file_set(object)
+      fsc = file_set.class
+
+      case object.mime_type
+      when *fsc.pdf_mime_types             then check_pdf_derivatives(object)
+      when *fsc.office_document_mime_types then check_office_document_derivatives(object)
+      when *fsc.audio_mime_types           then check_audio_derivatives(object)
+      when *fsc.video_mime_types           then check_video_derivatives(object)
+      when *fsc.image_mime_types           then check_image_derivatives(object)
+      end
+    end
+
+    def all_derivative_paths(file_set)
+      Hyrax::Migrator::HyraxCore::DerivativePath.new(file_set).all_paths
+    end
+
+    def check_pdf_derivatives(file_set)
+      # check thumbnail exists?
+      # check page count (it should match page count from OD1)
+      #
+      # TODO: return errors if any
+    end
+
+    def check_office_document_derivatives(file_set)
+      # check thumbnail exists?
+      # check extracted_text exists?
+      # check page count (it should match page count from OD1)
+      #
+      # TODO: return errors if any
+    end
+
+    def check_audio_derivatives(file_set)
+      # check thumbnail exists?
+      # check mp3 exists?
+      # check ogg exists?
+      #
+      # TODO: return errors if any
+    end
+
+    def check_video_derivatives(file_set)
+      # check thumbnail exists?
+      # check webm exists?
+      # check mp4 exists?
+      #
+      # TODO: return errors if any
+    end
+
+    def check_image_derivatives(file_set)
+      # check thumbnail (jpg) exists?
+      # check zoomable (jp2) exists?
+      #
+      # TODO: return errors if any
+    end
+
     ## Return derivatives info for the migrated asset (OD2)
-    # def migrated_info
-    #   return [
-    #     {
-    #       label: :thumbnail,
-    #       format: 'jpg',
-    #       type: 'pdf'
-    #     }
-    #   ]
-    # end
+    # @return hash (with derivatives info)
+    def migrated_info
+      original_info = @original_profile['derivatives_info']
+
+      # TODO: return array of hashes (one for each file_set)
+      # @work.file_sets.each do |file_set|
+      #   {
+      #     has_thumbnail: true,
+      #
+      #     # document
+      #     has_content_ocr: true,
+      #     page_count: 236,
+      #
+      #     # audio
+      #     has_content_ogg: true,
+      #     has_content_mp3: true,
+      #
+      #     # image
+      #     has_medium_image: true,
+      #     has_pyramidal_image: true,
+      #
+      #     # video
+      #     has_content_mp4: true,
+      #     has_content_jpg: true
+      #   }
+      # end
+    end
   end
 end
