@@ -15,21 +15,18 @@ module Hyrax::Migrator::Services
     # Given derivatives info from the original profile, verify that the derivatives
     # were successfully created after migrating the new asset
     def verify
-      errors = []
-
       @work.file_sets.each do |file_set|
-        result = verify_file_set(file_set)
-        errors << result if result.present?
+        verify_file_set(file_set)
       end
 
-      errors
+      @verification_errors
     rescue StandardError => e
       puts e.message
     end
 
     # Return error list Array
     def verify_file_set(object)
-      fsc = file_set.class
+      fsc = object.class
 
       case object.mime_type
       when *fsc.pdf_mime_types             then check_pdf_derivatives(object)
