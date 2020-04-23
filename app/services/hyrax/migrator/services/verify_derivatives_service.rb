@@ -105,6 +105,7 @@ module Hyrax::Migrator::Services
 
     def info_for_migrated(file_set)
       {
+        file_set_id: file_set.id,
         has_thumbnail: all_derivatives(file_set).select { |b| b.match 'thumbnail' }.present?,
         has_extracted_text: file_set.extracted_text.present?,
         page_count: derivatives_for_reference(file_set, 'jp2').count,
