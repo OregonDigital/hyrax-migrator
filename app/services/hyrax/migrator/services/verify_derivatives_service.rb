@@ -68,58 +68,52 @@ module Hyrax::Migrator::Services
       check_file_type(file_set, 'jp2')
     end
 
-    def all_derivative_basenames(file_set)
+    def all_derivatives(file_set)
       Hyrax::Migrator::HyraxCore::DerivativePath.new(file_set).all_paths.map { |f| File.basename(f) }
     end
 
     def check_thumbnail(file_set)
-      has_thumbnail = all_derivative_basenames(file_set).select { |b| b.match 'thumbnail' }.present?
+      has_thumbnail = info_for_migrated(file_set)[:has_thumbnail]
       @verification_errors << "Missing thumbnail in #{item.id}, file_set #{file_set.id}." unless has_thumbnail == true
     end
 
     def check_page_count(file_set)
       original_count = @original_profile['derivatives_info']['page_count']
-      new_count = derivatives_for_reference(file_set, 'jp2').count
+      new_count = info_for_migrated(file_set)[:page_count]
       @verification_errors << "Page count does not match for work #{item.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
     end
 
     def check_extracted_content(file_set)
-      @verification_errors << 'Missing extracted text' unless file_set.extracted_text.present?
+      @verification_errors << "Missing extracted text for work #{item.id}, file_set #{file_set.id}." unless info_for_migrated(file_set)[:has_extracted_text]
     end
 
     def check_file_type(file_set, extension)
-      @verification_errors << "Missing #{extension} derivative." unless derivatives_for_reference(file_set, extension).present?
+      @verification_errors << "Missing #{extension} derivative for work #{item.id}, file_set #{file_set.id}." unless derivatives_for_reference(file_set, extension).present?
     end
 
     def derivatives_for_reference(file_set, extension)
-      all_derivative_basenames(file_set).select { |b| File.extname(b) == ".#{extension}" }
+      all_derivatives(file_set).select { |b| File.extname(b) == ".#{extension}" }
     end
 
     ## Return derivatives info for the migrated asset (OD2)
     # @return hash (with derivatives info)
-    def migrated_info
-      # TODO: refactor and return array of hashes (one for each file_set)
-      # @work.file_sets.each do |file_set|
-      #   {
-      #     has_thumbnail: true,
-      #
-      #     # document
-      #     has_content_ocr: true,
-      #     page_count: 236,
-      #
-      #     # audio
-      #     has_content_ogg: true,
-      #     has_content_mp3: true,
-      #
-      #     # image
-      #     has_medium_image: true,
-      #     has_pyramidal_image: true,
-      #
-      #     # video
-      #     has_content_mp4: true,
-      #     has_content_jpg: true
-      #   }
-      # end
+    def info_for_migrated_asset
+      @work.file_sets.map do |f|
+        info_for_migrated(f)
+      end
+    end
+
+    def info_for_migrated(file_set)
+      {
+        has_thumbnail: all_derivatives(file_set).select { |b| b.match 'thumbnail' }.present?,
+        has_extracted_text: file_set.extracted_text.present?,
+        page_count: derivatives_for_reference(file_set, 'jp2').count,
+        has_content_ogg: derivatives_for_reference(file_set, 'ogg').present?,
+        has_content_mp3: derivatives_for_reference(file_set, 'mp3').present?,
+        has_zoomable_image: derivatives_for_reference(file_set, 'jp2').present?,
+        has_content_mp4: derivatives_for_reference(file_set, 'mp4').present?,
+        has_content_jpg: derivatives_for_reference(file_set, 'jpg').present?
+      }
     end
   end
 end

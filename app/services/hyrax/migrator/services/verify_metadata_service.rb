@@ -29,7 +29,7 @@ module Hyrax::Migrator::Services
       result_hash[:fields] = fields
       result_hash[:checksums] = checksums
       result_hash[:admin_set] = item.admin_set_id
-      result_hash[:derivatives_info] = derivatives_service.migrated_info
+      result_hash[:derivatives_info] = derivatives_service.info_for_migrated_asset
       result_hash
     end
 
