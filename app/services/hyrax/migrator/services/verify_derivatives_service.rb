@@ -66,26 +66,26 @@ module Hyrax::Migrator::Services
     end
 
     def all_derivatives(file_set)
-      Hyrax::Migrator::HyraxCore::DerivativePath.new(file_set).all_paths.map { |f| File.basename(f) }
+      Hyrax::Migrator::HyraxCore::DerivativePath.new(file_set: file_set).all_paths.map { |f| File.basename(f) }
     end
 
     def check_thumbnail(file_set)
       has_thumbnail = info_for_migrated(file_set)[:has_thumbnail]
-      @verification_errors << "Missing thumbnail in #{item.id}, file_set #{file_set.id}." unless has_thumbnail == true
+      @verification_errors << "Missing thumbnail in #{@work.id}, file_set #{file_set.id}." unless has_thumbnail == true
     end
 
     def check_page_count(file_set)
       original_count = @original_profile['derivatives_info']['page_count']
       new_count = info_for_migrated(file_set)[:page_count]
-      @verification_errors << "Page count does not match for work #{item.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
+      @verification_errors << "Page count does not match for work #{@work.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
     end
 
     def check_extracted_content(file_set)
-      @verification_errors << "Missing extracted text for work #{item.id}, file_set #{file_set.id}." unless info_for_migrated(file_set)[:has_extracted_text]
+      @verification_errors << "Missing extracted text for work #{@work.id}, file_set #{file_set.id}." unless info_for_migrated(file_set)[:has_extracted_text]
     end
 
     def check_file_type(file_set, extension)
-      @verification_errors << "Missing #{extension} derivative for work #{item.id}, file_set #{file_set.id}." unless derivatives_for_reference(file_set, extension).present?
+      @verification_errors << "Missing #{extension} derivative for work #{@work.id}, file_set #{file_set.id}." unless derivatives_for_reference(file_set, extension).present?
     end
 
     def derivatives_for_reference(file_set, extension)

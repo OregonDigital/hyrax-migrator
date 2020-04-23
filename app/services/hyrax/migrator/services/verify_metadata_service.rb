@@ -98,7 +98,7 @@ module Hyrax::Migrator::Services
     end
 
     def derivatives_service
-      Hyrax::Migrator::Services::VerifyDerivativesService.new(@item, @original_profile)
+      Hyrax::Migrator::Services::VerifyDerivativesService.new(item, original_profile)
     end
 
     def process_vals(key, val)
