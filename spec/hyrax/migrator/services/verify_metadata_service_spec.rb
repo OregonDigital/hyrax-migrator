@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'byebug'
 
 RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
   let(:migrator_work) { double }
@@ -8,7 +9,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
   let(:pid) { 'df70jh899' }
   let(:set) { double }
   let(:sets) { [set] }
-  let(:file_set) { instance_double('FileSet', id: 'bn999672v', uri: 'http://127.0.0.1/rest/fake/bn/99/96/72/bn999672v', extracted_text: 'test') }
+  let(:file_set) { instance_double('FileSet', id: 'bn999672v', uri: 'http://127.0.0.1/rest/fake/bn/99/96/72/bn999672v', extracted_text: 'test', mime_type: 'image/png') }
   let(:content_path) { 'spec/fixtures/data/world.png' }
   let(:original_file) { instance_double('hyrax_original_file', content: File.open(content_path).read) }
   let(:derivative_path) { instance_double('Hyrax::Migrator::HyraxCore::DerivativePath', all_paths: []) }
@@ -71,6 +72,29 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
 
       it 'returns errors' do
         expect(service.verify_content).to include(match(/Content does not match precomputed/))
+      end
+    end
+  end
+
+  describe 'verify_derivatives' do
+    let(:json) { {} }
+    let(:derivatives_service) { instance_double('Hyrax::Migrator::Services::VerifyDerivativesService', verify: []) }
+
+    before do
+      allow(service).to receive(:derivatives_service).and_return(derivatives_service)
+    end
+
+    context 'when derivatives exist' do
+      it 'returns no errors' do
+        expect(service.verify_derivatives).to eq([])
+      end
+    end
+
+    context 'when missing derivatives' do
+      let(:derivatives_service) { instance_double('Hyrax::Migrator::Services::VerifyDerivativesService', verify: ['Missing thumbnail derivative']) }
+
+      it 'returns errors' do
+        expect(service.verify_derivatives).to include(match(/Missing/))
       end
     end
   end
