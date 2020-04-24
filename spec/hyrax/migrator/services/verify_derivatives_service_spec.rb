@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'byebug'
 
 RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   let(:hyrax_work) { double }
@@ -81,5 +80,4 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
       expect(service.check_video_derivatives(file_set)).to eq([])
     end
   end
-
 end
