@@ -58,6 +58,28 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     allow(hyrax_work).to receive(:admin_set_id).and_return('uo-scua')
   end
 
+  describe 'verify' do
+    context 'when derivatives check is successfull' do
+      before do
+        allow(service).to receive(:verify_file_set).and_return([])
+      end
+
+      it 'checks every file_set in hyrax_work (returns no errors)' do
+        expect(service.verify).to eq []
+      end
+    end
+
+    context 'when derivatives check fails due to error' do
+      before do
+        allow(service).to receive(:verify_file_set).and_raise(StandardError)
+      end
+
+      it 'raises error when hyrax fails' do
+        expect { service.verify }.not_to raise_error
+      end
+    end
+  end
+
   describe 'check_pdf_derivatives' do
     let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/c2/47/ds/08/x-jp2-0000.jp2', '/data/tmp/shared/derivatives/c2/47/ds/08/x-thumbnail.jpeg'] }
     let(:derivatives_info) do
