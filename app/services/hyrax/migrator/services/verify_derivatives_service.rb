@@ -6,6 +6,8 @@ module Hyrax::Migrator::Services
   ##
   # A service to verify that derivatives for the content exist for the migrated asset
   class VerifyDerivativesService
+    attr_reader :verification_errors
+
     def initialize(asset_item, original_profile)
       @work = asset_item
       @original_profile = original_profile
