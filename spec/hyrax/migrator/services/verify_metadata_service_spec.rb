@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'byebug'
 
 RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
   let(:migrator_work) { double }
