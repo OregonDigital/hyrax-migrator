@@ -22,6 +22,7 @@ module Hyrax::Migrator::Services
       @verification_errors
     rescue StandardError => e
       puts e.message
+      puts e.backtrace.join('\n')
     end
 
     # Return error list Array
@@ -75,6 +76,12 @@ module Hyrax::Migrator::Services
     end
 
     def check_page_count(file_set)
+      # skip page count check if derivative_info is not available in the original profile
+      # this means that the it probably didn't have page derivatives like it's the
+      # case with some mime_types like application/vnd.ms-excel where it was not
+      # not originally generated in OD1
+      return true unless @original_profile['derivatives_info'].present?
+
       original_count = @original_profile['derivatives_info']['page_count']
       new_count = info_for_migrated(file_set)[:page_count]
       @verification_errors << "Page count does not match for work #{@work.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
