@@ -100,7 +100,6 @@ module Hyrax::Migrator::Services
     end
 
     ## Return derivatives info for the migrated asset (OD2)
-    # @return hash (with derivatives info)
     def info_for_migrated_asset
       @work.file_sets.map do |f|
         info_for_migrated(f)
@@ -112,12 +111,7 @@ module Hyrax::Migrator::Services
         file_set_id: file_set.id,
         has_thumbnail: all_derivatives(file_set).select { |b| b.match 'thumbnail' }.present?,
         has_extracted_text: file_set.extracted_text.present?,
-        page_count: derivatives_for_reference(file_set, 'jp2').count,
-        has_content_ogg: derivatives_for_reference(file_set, 'ogg').present?,
-        has_content_mp3: derivatives_for_reference(file_set, 'mp3').present?,
-        has_zoomable_image: derivatives_for_reference(file_set, 'jp2').present?,
-        has_content_mp4: derivatives_for_reference(file_set, 'mp4').present?,
-        has_content_jpg: derivatives_for_reference(file_set, 'jpg').present?
+        page_count: derivatives_for_reference(file_set, 'jp2').count
       }
     end
   end

@@ -2,6 +2,7 @@
 
 require 'yaml'
 
+# rubocop:disable Metrics/ClassLength
 module Hyrax::Migrator::Services
   ##
   # A service to compare metadata from the source asset and the migrated asset
@@ -132,3 +133,4 @@ module Hyrax::Migrator::Services
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
