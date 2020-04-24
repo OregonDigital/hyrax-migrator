@@ -42,7 +42,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   describe 'check_pdf_derivatives' do
-    let(:all_derivative_paths) { [] }
+    let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/c2/47/ds/08/x-jp2-0000.jp2', '/data/tmp/shared/derivatives/c2/47/ds/08/x-thumbnail.jpeg'] }
 
     it 'returns no errors' do
       expect(service.check_pdf_derivatives(file_set)).to eq([])
@@ -50,7 +50,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   describe 'check_image_derivatives' do
-    let(:all_derivative_paths) { [] }
+    let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/p8/41/8n/20/k-jp2.jp2', '/data/tmp/shared/derivatives/p8/41/8n/20/k-thumbnail.jpeg'] }
 
     it 'returns the error' do
       expect(service.check_image_derivatives(file_set)).to eq([])
@@ -58,7 +58,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   describe 'check_office_document_derivatives' do
-    let(:all_derivative_paths) { [] }
+    let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/nv/93/52/84/1-jp2-0000.jp2', '/data/tmp/shared/derivatives/nv/93/52/84/1-thumbnail.jpeg'] }
 
     it 'returns the error' do
       expect(service.check_office_document_derivatives(file_set)).to eq([])
@@ -66,7 +66,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   describe 'check_audio_derivatives' do
-    let(:all_derivative_paths) { [] }
+    let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/cn/69/m4/12/8-ogg.ogg', '/data/tmp/shared/derivatives/cn/69/m4/12/8-jp2.jp2', '/data/tmp/shared/derivatives/cn/69/m4/12/8-mp3.mp3', '/data/tmp/shared/derivatives/cn/69/m4/12/8-thumbnail.jpeg'] }
 
     it 'returns the error' do
       expect(service.check_audio_derivatives(file_set)).to eq([])
@@ -74,7 +74,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   describe 'check_video_derivatives' do
-    let(:all_derivative_paths) { [] }
+    let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/nc/58/0m/64/9-jp2.jp2', '/data/tmp/shared/derivatives/nc/58/0m/64/9-mp4.mp4', '/data/tmp/shared/derivatives/nc/58/0m/64/9-webm.webm', '/data/tmp/shared/derivatives/nc/58/0m/64/9-thumbnail.jpeg'] }
 
     it 'returns the error' do
       expect(service.check_video_derivatives(file_set)).to eq([])
