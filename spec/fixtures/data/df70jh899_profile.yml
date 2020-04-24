@@ -11,6 +11,16 @@ checksums:
   - 28da6259ae5707c68708192a40b3e85c
   MD5base64:
   - KNpiWa5XB8aHCBkqQLPoXA==
+derivatives_info:
+  has_thumbnail: false
+  has_content_ocr: false
+  page_count: 10
+  has_content_ogg: true
+  has_content_mp3: true
+  has_medium_image: false
+  has_pyramidal_image: false
+  has_content_mp4: false
+  has_content_jpg: false
 fields:
   title:
   - Letters

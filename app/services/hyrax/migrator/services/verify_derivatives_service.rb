@@ -25,7 +25,8 @@ module Hyrax::Migrator::Services
       puts e.backtrace.join('\n')
     end
 
-    # Return error list Array
+    # No coverage for Hyrax application integration to eliminate dependencies
+    # :nocov:
     def verify_file_set(object)
       fsc = object.class
 
@@ -37,6 +38,7 @@ module Hyrax::Migrator::Services
       when *fsc.image_mime_types           then check_image_derivatives(object)
       end
     end
+    # :nocov:
 
     def check_pdf_derivatives(file_set)
       check_thumbnail(file_set)
