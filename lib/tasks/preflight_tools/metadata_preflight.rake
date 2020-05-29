@@ -7,19 +7,23 @@
 # If verbose=true then the attributes will be displayed
 
 namespace :preflight_tools do
-  desc 'for migration preflight check of metadata'
   task metadata_preflight: :environment do
     require 'hyrax/migrator/crosswalk_metadata_preflight'
     require 'hyrax/migrator/required_fields'
+    require 'hyrax/migrator/asset_status'
     init
     pids.each do |pid|
       begin
         @errors << "Working on #{pid}..."
-        reset_crosswalk(pid)
+        work = GenericAsset.find(pid)
+        reset_status(work)
+        next unless status(@status_service.verify_status)
+
+        reset_crosswalk(work)
         crosswalk_result = @crosswalk_service.crosswalk
         reset_required(crosswalk_result)
         required_result = @required_service.verify_fields
-        concat_errors(crosswalk_result[:errors], required_result)
+        concat_errors([crosswalk_result[:errors], required_result])
         verbose_display(pid, crosswalk_result.except(:errors)) if ENV.include? 'verbose'
       rescue StandardError => e
         @errors << "Could not check #{pid}, error message: #{e.message}"
@@ -45,22 +49,35 @@ def init
   @report = File.open(File.join(@work_dir, "report_#{datetime_today}.txt"), 'w')
   @crosswalk_service = Hyrax::Migrator::CrosswalkMetadataPreflight.new(crosswalk_file, crosswalk_overrides_file)
   @required_service = Hyrax::Migrator::RequiredFields.new(required_fields_file)
+  @status_service = Hyrax::Migrator::AssetStatus.new
   @errors = []
 end
 
-def concat_errors(crosswalk_result_errors, required_result)
-  @errors.concat crosswalk_result_errors unless crosswalk_result_errors.blank?
-  @errors.concat required_result unless required_result.blank?
+def status(result)
+  return true if result == 'ok'
+
+  concat_errors([[result]])
+  false
 end
 
-def reset_crosswalk(pid)
-  @crosswalk_service.graph = create_graph(GenericAsset.find(pid))
+def concat_errors(errors)
+  errors.each do |errs|
+    @errors.concat errs unless errs.blank?
+  end
+end
+
+def reset_crosswalk(work)
+  @crosswalk_service.graph = create_graph(work)
   @crosswalk_service.errors = []
   @crosswalk_service.result = {}
 end
 
 def reset_required(attributes)
   @required_service.attributes = attributes
+end
+
+def reset_status(work)
+  @status_service.work = work
 end
 
 def crosswalk_overrides_file
