@@ -2,7 +2,6 @@
 
 require 'yaml'
 
-# rubocop:disable Metrics/ClassLength
 module Hyrax::Migrator::Services
   ##
   # A service to compare metadata from the source asset and the migrated asset
@@ -30,7 +29,6 @@ module Hyrax::Migrator::Services
       result_hash[:fields] = fields
       result_hash[:checksums] = checksums
       result_hash[:admin_set] = item.admin_set_id
-      result_hash[:derivatives_info] = derivatives_service.info_for_migrated_asset
       result_hash
     end
 
@@ -94,14 +92,6 @@ module Hyrax::Migrator::Services
       puts e.message
     end
 
-    def verify_derivatives
-      derivatives_service.verify
-    end
-
-    def derivatives_service
-      Hyrax::Migrator::Services::VerifyDerivativesService.new(item, original_profile)
-    end
-
     def process_vals(key, val)
       errors = []
       val.each do |v|
@@ -133,4 +123,3 @@ module Hyrax::Migrator::Services
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
