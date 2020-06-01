@@ -54,7 +54,6 @@ module Hyrax::Migrator::Services
     end
 
     def check_audio_derivatives(file_set)
-      check_thumbnail(file_set)
       check_file_type(file_set, 'mp3')
       check_file_type(file_set, 'ogg')
     end
