@@ -50,9 +50,9 @@ module Hyrax::Migrator::Actors
     end
 
     def post_fail
-      failed(aasm.current_state, "Work #{@work.pid} required fields failed.", Hyrax::Migrator::Work::FAIL)
       @work.env[:errors] ||= []
       @work.env[:errors].concat @required_fields unless @required_fields.blank?
+      failed(aasm.current_state, "Work #{@work.pid} required fields failed.", Hyrax::Migrator::Work::FAIL)
     end
   end
 end
