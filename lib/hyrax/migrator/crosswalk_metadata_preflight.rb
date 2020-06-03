@@ -5,7 +5,7 @@ require 'hyrax/migrator/crosswalk_metadata'
 module Hyrax::Migrator
   # For use with MetadataPreflightRake
   class CrosswalkMetadataPreflight < Hyrax::Migrator::CrosswalkMetadata
-    attr_accessor :pid, :errors, :result
+    attr_accessor :errors, :result
     def initialize(crosswalk_metadata_file, crosswalk_overrides_file)
       super
       @errors = []
@@ -27,7 +27,7 @@ module Hyrax::Migrator
       result = super
       return result unless result.nil?
 
-      @errors << "Predicate not found: #{predicate} during crosswalk for #{@pid}"
+      @errors << "Predicate not found: #{predicate} during crosswalk"
       nil
     end
 
@@ -37,7 +37,7 @@ module Hyrax::Migrator
       result = super
       return result unless result.nil?
 
-      @errors << "Invalid URI #{object} found in crosswalk of #{@pid}"
+      @errors << "Invalid URI #{object} found in crosswalk"
       nil
     end
   end

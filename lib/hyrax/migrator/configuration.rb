@@ -153,5 +153,10 @@ module Hyrax::Migrator
     def fields_map
       @fields_map ||= ''
     end
+
+    attr_writer :required_fields_file
+    def required_fields_file
+      @required_fields_file ||= ''
+    end
   end
 end

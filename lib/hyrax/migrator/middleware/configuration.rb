@@ -18,6 +18,7 @@ module Hyrax
           @actor_stack ||= [
             Hyrax::Migrator::Actors::BagValidatorActor,
             Hyrax::Migrator::Actors::CrosswalkMetadataActor,
+            Hyrax::Migrator::Actors::RequiredFieldsActor,
             Hyrax::Migrator::Actors::ModelLookupActor,
             Hyrax::Migrator::Actors::AdminSetMembershipActor,
             Hyrax::Migrator::Actors::VisibilityLookupActor,

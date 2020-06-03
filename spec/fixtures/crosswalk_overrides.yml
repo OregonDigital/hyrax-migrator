@@ -14,3 +14,9 @@ overrides:
   - property: material
     predicate: http://opaquenamespace.org/ns/vra/material
     multiple: true
+  - property: rights_statement
+    predicate: http://purl.org/dc/terms/rights
+    multiple: false
+  - property: resource_type
+    predicate: http://purl.org/dc/terms/type
+    multiple: false
