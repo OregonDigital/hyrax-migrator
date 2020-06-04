@@ -108,7 +108,7 @@ RSpec.describe 'preflight_tools rake tasks' do
 
         before do
           allow(GenericAsset).to receive(:find).and_raise(error)
-          stdio = run_task('preflight_tools:metadata_preflight')
+          run_task('preflight_tools:metadata_preflight')
         end
 
         it 'handles the error' do
