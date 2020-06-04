@@ -85,6 +85,9 @@ RSpec.describe 'preflight_tools rake tasks' do
         it 'writes it to file' do
           expect(io).to include('status: unreviewed')
         end
+        it 'does not continue and check metadata' do
+          expect(io).not_to include('Predicate not found')
+        end
       end
 
       context 'when an asset has been destroyed' do
@@ -95,6 +98,21 @@ RSpec.describe 'preflight_tools rake tasks' do
 
         it 'writes it to file' do
           expect(io).to include('status: destroyed')
+        end
+      end
+
+      context 'when an error is caught' do
+        let(:error) { StandardError }
+        let(:io) { IO.read(file.first) }
+        let(:file) { Dir.glob('spec/fixtures/report_*') }
+
+        before do
+          allow(GenericAsset).to receive(:find).and_raise(error)
+          stdio = run_task('preflight_tools:metadata_preflight')
+        end
+
+        it 'handles the error' do
+          expect(io).to include('Could not check')
         end
       end
     end
