@@ -86,7 +86,7 @@ RSpec.describe 'preflight_tools rake tasks' do
           expect(io).to include('status: unreviewed')
         end
         it 'does not continue and check metadata' do
-          expect(io).not_to include('Predicate not found')
+          expect(work).not_to receive(:datastreams)
         end
       end
 
