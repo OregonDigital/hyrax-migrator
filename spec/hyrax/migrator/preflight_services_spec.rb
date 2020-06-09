@@ -12,7 +12,7 @@ class GenericAsset
   def self.find(pid); end
 end
 
-RSpec.describe Hyrax::Migrator::PreflightService do
+RSpec.describe Hyrax::Migrator::PreflightServices do
   def capture_stdout(&blk)
     old = $stdout
     $stdout = fake = StringIO.new
