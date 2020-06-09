@@ -29,7 +29,7 @@ RSpec.describe Hyrax::Migrator::PreflightServices do
     let(:datastream) { double }
     let(:graph) { RDF::Graph.load(nt) }
     let(:workflow) { double }
-    let(:service) { Hyrax::Migrator::PreflightServices.new(path, 'pidlist', true) }
+    let(:service) { described_class.new(path, 'pidlist', true) }
     let(:path) { 'spec/fixtures' }
 
     before do
