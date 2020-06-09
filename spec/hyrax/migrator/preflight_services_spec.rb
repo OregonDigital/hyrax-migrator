@@ -12,7 +12,7 @@ class GenericAsset
   def self.find(pid); end
 end
 
-RSpec.describe 'Hyrax::Migrator::PreflightServices' do
+RSpec.describe Hyrax::Migrator::PreflightService do
   def capture_stdout(&blk)
     old = $stdout
     $stdout = fake = StringIO.new
@@ -122,7 +122,6 @@ RSpec.describe 'Hyrax::Migrator::PreflightServices' do
     end
 
     context 'when there are valid attributes and verbose is true' do
-      
       it 'displays them' do
         printed = capture_stdout do
           service.verify
