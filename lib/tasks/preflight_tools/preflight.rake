@@ -8,7 +8,7 @@
 
 namespace :preflight_tools do
   task preflight: :environment do
-    require 'hyrax/migrator/preflight_services'
+    require 'hyrax/migrator/preflight_checks'
     init
     @service.verify
   end
@@ -17,5 +17,5 @@ end
 def init
   @work_dir = ENV['work_dir']
   @pidlist = ENV['pidlist']
-  @service = Hyrax::Migrator::PreflightServices.new(@work_dir, @pidlist, ENV['verbose'])
+  @service = Hyrax::Migrator::PreflightChecks.new(@work_dir, @pidlist, ENV['verbose'])
 end
