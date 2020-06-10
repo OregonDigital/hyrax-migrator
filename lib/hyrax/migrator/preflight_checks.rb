@@ -12,7 +12,7 @@ require 'hyrax/migrator/asset_status'
 module Hyrax::Migrator
   ##
   # Intended to be run on OD1, reuses migrator code to perform pre-migration checks
-  class PreflightServices
+  class PreflightChecks
     def initialize(work_dir, pidlist, verbose = false)
       @work_dir = work_dir
       @pidlist = pidlist

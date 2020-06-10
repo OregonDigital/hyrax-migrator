@@ -6,14 +6,14 @@ require 'rdf'
 require 'uri'
 require 'rdf/ntriples'
 require 'stringio'
-require 'hyrax/migrator/preflight_services'
+require 'hyrax/migrator/preflight_checks'
 
 # OD1 assets
 class GenericAsset
   def self.find(pid); end
 end
 
-RSpec.describe Hyrax::Migrator::PreflightServices do
+RSpec.describe Hyrax::Migrator::PreflightChecks do
   let(:work) { double }
   let(:nt) { 'spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt' }
   let(:datastreams) { double }
