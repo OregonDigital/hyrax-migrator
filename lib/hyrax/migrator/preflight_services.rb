@@ -8,6 +8,7 @@
 require 'hyrax/migrator/crosswalk_metadata_preflight'
 require 'hyrax/migrator/required_fields'
 require 'hyrax/migrator/asset_status'
+
 module Hyrax::Migrator
   ##
   # Intended to be run on OD1, reuses migrator code to perform pre-migration checks
@@ -29,8 +30,7 @@ module Hyrax::Migrator
         @errors << "Working on #{pid}..."
         process(pid)
       rescue StandardError => e
-        @errors << "Could not check #{pid}, error message: #{e.message}"
-        next
+        @errors << "System error: #{e.message}"
       end
       write_errors
       @report.close
