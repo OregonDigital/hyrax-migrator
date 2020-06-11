@@ -27,10 +27,12 @@ module Hyrax::Migrator
 
     def verify
       pids.each do |pid|
-        @errors << "Working on #{pid}..."
-        process(pid)
-      rescue StandardError => e
-        @errors << "System error: #{e.message}"
+        begin
+          @errors << "Working on #{pid}..."
+          process(pid)
+        rescue StandardError => e
+          @errors << "System error: #{e.message}"
+        end
       end
       write_errors
       @report.close

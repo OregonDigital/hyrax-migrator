@@ -37,7 +37,8 @@ Style/ClassAndModuleChildren:
 
 Style/RedundantBegin:
   Exclude:
-    - 'lib/tasks/preflight_tools/metadata_preflight.rake'
+    - 'lib/tasks/preflight_tools/preflight.rake'
+    - 'lib/hyrax/migrator/preflight_checks.rb'
 
 Style/SingleLineBlockParams:
   Enabled: false
