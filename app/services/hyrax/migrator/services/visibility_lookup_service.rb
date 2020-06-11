@@ -16,7 +16,10 @@ module Hyrax::Migrator::Services
     end
 
     def lookup_visibility
-      lookup(read_groups)
+      result = lookup(read_groups)
+      return result if comparison_check(result)
+
+      raise StandardError, 'visibility does not agree with access_restrictions'
     end
 
     private
@@ -52,6 +55,15 @@ module Hyrax::Migrator::Services
       else
         { visibility: 'restricted' }
       end
+    end
+
+    def comparison_check(visibility)
+      unless @work[:env][:attributes][:access_restrictions_attributes].blank?
+        return true if visibility[:visibility] == 'authenticated'
+
+        return false
+      end
+      true
     end
   end
 end
