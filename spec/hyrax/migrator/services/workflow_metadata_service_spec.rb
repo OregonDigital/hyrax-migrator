@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'byebug'
 
 RSpec.describe Hyrax::Migrator::Services::WorkflowMetadataService do
@@ -14,7 +15,7 @@ RSpec.describe Hyrax::Migrator::Services::WorkflowMetadataService do
       end
     end
 
-    context 'when work_file_path (bag directory) does not exist' do
+    context 'when {pid}_workflowMetadata_profile.yml doesn\'t exist' do
       let(:error) { StandardError }
       let(:file_path) { 'unknown-path' }
 

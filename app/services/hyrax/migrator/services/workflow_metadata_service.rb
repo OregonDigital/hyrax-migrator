@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'byebug'
 
 module Hyrax::Migrator::Services
@@ -17,6 +18,15 @@ module Hyrax::Migrator::Services
       message = "workflowMetadata_profile for #{@work.pid} not found"
       Rails.logger.error(message)
       raise StandardError, message
+    end
+
+    def workflow_metadata_profile_map
+      { date_uploaded: 'dsCreateDate' }
+    end
+
+    # TODO: implement profile_lookup
+    def profile_lookup
+      # use workflow_metadata_profile_map to retrieve new value from profile and return valid attribute
     end
   end
 end
