@@ -14,6 +14,7 @@ RSpec.describe Hyrax::Migrator::Services::WorkflowMetadataService do
       allow(service).to receive(:asset).and_return(asset)
       allow(service).to receive(:update_asset).and_return(true)
     end
+
     context 'when workflowMetadata profile is available' do
       it 'returns a hash with workflowMetadata profile values' do
         expect(service.workflow_profile).to include('dsCreateDate')
