@@ -28,6 +28,7 @@ module Hyrax
             Hyrax::Migrator::Actors::ChildrenAuditActor,
             Hyrax::Migrator::Actors::PersistWorkActor,
             Hyrax::Migrator::Actors::AddRelationshipsActor,
+            Hyrax::Migrator::Actors::WorkflowMetadataActor,
             Hyrax::Migrator::Actors::TerminalActor
           ]
         end
