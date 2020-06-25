@@ -3,6 +3,7 @@
 require 'rdf'
 
 module Hyrax::Migrator::Actors
+  # Lookup additional metadata found in the workflowMetadata file, and update the asset to preserve this information like date_uploaded
   class WorkflowMetadataActor < Hyrax::Migrator::Actors::AbstractActor
     include RDF
 
@@ -29,8 +30,7 @@ module Hyrax::Migrator::Actors
       super
       workflow_metadata_initial
       update_work(aasm.current_state)
-      @workflow_profile = service.workflow_profile
-      @workflow_profile.present? && service.update_asset ? workflow_metadata_succeeded : workflow_metadata_failed
+      lookup_and_update ? workflow_metadata_succeeded : workflow_metadata_failed
     rescue StandardError => e
       log("failed workflow metadata lookup #{e.message} : #{e.backtrace}")
       workflow_metadata_failed
@@ -43,6 +43,11 @@ module Hyrax::Migrator::Actors
       @service ||= Hyrax::Migrator::Services::WorkflowMetadataService.new(@work)
     end
     #:nocov:
+
+    def lookup_and_update
+      @workflow_profile = service.workflow_profile
+      @workflow_profile.present? && service.update_asset
+    end
 
     def post_success
       @work.env[:raw_workflow_metadata_profile] = @workflow_profile
