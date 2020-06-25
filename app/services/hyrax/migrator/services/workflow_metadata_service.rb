@@ -10,11 +10,10 @@ module Hyrax::Migrator::Services
     def initialize(work)
       @work = work
       @data_dir = File.join(work.working_directory, 'data')
-      @asset = asset
     end
 
     def update_asset
-      @asset.date_uploaded = profile_lookup[:date_uploaded].to_datetime
+      asset.date_uploaded = profile_lookup[:date_uploaded].to_datetime
       status = @asset.save!
       status
     rescue StandardError => e
@@ -41,7 +40,8 @@ module Hyrax::Migrator::Services
     end
 
     def asset
-      Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
+      @asset ||= Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
+      @asset
     end
 
     def metadata_profile_map
