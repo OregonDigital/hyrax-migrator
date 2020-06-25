@@ -3,7 +3,7 @@
 require 'byebug'
 
 module Hyrax::Migrator::Services
-  # Called by the WorkflowMetadataActor to retrieve additional data from WorkflowMetadata and update asset 
+  # Called by the WorkflowMetadataActor to retrieve additional data from WorkflowMetadata and update asset
   # to set new expected values, i.e. date_uploaded
   class WorkflowMetadataService
     attr_reader :result
@@ -14,7 +14,7 @@ module Hyrax::Migrator::Services
     end
 
     def update_asset
-      @asset.date_uploaded = profile_lookup[:date_uploaded]
+      @asset.date_uploaded = profile_lookup[:date_uploaded].to_datetime
       status = @asset.save!
       status
     rescue StandardError => e
@@ -41,7 +41,7 @@ module Hyrax::Migrator::Services
     end
 
     def asset
-      Hyrax::Migrator::HyraxCore.find(@work.pid)
+      Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
     end
 
     def metadata_profile_map
