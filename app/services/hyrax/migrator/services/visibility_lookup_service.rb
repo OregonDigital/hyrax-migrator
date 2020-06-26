@@ -15,6 +15,13 @@ module Hyrax::Migrator::Services
       @config = migrator_config
     end
 
+    def lookup_visibility
+      result = super
+      return result unless result.nil?
+
+      raise StandardError, 'visibility does not agree with access_restrictions'
+    end
+
     private
 
     def doc

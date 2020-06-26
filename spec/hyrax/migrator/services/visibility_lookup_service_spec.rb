@@ -1,6 +1,7 @@
 # frozen_string_literal:true
 
 require 'nokogiri'
+require 'hyrax/migrator/visibility_lookup'
 
 RSpec.describe Hyrax::Migrator::Services::VisibilityLookupService do
   let(:config) { Hyrax::Migrator::Configuration.new }
@@ -86,42 +87,6 @@ RSpec.describe Hyrax::Migrator::Services::VisibilityLookupService do
 
       it 'extracts the groups' do
         expect(service.send(:read_groups)).to eq(%w[public])
-      end
-    end
-  end
-
-  describe '#lookup' do
-    context 'when the original group is public' do
-      let(:groups) { %w[public admin archivist] }
-
-      it 'returns open' do
-        expect(service.send(:lookup, groups)).to eq(visibility: 'open')
-      end
-    end
-
-    context 'when the original group is an institution' do
-      let(:groups) { %w[admin archivist University-of-Oregon] }
-
-      it 'returns authenticated' do
-        expect(service.send(:lookup, groups)).to eq(visibility: 'authenticated')
-      end
-    end
-
-    context 'when the original group is none of the above' do
-      let(:groups) { %w[admin archivist] }
-
-      it 'returns restricted' do
-        expect(service.send(:lookup, groups)).to eq(visibility: 'restricted')
-      end
-    end
-  end
-
-  describe '#comparison_check' do
-    context 'when there are no access_restrictions' do
-      let(:visibility) { { visibility: 'open' } }
-
-      it 'returns true' do
-        expect(service.send(:comparison_check, visibility)).to eq true
       end
     end
   end
