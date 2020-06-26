@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'byebug'
-
 module Hyrax::Migrator::Services
   # Called by the WorkflowMetadataActor to retrieve additional data from WorkflowMetadata and update asset
   # to set new expected values, i.e. date_uploaded
