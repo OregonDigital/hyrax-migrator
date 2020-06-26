@@ -35,7 +35,7 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
     allow(datastream).to receive(:graph).and_return(graph)
     allow(work).to receive(:read_groups).and_return(read_groups)
     allow(work).to receive(:descMetadata).and_return(descmeta)
-    allow(descmeta).to receive(:access_restrictions).and_return([])
+    allow(descmeta).to receive(:accessRestrictions).and_return([])
     allow(work).to receive(:pid).and_return('3t945r08v')
   end
 

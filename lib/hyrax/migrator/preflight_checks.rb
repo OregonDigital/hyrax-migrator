@@ -66,7 +66,7 @@ module Hyrax::Migrator
       required_result = @required_service.verify_fields
       reset_visibility(work)
       visibility_result = @visibility_service.lookup_visibility
-      concat_errors([crosswalk_result[:errors], required_result, visibility_result])
+      concat_errors([crosswalk_result[:errors], required_result, [visibility_result]])
       verbose_display(work.pid, crosswalk_result.except(:errors)) if @verbose
     end
 

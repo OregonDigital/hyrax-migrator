@@ -22,7 +22,7 @@ module Hyrax::Migrator
     end
 
     def access_restrictions
-      @work.descMetadata.access_restrictions
+      @work.descMetadata.accessRestrictions
     end
   end
 end
