@@ -13,21 +13,11 @@ module Hyrax::Migrator::Services
     end
 
     def update_asset
-      asset.date_uploaded = profile_lookup[:date_uploaded].to_datetime
-      status = @asset.save!
-      status
+      update_field(:date_uploaded=, profile_lookup[:date_uploaded].to_datetime)
     rescue StandardError => e
       message = "failed to update date_uploaded on work #{@work.pid}, #{e.message} #{e.backtrace}"
       Rails.logger.error message
       raise StandardError, message
-    end
-
-    def profile_lookup
-      result_hash = {}
-      metadata_profile_map.each do |field, profile_field|
-        result_hash[field] = workflow_profile[profile_field]
-      end
-      result_hash
     end
 
     def workflow_profile
@@ -39,9 +29,18 @@ module Hyrax::Migrator::Services
       raise StandardError, message
     end
 
-    def asset
-      @asset ||= Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
-      @asset
+    private
+
+    def profile_lookup
+      result_hash = {}
+      metadata_profile_map.each do |field, profile_field|
+        result_hash[field] = workflow_profile[profile_field]
+      end
+      result_hash
+    end
+
+    def update_field(field, new_value)
+      Hyrax::Migrator::HyraxCore::Asset.update_field(@work.pid, field, new_value)
     end
 
     def metadata_profile_map

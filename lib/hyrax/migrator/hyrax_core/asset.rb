@@ -10,6 +10,12 @@ module Hyrax::Migrator
         ActiveFedora::Base.exists?(id)
       end
 
+      def self.update_field(id, field, new_value)
+        asset = Hyrax::Migrator::HyraxCore::Asset.find(id)
+        asset.send(field, new_value)
+        asset.save!
+      end
+
       def self.find(id)
         ActiveFedora::Base.find(id)
       rescue ActiveFedora::ObjectNotFoundError
