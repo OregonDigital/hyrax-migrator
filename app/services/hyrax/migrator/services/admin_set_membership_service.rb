@@ -5,7 +5,7 @@ require 'rdf'
 module Hyrax::Migrator::Services
   # A service to pull ids out of set-related fields for admin_set and collection memberships
   class AdminSetMembershipService
-    DEFAULT_ADMIN_SET_ID = 'admin/default'
+    DEFAULT_ADMIN_SET_ID = 'admin_set/default'
     PRIMARY_SET_PREDICATE = 'http://opaquenamespace.org/ns/primarySet'
     SET_PREDICATE = 'http://opaquenamespace.org/ns/set'
     INSTITUTION_PREDICATE = 'http://opaquenamespace.org/ns/contributingInstitution'
