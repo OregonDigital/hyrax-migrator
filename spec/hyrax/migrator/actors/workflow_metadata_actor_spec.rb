@@ -7,7 +7,6 @@ RSpec.describe Hyrax::Migrator::Actors::WorkflowMetadataActor do
   let(:pid) { 'fx719n867' }
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:service) { double }
-  let(:work_file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
 
   before do
     allow(actor).to receive(:config).and_return(config)
@@ -19,7 +18,6 @@ RSpec.describe Hyrax::Migrator::Actors::WorkflowMetadataActor do
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:workflow_profile).and_return(double)
         allow(service).to receive(:update_asset).and_return(true)
-        allow(work).to receive(:working_directory).and_return(work_file_path)
         actor.next_actor = terminal
       end
 
