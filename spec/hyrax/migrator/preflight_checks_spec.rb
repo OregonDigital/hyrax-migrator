@@ -22,6 +22,8 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
   let(:workflow) { double }
   let(:service) { described_class.new(path, 'pidlist', true) }
   let(:path) { 'spec/fixtures' }
+  let(:read_groups) { ['public'] }
+  let(:descmeta) { double }
 
   before do
     allow(GenericAsset).to receive(:find).and_return(work)
@@ -31,6 +33,10 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
     allow(workflow).to receive(:reviewed).and_return(true)
     allow(workflow).to receive(:destroyed).and_return(false)
     allow(datastream).to receive(:graph).and_return(graph)
+    allow(work).to receive(:read_groups).and_return(read_groups)
+    allow(work).to receive(:descMetadata).and_return(descmeta)
+    allow(descmeta).to receive(:accessRestrictions).and_return([])
+    allow(work).to receive(:pid).and_return('3t945r08v')
   end
 
   after do

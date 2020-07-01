@@ -5,7 +5,7 @@ require 'nokogiri'
 module Hyrax::Migrator::Services
   ##
   # A service to inspect the metadata and crosswalk the type to a model used for migration
-  class VisibilityLookupService
+  class VisibilityLookupService < Hyrax::Migrator::VisibilityLookup
     XML_NODE = 'group'
     XML_FILE = 'rightsmetadata.xml'
 
@@ -16,7 +16,10 @@ module Hyrax::Migrator::Services
     end
 
     def lookup_visibility
-      lookup(read_groups)
+      result = super
+      return result unless result.nil?
+
+      raise StandardError, 'visibility does not agree with access_restrictions'
     end
 
     private
@@ -44,14 +47,8 @@ module Hyrax::Migrator::Services
       nodes.map(&:text)
     end
 
-    def lookup(groups)
-      if groups.include? 'public'
-        { visibility: 'open' }
-      elsif (groups.include? 'University-of-Oregon') || (groups.include? 'Oregon-State')
-        { visibility: 'authenticated' }
-      else
-        { visibility: 'restricted' }
-      end
+    def access_restrictions
+      @work[:env][:attributes][:access_restrictions_attributes]
     end
   end
 end

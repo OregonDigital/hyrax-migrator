@@ -14,6 +14,7 @@ require 'hyrax/migrator/hyrax_core/uploaded_file'
 require 'hyrax/migrator/hyrax_core/user'
 require 'hyrax/migrator/hyrax_core/derivative_path'
 require 'hyrax/migrator/crosswalk_metadata'
+require 'hyrax/migrator/visibility_lookup'
 
 module Hyrax
   ##
