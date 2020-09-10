@@ -19,13 +19,15 @@ module Hyrax::Migrator::Services
 
     def ingest
       # run job for each bag within batch_name
-      @pids.each do |batch_name|
-        @pids[batch_name|.each do |pid|
-        if Hyrax::Migrator::HyraxCore::Asset.exists?(pid) && migrator_success?(pid)
-          Rails.logger.warn "Work #{pid} already exists, skipping MigrateWorkJob"
-          next
+      @pids.each do |batch_name, _pids|
+        _pids.each do |pid|
+          if Hyrax::Migrator::HyraxCore::Asset.exists?(pid) && migrator_success?(pid)
+            Rails.logger.warn "Work #{pid} already exists, skipping MigrateWorkJob"
+            next
+
+          end
+          Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(args(pid, file_path))
         end
-        Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(args(pid, file_path))
       end
     end
 
@@ -55,7 +57,7 @@ module Hyrax::Migrator::Services
       puts "Printing aasm_state, status, status_message, and asset.exists? for works in batch #{batch_name}."
       puts "File will be written to #{migrator_config.file_system_path}"
       datetime_today = Time.zone.now.strftime('%Y%m%d%H%M%S') # "20171021125903"
-      f = File.open(File.join(migrator_config.file_system_path, "#{batch_name}_report_#{datetime_today}.txt", 'w')
+      f = File.open(File.join(migrator_config.file_system_path, "#{batch_name}_report_#{datetime_today}.txt"), 'w')
       report.each do |pid, val|
         f.puts "#{pid}: #{val}"
       end
