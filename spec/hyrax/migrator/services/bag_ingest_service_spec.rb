@@ -75,4 +75,36 @@ RSpec.describe Hyrax::Migrator::Services::BagIngestService do
       end
     end
   end
+
+  describe '#batch_report' do
+    before do
+      config.ingest_storage_service = :file_system
+      allow(location_service).to receive(:bags_to_ingest).and_return('batch1' => [bag1])
+      allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).with('df65vc341').and_return(true)
+      Hyrax::Migrator::Work.create(pid: 'df65vc341', status: Hyrax::Migrator::Work::SUCCESS)
+    end
+
+    context 'when to_file is false' do
+      it 'prints the report to the screen' do
+        printed = capture_stdout do
+          service.batch_report(batch_name)
+        end
+        expect(printed).to include('df65vc341')
+      end
+    end
+
+    context 'when to_file is true' do
+      let(:file) { double }
+
+      before do
+        allow(File).to receive(:open).and_return file
+        allow(file).to receive(:close)
+      end
+
+      it 'prints the report to a file' do
+        expect(file).to receive(:puts).with("df65vc341: \tsuccess\t\ttrue")
+        service.batch_report(batch_name, true)
+      end
+    end
+  end
 end

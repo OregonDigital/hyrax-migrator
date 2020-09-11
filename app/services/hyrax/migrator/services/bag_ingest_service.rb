@@ -44,7 +44,7 @@ module Hyrax::Migrator::Services
     private
 
     def write_to_screen(report)
-      puts "Printing aasm_state, status, status_message, and asset.exists? for works in batch #{batch_name}..."
+      puts 'Printing aasm_state, status, status_message, and asset.exists?...'
       report.each do |pid, val|
         puts "#{pid}: #{val}"
       end
