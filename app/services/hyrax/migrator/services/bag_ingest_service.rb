@@ -16,7 +16,7 @@ module Hyrax::Migrator::Services
       @options = options
     end
 
-   def ingest
+    def ingest
       # run job for each bag within batch_name
       location_service.each do |_batch_name, bag_locations|
         bag_locations.each do |file_path|
@@ -30,16 +30,13 @@ module Hyrax::Migrator::Services
       end
     end
 
-    def batch_report(batch_name, to_file=false)
+    def batch_report(batch_name, to_file = false)
       report = {}
       location_service[batch_name].each do |file_path|
         pid = parse_pid(file_path)
-        w = Hyrax::Migrator::Work.find_by_pid(pid)
-        asset = Hyrax::Migrator::HyraxCore::Asset.exists?(pid)
-        report[pid] = "#{w.aasm_state}\t#{w.status}\t#{w.status_message}\t#{asset}" unless w.nil?
-        next
-
-        report[pid] = "migrator work not found"
+        w = Hyrax::Migrator::Work.find_by(pid: pid)
+        status = Hyrax::Migrator::HyraxCore::Asset.exists?(pid)
+        report[pid] = w.nil? ? 'migrator work not found' : "#{w.aasm_state}\t#{w.status}\t#{w.status_message}\t#{status}"
       end
       to_file ? write_to_file(batch_name, report) : write_to_screen(report)
     end
