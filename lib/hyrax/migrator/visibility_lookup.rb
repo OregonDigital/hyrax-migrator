@@ -38,7 +38,7 @@ module Hyrax::Migrator
 
     def comparison_check(visibility)
       unless access_restrictions.blank?
-        return true if (visibility[:visibility] != 'open')
+        return true if visibility[:visibility] != 'open'
 
         return false
       end
