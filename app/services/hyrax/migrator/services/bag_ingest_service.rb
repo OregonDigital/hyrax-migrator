@@ -14,17 +14,16 @@ module Hyrax::Migrator::Services
       @input_batch_names = input_batch_names
       @location_service = bag_file_location_service
       @options = options
-      @pids = harvest_pids
     end
 
-    def ingest
+   def ingest
       # run job for each bag within batch_name
-      @pids.each do |batch_name, _pids|
-        _pids.each do |pid|
+      location_service.each do |_batch_name, bag_locations|
+        bag_locations.each do |file_path|
+          pid = parse_pid(file_path)
           if Hyrax::Migrator::HyraxCore::Asset.exists?(pid) && migrator_success?(pid)
             Rails.logger.warn "Work #{pid} already exists, skipping MigrateWorkJob"
             next
-
           end
           Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(args(pid, file_path))
         end
@@ -33,7 +32,8 @@ module Hyrax::Migrator::Services
 
     def batch_report(batch_name, to_file=false)
       report = {}
-      @pids[batch_name].each do |pid|
+      location_service[batch_name].each do |file_path|
+        pid = parse_pid(file_path)
         w = Hyrax::Migrator::Work.find_by_pid(pid)
         asset = Hyrax::Migrator::HyraxCore::Asset.exists?(pid)
         report[pid] = "#{w.aasm_state}\t#{w.status}\t#{w.status_message}\t#{asset}" unless w.nil?
@@ -79,18 +79,7 @@ module Hyrax::Migrator::Services
     end
 
     def bag_file_location_service
-      Hyrax::Migrator::Services::BagFileLocationService.new(input_batch_names, migrator_config)
-    end
-
-    def harvest_pids
-      pid_hash = {}
-      location_service.bags_to_ingest.each do |_batch_name, bag_locations|
-        pid_hash[_batch_name] = []
-        bag_locations.each do |file_path|
-          pid_hash[_batch_name] << parse_pid(file_path)
-        end
-      end
-      pid_hash
+      Hyrax::Migrator::Services::BagFileLocationService.new(input_batch_names, migrator_config).bags_to_ingest
     end
   end
 end
