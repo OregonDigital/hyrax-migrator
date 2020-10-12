@@ -59,6 +59,14 @@ RSpec.describe Hyrax::Migrator::VisibilityLookup do
       end
     end
 
+    context 'when the original group is the other institution' do
+      let(:groups) { %w[admin archivist Oregon-State] }
+
+      it 'returns the institution' do
+        expect(service.send(:lookup, groups)).to eq(visibility: 'osu')
+      end
+    end
+
     context 'when the original group is none of the above' do
       let(:groups) { %w[admin archivist] }
 
