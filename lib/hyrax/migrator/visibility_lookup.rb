@@ -27,8 +27,10 @@ module Hyrax::Migrator
     def lookup(groups)
       if groups.include? 'public'
         { visibility: 'open' }
-      elsif (groups.include? 'University-of-Oregon') || (groups.include? 'Oregon-State')
-        { visibility: 'authenticated' }
+      elsif groups.include? 'University-of-Oregon'
+        { visibility: 'uo' }
+      elsif groups.include? 'Oregon-State'
+        { visibility: 'osu' }
       else
         { visibility: 'restricted' }
       end
@@ -36,7 +38,7 @@ module Hyrax::Migrator
 
     def comparison_check(visibility)
       unless access_restrictions.blank?
-        return true if visibility[:visibility] == 'authenticated'
+        return true if visibility[:visibility] != 'open'
 
         return false
       end

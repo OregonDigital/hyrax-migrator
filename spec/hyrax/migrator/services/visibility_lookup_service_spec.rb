@@ -54,7 +54,7 @@ RSpec.describe Hyrax::Migrator::Services::VisibilityLookupService do
         end
 
         it 'returns the result' do
-          expect(service.lookup_visibility).to eq(visibility: 'authenticated')
+          expect(service.lookup_visibility).to eq(visibility: 'uo')
         end
       end
 

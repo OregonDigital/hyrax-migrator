@@ -24,7 +24,7 @@ RSpec.describe Hyrax::Migrator::VisibilityLookup do
         end
 
         it 'returns the result' do
-          expect(service.lookup_visibility).to eq(visibility: 'authenticated')
+          expect(service.lookup_visibility).to eq(visibility: 'uo')
         end
       end
 
@@ -54,8 +54,16 @@ RSpec.describe Hyrax::Migrator::VisibilityLookup do
     context 'when the original group is an institution' do
       let(:groups) { %w[admin archivist University-of-Oregon] }
 
-      it 'returns authenticated' do
-        expect(service.send(:lookup, groups)).to eq(visibility: 'authenticated')
+      it 'returns the institution' do
+        expect(service.send(:lookup, groups)).to eq(visibility: 'uo')
+      end
+    end
+
+    context 'when the original group is the other institution' do
+      let(:groups) { %w[admin archivist Oregon-State] }
+
+      it 'returns the institution' do
+        expect(service.send(:lookup, groups)).to eq(visibility: 'osu')
       end
     end
 
