@@ -25,6 +25,7 @@ RSpec.describe Hyrax::Migrator::Services::BagIngestService do
     config.aws_s3_ingest_bucket = 'my-ingest-bucket'
     config.aws_s3_region = 'test'
     config.aws_s3_url_availability = 86_400
+    config.file_system_path = '/data/tmp'
   end
 
   describe '#ingest' do
