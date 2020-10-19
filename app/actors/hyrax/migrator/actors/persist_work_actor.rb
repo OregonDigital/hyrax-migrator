@@ -30,7 +30,8 @@ module Hyrax::Migrator::Actors
       service.persist_work ? persist_work_succeeded : persist_work_failed
     rescue StandardError => e
       persist_work_failed
-      log("failed while persisting work: #{e.message} : #{e.backtrace}")
+      errors(message(e))
+      log("error while persisting work: #{e.message} : #{e.backtrace}")
     end
 
     private
@@ -40,6 +41,12 @@ module Hyrax::Migrator::Actors
       @service ||= Hyrax::Migrator::Services::PersistWorkService.new(@work, user)
     end
     #:nocov:
+
+    def message(err)
+      message = "error while persisting work: #{err.message}"
+      message += ', work persisted' if Hyrax::Migrator::HyraxCore::Asset.exists?(@work.pid)
+      message
+    end
 
     def post_fail
       failed(aasm.current_state, "Work #{@work.pid} failed publishing to the repository.", Hyrax::Migrator::Work::FAIL)
