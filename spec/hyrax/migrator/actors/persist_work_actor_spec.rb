@@ -45,6 +45,7 @@ RSpec.describe Hyrax::Migrator::Actors::PersistWorkActor do
       before do
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:persist_work).and_return(false)
+        allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).and_return(false)
         actor.next_actor = terminal
       end
 
@@ -73,6 +74,7 @@ RSpec.describe Hyrax::Migrator::Actors::PersistWorkActor do
       before do
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:persist_work).and_raise(StandardError)
+        allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).and_return(false)
         actor.next_actor = terminal
       end
 
