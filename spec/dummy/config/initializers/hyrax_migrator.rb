@@ -42,7 +42,7 @@ Hyrax::Migrator.config do |config|
   #                                 end
 
   # The destination file system path used mainly for :file_system service. It defaults to environment BROWSEEVERYTHING_FILESYSTEM_PATH.
-  # config.file_system_path = ENV['BROWSEEVERYTHING_FILESYSTEM_PATH']
+  config.file_system_path = '../fixtures'
 
   # The AWS S3 app key used for :aws_s3 service. It defaults to environment AWS_S3_APP_KEY.
   # config.aws_s3_app_key = ENV['AWS_S3_APP_KEY']
