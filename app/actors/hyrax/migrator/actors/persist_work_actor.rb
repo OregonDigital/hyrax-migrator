@@ -25,6 +25,8 @@ module Hyrax::Migrator::Actors
     # Use the PersistWorkService to create the work in Hyrax.
     def create(work)
       super
+      return persist_work_succeeded if exists?
+
       persist_work_initial
       update_work(aasm.current_state)
       service.persist_work ? persist_work_succeeded : persist_work_failed
@@ -46,6 +48,10 @@ module Hyrax::Migrator::Actors
       message = "error while persisting work: #{err.message}"
       message += ', work persisted' if Hyrax::Migrator::HyraxCore::Asset.exists?(@work.pid)
       message
+    end
+
+    def exists?
+      Hyrax::Migrator::HyraxCore::Asset.exists? @work.pid
     end
 
     def post_fail
