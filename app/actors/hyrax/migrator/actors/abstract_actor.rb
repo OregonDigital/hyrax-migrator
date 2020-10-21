@@ -50,6 +50,12 @@ module Hyrax::Migrator::Actors
       Rails.logger.warn "#{@work.pid} #{message}"
     end
 
+    def errors(message)
+      @work.env[:errors] ||= []
+      @work.env[:errors] << message
+      @work.save
+    end
+
     def failed(aasm_state, message, status)
       @work.remove_temp_directory
       update_work(aasm_state, message, status)
