@@ -10,12 +10,14 @@ RSpec.describe Hyrax::Migrator::Services::VerificationService do
   let(:metadata_service) { double }
   let(:checksums_service) { double }
   let(:derivatives_service) { double }
+  let(:children_service) { double }
 
   before do
     allow(migrator_work).to receive(:pid).and_return(pid)
     allow(Hyrax::Migrator::Services::VerifyMetadataService).to receive(:new).and_return(metadata_service)
     allow(Hyrax::Migrator::Services::VerifyChecksumsService).to receive(:new).and_return(checksums_service)
     allow(Hyrax::Migrator::Services::VerifyDerivativesService).to receive(:new).and_return(derivatives_service)
+    allow(Hyrax::Migrator::Services::VerifyChildrenService).to receive(:new).and_return(children_service)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:find).and_return(hyrax_work)
   end
 
@@ -25,10 +27,11 @@ RSpec.describe Hyrax::Migrator::Services::VerificationService do
         allow(metadata_service).to receive(:verify_metadata).and_return(["Unable to verify identifier in #{pid}."])
         allow(checksums_service).to receive(:verify_content).and_return([])
         allow(derivatives_service).to receive(:verify).and_return([])
+        allow(children_service).to receive(:verify_children).and_return([])
       end
 
       it 'passes the error on' do
-        expect(service.verify).to eq([["Unable to verify identifier in #{pid}."], [], []])
+        expect(service.verify).to eq([["Unable to verify identifier in #{pid}."], [], [], []])
       end
     end
 

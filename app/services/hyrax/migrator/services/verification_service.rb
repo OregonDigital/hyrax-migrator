@@ -10,9 +10,14 @@ module Hyrax::Migrator::Services
       @work = migrator_work
       @profile_dir = profile_dir.nil? ? File.join(@work.working_directory, 'data') : profile_dir
       @config = migrator_config
+      add_services
+    end
+
+    def add_services
       @metadata_service = Hyrax::Migrator::Services::VerifyMetadataService.new(@work, @config, hyrax_asset, original_profile)
       @checksums_service = Hyrax::Migrator::Services::VerifyChecksumsService.new(@work, hyrax_asset, original_profile)
       @derivatives_service = Hyrax::Migrator::Services::VerifyDerivativesService.new(hyrax_asset, original_profile)
+      @children_service = Hyrax::Migrator::Services::VerifyChildrenService.new(@work, hyrax_asset, original_profile)
     end
 
     def hyrax_asset
@@ -24,6 +29,7 @@ module Hyrax::Migrator::Services
       errors << @metadata_service.verify_metadata
       errors << @checksums_service.verify_content
       errors << @derivatives_service.verify
+      errors << @children_service.verify_children
       errors
     rescue StandardError => e
       errors << "Encountered an error while working on #{@work.pid}: #{e.message}"

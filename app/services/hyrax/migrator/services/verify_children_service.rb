@@ -18,6 +18,8 @@ module Hyrax::Migrator::Services
     end
 
     def verify_children
+      return [] if @original_profile['contents'].blank?
+
       errors = verify_children_present
       return errors unless errors.empty?
 
