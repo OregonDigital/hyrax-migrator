@@ -5,7 +5,6 @@ require 'rdf'
 module Hyrax::Migrator::Services
   # A service to pull ids out of set-related fields for admin_set and collection memberships
   class AdminSetMembershipService
-    DEFAULT_ADMIN_SET_ID = 'admin_set/default'
     PRIMARY_SET_PREDICATE = 'http://opaquenamespace.org/ns/primarySet'
     SET_PREDICATE = 'http://opaquenamespace.org/ns/set'
     INSTITUTION_PREDICATE = 'http://opaquenamespace.org/ns/contributingInstitution'
@@ -75,12 +74,12 @@ module Hyrax::Migrator::Services
     def admin_set_id_from_primary_set(uri)
       primary_set_id = strip_id(uri)
       id = match_primary_set(primary_set_id)
-      id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : DEFAULT_ADMIN_SET_ID
+      id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : log_and_raise('Primary Set/Admin Set mapping failed')
     end
 
     def admin_set_id_from_institution(uri)
       id = match_institution(uri)
-      id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : DEFAULT_ADMIN_SET_ID
+      id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : log_and_raise('Institution/Admin Set mapping failed')
     end
 
     # Returns a data list that maps OD1 primary sets and institutions to OD2 amdin sets
