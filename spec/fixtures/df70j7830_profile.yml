@@ -1,0 +1,50 @@
+sets:
+  set:
+  - oregondigital:uo-veterans
+  primarySet: oregondigital:uo-veterans
+contents:
+  - oregondigital:df70j709q
+  - oregondigital:df70j710g
+checksums:
+derivatives_info:
+fields:
+  title:
+  - "Interview with Michael G. Harris, University of Oregon Veterans"
+  interviewee:
+  - "http://opaquenamespace.org/ns/creator/HarrisMichael"
+  interviewer:
+  - "http://opaquenamespace.org/ns/creator/PasquiouChristophe"
+  - "http://opaquenamespace.org/ns/creator/NelsonGarret"
+  description:
+  - "Interview with Michael G. Harris discussing his experiences serving in the Air Force."
+  militaryServiceLocation:
+  - "Japan; Turkey; Germany"
+  militaryHighestRank:
+  - "2A6X6"
+  militaryOccupation:
+  - "Electro-Environmental Systems Specialist"
+  lcsubject:
+  - "http://id.loc.gov/authorities/subjects/sh85067568"
+  - "http://id.loc.gov/authorities/subjects/sh85142973"
+  militaryBranch:
+  - "http://id.loc.gov/authorities/names/n79126811"
+  date:
+  - "2014-01-28"
+  identifier:
+  - "ua167_harris_michael_interview"
+  rights:
+  - "http://rightsstatements.org/vocab/InC/1.0/"
+  dcRightsHolder:
+  - "Pasquiou, Christophe"
+  - "Nelson, Garret"
+  - "Harris, Michael"
+  accessRestrictions:
+  - "http://opaquenamespace.org/ns/accessRestrictions/UOrestricted"
+  language:
+  - "http://id.loc.gov/vocabulary/iso639-2/eng"
+  format:
+  - "https://w3id.org/spar/mediatype/application/xml"
+  institution:
+  - "http://id.loc.gov/authorities/names/n80126183"
+  replacesUrl:
+  - "http://oregondigital.org/u?/uo-veterans,108"
