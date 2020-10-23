@@ -147,7 +147,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     context 'when the lookup fails' do
       let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-george' }
 
-      it { expect { service.send(:admin_set_id_from_primary_set, metadata_primary_set) }.to raise_error }
+      it { expect { service.send(:admin_set_id_from_primary_set, metadata_primary_set) }.to raise_error StandardError }
     end
   end
 
@@ -169,7 +169,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     context 'when the lookup fails' do
       let(:metadata_institution) { 'http://dbpedia.org/resource/Brakebills-University' }
 
-      it { expect { service.send(:admin_set_id_from_institution, metadata_institution) }.to raise_error }
+      it { expect { service.send(:admin_set_id_from_institution, metadata_institution) }.to raise_error StandardError }
     end
   end
 end
