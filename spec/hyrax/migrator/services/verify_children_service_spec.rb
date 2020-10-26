@@ -12,8 +12,8 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
   describe 'verify_children when there are children' do
     let(:original_profile) do
       str = "contents:\n"
-      str += "- oregondigital:df70j709q\n"
-      str += "- oregondigital:df70j710g\n"
+      str += "- df70j709q\n"
+      str += "- df70j710g\n"
       YAML.safe_load(str)
     end
 

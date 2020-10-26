@@ -20,25 +20,35 @@ module Hyrax::Migrator::Services
     def verify_children
       return [] if @original_profile['contents'].blank?
 
-      errors = verify_children_present
-      return errors unless errors.empty?
+      return [] if compare
 
-      verify_children_order
+      find_error
     end
 
-    def verify_children_order
+    def compare
+      @original_profile['contents'] == children
+    end
+
+    def find_error
+      return find_missing_children unless size_equal?
+
+      find_order_error
+    end
+
+    def find_order_error
       @original_profile['contents'].each_with_index do |pid, index|
-        clean_pid = pid.strip.gsub('oregondigital:', '')
-        return ["#{children[index]} is out of order"] if children[index] != clean_pid
+        return ["#{children[index]} is out of order"] if children[index] != pid
       end
-      []
     end
 
-    def verify_children_present
+    def size_equal?
+      @original_profile['contents'].size == children.size
+    end
+
+    def find_missing_children
       errors = []
       @original_profile['contents'].each do |pid|
-        clean_pid = pid.strip.gsub('oregondigital:', '')
-        errors << "#{clean_pid} missing;" unless children.include? clean_pid
+        errors << "#{pid} missing;" unless children.include? pid
       end
       errors
     end
