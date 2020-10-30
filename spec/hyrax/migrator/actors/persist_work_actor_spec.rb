@@ -15,6 +15,7 @@ RSpec.describe Hyrax::Migrator::Actors::PersistWorkActor do
   describe '#create' do
     context 'when the service succeeds' do
       before do
+        allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).and_return(false)
         allow(actor).to receive(:service).and_return(service)
         allow(service).to receive(:persist_work).and_return(true)
         actor.next_actor = terminal
@@ -35,6 +36,22 @@ RSpec.describe Hyrax::Migrator::Actors::PersistWorkActor do
         expect(work.status).to eq('success')
       end
 
+      it 'calls the next actor' do
+        expect(terminal).to receive(:create)
+        actor.create(work)
+      end
+    end
+
+    context 'when the asset already exists' do
+      before do
+        allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).and_return(true)
+        actor.next_actor = terminal
+      end
+
+      it 'sets the status' do
+        actor.create(work)
+        expect(work.status).to eq('success')
+      end
       it 'calls the next actor' do
         expect(terminal).to receive(:create)
         actor.create(work)

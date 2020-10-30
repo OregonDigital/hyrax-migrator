@@ -7,7 +7,7 @@ module Hyrax::Migrator::Actors
       state :persist_work_initial, initial: true
       state :persist_work_succeeded, :persist_work_failed
 
-      event :persist_work_initial do
+      event :persist_work_initial, after: :post_initial do
         transitions from: %i[persist_work_initial persist_work_failed],
                     to: :persist_work_initial
       end
@@ -25,8 +25,9 @@ module Hyrax::Migrator::Actors
     # Use the PersistWorkService to create the work in Hyrax.
     def create(work)
       super
+      return persist_work_succeeded if exists?
+
       persist_work_initial
-      update_work(aasm.current_state)
       service.persist_work ? persist_work_succeeded : persist_work_failed
     rescue StandardError => e
       persist_work_failed
@@ -46,6 +47,14 @@ module Hyrax::Migrator::Actors
       message = "error while persisting work: #{err.message}"
       message += ', work persisted' if Hyrax::Migrator::HyraxCore::Asset.exists?(@work.pid)
       message
+    end
+
+    def exists?
+      Hyrax::Migrator::HyraxCore::Asset.exists? @work.pid
+    end
+
+    def post_initial
+      update_work(aasm.current_state)
     end
 
     def post_fail
