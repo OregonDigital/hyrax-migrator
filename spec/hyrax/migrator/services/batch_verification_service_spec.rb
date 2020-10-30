@@ -1,7 +1,5 @@
 # frozen_string_literal:true
 
-require 'byebug'
-
 RSpec.describe Hyrax::Migrator::Services::BatchVerificationService do
   let(:batch_name) { 'batch1' }
   let(:service) { described_class.new(batch_name) }
