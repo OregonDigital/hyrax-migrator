@@ -131,31 +131,45 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
 
   describe 'admin_set_id_from_primary_set' do
     let(:admin_set) { instance_double('AdminSet', id: 'osu', title: 'Oregon State University', description: 'hello world') }
-    let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-gorge' }
 
     before do
       crosswalk_metadata[:institution] = [RDF::URI('http://dbpedia.org/resource/Oregon-State-University')]
     end
 
     context 'when called' do
+      let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-gorge' }
+
       it 'returns corresponding admin set id' do
         expect(service.send(:admin_set_id_from_primary_set, metadata_primary_set)).to eq 'osu'
       end
+    end
+
+    context 'when the lookup fails' do
+      let(:metadata_primary_set) { 'http://oregondigital.org/resource/oregondigital:columbia-george' }
+
+      it { expect { service.send(:admin_set_id_from_primary_set, metadata_primary_set) }.to raise_error StandardError }
     end
   end
 
   describe 'admin_set_id_from_institution' do
     let(:admin_set) { instance_double('AdminSet', id: 'uo', title: 'University of Oregon', description: 'hola mundo') }
-    let(:metadata_institution) { 'http://dbpedia.org/resource/University_of_Oregon' }
 
     before do
       crosswalk_metadata[:institution] = [RDF::URI('http://dbpedia.org/resource/University_of_Oregon')]
     end
 
     context 'when called' do
+      let(:metadata_institution) { 'http://dbpedia.org/resource/University_of_Oregon' }
+
       it 'returns corresponding admin set id' do
         expect(service.send(:admin_set_id_from_institution, metadata_institution)).to eq 'uo'
       end
+    end
+
+    context 'when the lookup fails' do
+      let(:metadata_institution) { 'http://dbpedia.org/resource/Brakebills-University' }
+
+      it { expect { service.send(:admin_set_id_from_institution, metadata_institution) }.to raise_error StandardError }
     end
   end
 end
