@@ -28,10 +28,16 @@ RSpec.describe Hyrax::Migrator::Services::VerificationService do
         allow(checksums_service).to receive(:verify_content).and_return([])
         allow(derivatives_service).to receive(:verify).and_return([])
         allow(children_service).to receive(:verify_children).and_return([])
+        allow(migrator_work).to receive(:remove_temp_directory)
       end
 
       it 'passes the error on' do
         expect(service.verify).to eq([["Unable to verify identifier in #{pid}."], [], [], []])
+      end
+
+      it 'removes the temp directory' do
+        expect(migrator_work).to receive(:remove_temp_directory)
+        service.verify
       end
     end
 
@@ -42,10 +48,16 @@ RSpec.describe Hyrax::Migrator::Services::VerificationService do
         allow(metadata_service).to receive(:verify_metadata).and_return([])
         allow(checksums_service).to receive(:verify_content).and_return([])
         allow(derivatives_service).to receive(:verify).and_raise(error, 'Fail')
+        allow(migrator_work).to receive(:remove_temp_directory)
       end
 
       it 'handles the error' do
         expect(service.verify).to eq([[], [], "Encountered an error while working on #{pid}: Fail"])
+      end
+
+     it 'removes the temp directory' do
+        expect(migrator_work).to receive(:remove_temp_directory)
+        service.verify
       end
     end
   end

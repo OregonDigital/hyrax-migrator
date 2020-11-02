@@ -30,8 +30,10 @@ module Hyrax::Migrator::Services
       errors << @checksums_service.verify_content
       errors << @derivatives_service.verify
       errors << @children_service.verify_children
+      @work.remove_temp_directory
       errors
     rescue StandardError => e
+      @work.remove_temp_directory
       errors << "Encountered an error while working on #{@work.pid}: #{e.message}"
     end
 
