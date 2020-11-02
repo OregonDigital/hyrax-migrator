@@ -55,7 +55,7 @@ RSpec.describe Hyrax::Migrator::Services::VerificationService do
         expect(service.verify).to eq([[], [], "Encountered an error while working on #{pid}: Fail"])
       end
 
-     it 'removes the temp directory' do
+      it 'removes the temp directory' do
         expect(migrator_work).to receive(:remove_temp_directory)
         service.verify
       end
