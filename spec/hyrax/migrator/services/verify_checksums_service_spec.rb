@@ -35,5 +35,17 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
         expect(service.verify_content).to include(match(/Content does not match precomputed/))
       end
     end
+
+    context 'when the original profile does not have checksums' do
+      let(:original_profile) { instance_double('od_asset_profile', content: 'cpd has no content file') }
+
+      before do
+        allow(original_profile).to receive(:[]).with('checksums').and_return nil
+      end
+
+      it 'returns no errors' do
+        expect(service.verify_content).to eq([])
+      end
+    end
   end
 end

@@ -16,7 +16,7 @@ module Hyrax::Migrator::Services
 
     def content
       fs = @hyrax_asset.file_sets.first
-      fs.original_file.content unless fs.blank?
+      @content = fs.blank? ? '' : fs.original_file.content
     end
 
     def new_profile
@@ -35,6 +35,8 @@ module Hyrax::Migrator::Services
     end
 
     def verify_content
+      return [] if @original_profile['checksums'].blank?
+
       errors = []
       @original_profile['checksums'].each do |key, val|
         next if val.blank?
@@ -42,8 +44,6 @@ module Hyrax::Migrator::Services
         errors << "Content does not match precomputed #{key} checksums for #{@migrator_work.pid}. Source: #{val.first} Migrated: #{@new_profile[:checksums][key]}" unless val.first == @new_profile[:checksums][key]
       end
       errors
-    rescue StandardError => e
-      puts e.message
     end
   end
 end
