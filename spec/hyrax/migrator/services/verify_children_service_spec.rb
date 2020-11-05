@@ -40,6 +40,14 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
         expect(service.verify_children).to eq ['df70j710g missing;']
       end
     end
+
+    context 'when one of the children is nil' do
+      let(:member_ids) { ['df70j709q', nil] }
+
+      it 'returns a list of missing children' do
+        expect(service.verify_children).to eq ['df70j710g missing;']
+      end
+    end
   end
 
   describe 'verify children' do

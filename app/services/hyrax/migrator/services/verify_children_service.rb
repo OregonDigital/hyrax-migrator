@@ -42,6 +42,8 @@ module Hyrax::Migrator::Services
     end
 
     def size_equal?
+      return false if children.include? nil
+
       @original_profile['contents'].size == children.size
     end
 
