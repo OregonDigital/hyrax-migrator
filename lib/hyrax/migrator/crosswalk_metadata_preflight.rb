@@ -1,7 +1,7 @@
 # frozen_string_literal:true
 
 require 'hyrax/migrator/crosswalk_metadata'
-require 'byebug'
+
 module Hyrax::Migrator
   # For use with MetadataPreflightRake
   class CrosswalkMetadataPreflight < Hyrax::Migrator::CrosswalkMetadata
