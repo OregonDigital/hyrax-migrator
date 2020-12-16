@@ -75,7 +75,7 @@ module Hyrax::Migrator
 
     def visibility?
       result = @results.delete :visibility
-      @counters[:visibility] += 1 unless result.include? 'open'
+      @counters[:visibility] += 1 unless result.has_value? 'open'
       concat_errors(result) if result.include? 'error'
     end
 
