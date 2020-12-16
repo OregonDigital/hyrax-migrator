@@ -3,7 +3,6 @@
 RSpec.describe Hyrax::Migrator::Jobs::MigrateWorkJob, type: :job do
   include ActiveJob::TestHelper
 
-  let!(:job) { described_class.perform_later(pid: pid, file_path: file_path) }
   let(:pid) { 'abcde1234' }
   let(:file_path) { 'tmp/test_file.zip' }
 
@@ -12,5 +11,11 @@ RSpec.describe Hyrax::Migrator::Jobs::MigrateWorkJob, type: :job do
     clear_performed_jobs
   end
 
-  it { expect(ActiveJob::Base.queue_adapter.enqueued_jobs.count).to eq 1 }
+  it 'performs job' do
+    expect(Rails.logger).to receive(:info).at_least(:twice)
+    perform_enqueued_jobs do
+      described_class.perform_later(pid: pid, file_path: file_path)
+    end
+    assert_performed_jobs 1
+  end
 end
