@@ -20,12 +20,16 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataPreflight do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
+  let(:descMetadata) { double }
+  let(:work) { double }
   let(:service) { described_class.new(crosswalk_metadata_file, crosswalk_overrides_file) }
 
   before do
-    service.graph = graph
+    service.work = work
     service.errors = []
     service.result = {}
+    allow(work).to receive(:descMetadata).and_return(descMetadata)
+    allow(descMetadata).to receive(:graph).and_return(graph)
   end
 
   describe 'lookup' do
@@ -53,9 +57,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataPreflight do
       let(:predicate) { RDF::URI('http://badpredicates.org/ns/bad') }
 
       it 'reports them' do
-        service.crosswalk
-        result = service.instance_variable_get(:@result)
-        expect(result[:errors].size).to eq 1
+        expect(service.crosswalk[:errors].size).to eq 1
       end
     end
   end
