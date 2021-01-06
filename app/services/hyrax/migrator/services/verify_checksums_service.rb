@@ -6,12 +6,11 @@ module Hyrax::Migrator::Services
   ##
   # A service to compare the checksums from the source asset and the migrated asset
   class VerifyChecksumsService
-    def initialize(migrator_work, hyrax_asset, original_profile)
-      @migrator_work = migrator_work
+    def initialize(hyrax_asset, profile_dir)
       @hyrax_asset = hyrax_asset
-      @original_profile = original_profile
+      @profile_dir = profile_dir
       @new_profile = new_profile
-      @errors = verify_content
+      @errors = []
     end
 
     def content
@@ -34,16 +33,21 @@ module Hyrax::Migrator::Services
       checksums
     end
 
-    def verify_content
-      return [] if @original_profile['checksums'].blank?
+    def original_checksums
+      @original_checksums ||= YAML.load_file(File.join(@profile_dir, "#{@hyrax_asset.id}_checksums.yml"))
+    rescue StandardError
+      @original_checksums = {}
+    end
 
-      errors = []
-      @original_profile['checksums'].each do |key, val|
+    def verify_content
+      return [] if original_checksums['checksums'].blank?
+
+      original_checksums['checksums'].each do |key, val|
         next if val.blank?
 
-        errors << "Content does not match precomputed #{key} checksums for #{@migrator_work.pid}. Source: #{val.first} Migrated: #{@new_profile[:checksums][key]}" unless val.first == @new_profile[:checksums][key]
+        @errors << "Content does not match precomputed #{key} checksums for #{@hyrax_asset.id}." unless val.first == @new_profile[:checksums][key]
       end
-      errors
+      @errors
     end
   end
 end

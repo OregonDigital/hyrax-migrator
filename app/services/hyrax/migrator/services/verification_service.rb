@@ -15,7 +15,7 @@ module Hyrax::Migrator::Services
 
     def add_services
       @metadata_service = Hyrax::Migrator::Services::VerifyMetadataService.new(@work, @config, hyrax_asset, original_profile)
-      @checksums_service = Hyrax::Migrator::Services::VerifyChecksumsService.new(@work, hyrax_asset, original_profile)
+      @checksums_service = Hyrax::Migrator::Services::VerifyChecksumsService.new(hyrax_asset, @profile_dir)
       @derivatives_service = Hyrax::Migrator::Services::VerifyDerivativesService.new(hyrax_asset, original_profile)
       @children_service = Hyrax::Migrator::Services::VerifyChildrenService.new(@work, hyrax_asset, original_profile)
     end

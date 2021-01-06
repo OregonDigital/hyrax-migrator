@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
-  let(:migrator_work) { double }
   let(:hyrax_work) { double }
-  let(:config) { Hyrax::Migrator::Configuration.new }
-  let(:original_profile) { YAML.load_file("spec/fixtures/data/#{pid}_profile.yml") }
-  let(:service) { described_class.new(migrator_work, hyrax_work, original_profile) }
+  let(:service) { described_class.new(hyrax_work, profile_dir) }
+  let(:profile_dir) { 'spec/fixtures/data' }
   let(:pid) { 'df70jh899' }
   let(:file_set) { instance_double('FileSet', id: 'bn999672v', uri: 'http://127.0.0.1/rest/fake/bn/99/96/72/bn999672v') }
   let(:content_path) { 'spec/fixtures/data/world.png' }
@@ -14,9 +12,9 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
   before do
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:find).and_return(hyrax_work)
     allow(hyrax_work).to receive(:as_json).and_return(json)
-    allow(migrator_work).to receive(:pid).and_return(pid)
     allow(hyrax_work).to receive(:file_sets).and_return([file_set])
     allow(file_set).to receive(:original_file).and_return(original_file)
+    allow(hyrax_work).to receive(:id).and_return(pid)
   end
 
   describe 'verify_content' do
@@ -36,11 +34,9 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
       end
     end
 
-    context 'when the original profile does not have checksums' do
-      let(:original_profile) { instance_double('od_asset_profile', content: 'cpd has no content file') }
-
+    context 'when there were no checksums generated for the export' do
       before do
-        allow(original_profile).to receive(:[]).with('checksums').and_return nil
+        allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
       end
 
       it 'returns no errors' do
