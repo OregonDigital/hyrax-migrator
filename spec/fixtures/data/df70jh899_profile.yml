@@ -2,15 +2,6 @@ sets:
   set:
   - oregondigital:joel-palmer
   primarySet: oregondigital:joel-palmer
-checksums:
-  SHA1hex:
-  - f794b23c0c6fe1083d0ca8b58261a078cd968967
-  SHA1base64:
-  - 95SyPAxv4Qg9DKi1gmGgeM2WiWc=
-  MD5hex:
-  - 28da6259ae5707c68708192a40b3e85c
-  MD5base64:
-  - KNpiWa5XB8aHCBkqQLPoXA==
 derivatives_info:
   has_thumbnail: false
   has_content_ocr: false
