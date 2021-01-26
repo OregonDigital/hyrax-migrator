@@ -16,6 +16,10 @@ module Hyrax::Migrator
         asset.save!
       end
 
+      def self.solr_record(id)
+        ActiveFedora::SolrService.query("id:#{id}", rows: 1).first || []
+      end
+
       def self.find(id)
         ActiveFedora::Base.find(id)
       rescue ActiveFedora::ObjectNotFoundError
