@@ -15,6 +15,7 @@ RSpec.describe Hyrax::Migrator::Work do
 
   context 'with a temporary directory containing the unzipped file' do
     before do
+      Hyrax::Migrator.config.file_system_path = '/tmp'
       Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
         zipfile.add('Gemfile', File.join(Rails.root, '../../Gemfile'))
       end

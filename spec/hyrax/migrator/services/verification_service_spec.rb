@@ -14,6 +14,7 @@ RSpec.describe Hyrax::Migrator::Services::VerificationService do
 
   before do
     allow(migrator_work).to receive(:pid).and_return(pid)
+    allow(migrator_work).to receive(:remove_temp_directory)
     allow(Hyrax::Migrator::Services::VerifyMetadataService).to receive(:new).and_return(metadata_service)
     allow(Hyrax::Migrator::Services::VerifyChecksumsService).to receive(:new).and_return(checksums_service)
     allow(Hyrax::Migrator::Services::VerifyDerivativesService).to receive(:new).and_return(derivatives_service)
