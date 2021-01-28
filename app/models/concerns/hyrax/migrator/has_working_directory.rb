@@ -122,7 +122,7 @@ module Hyrax::Migrator
     end
 
     def temporary_directory(prefix)
-      Dir.mktmpdir([prefix, Time.now.to_i.to_s])
+      Dir.mktmpdir([prefix, Time.now.to_i.to_s], Hyrax::Migrator.config.file_system_path)
     end
   end
 end
