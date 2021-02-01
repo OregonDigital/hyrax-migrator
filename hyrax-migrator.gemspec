@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rdf'
   s.add_dependency 'rubyzip'
   s.add_dependency 'sidekiq'
-
+  s.add_development_dependency 'blacklight', '~>6.23.0'
   s.add_development_dependency 'byebug'
   s.add_development_dependency 'coveralls', '~> 0.8'
   s.add_development_dependency 'factory_bot_rails'
