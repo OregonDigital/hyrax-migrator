@@ -10,31 +10,34 @@ module Hyrax::Migrator::Services
       @errors = []
       @facet_properties = {}
       @collections = []
+      @asset_rows = []
       @report1 = report(:assets)
       @report2 = report(:totals)
     end
 
     def create_report
+      collect_assets
       print_assets
-      print_header
       print_totals
       print_errors
       @report1.close
       @report2.close
     end
 
-    def print_assets
+    def collect_assets
       location_service[@batch_name].each do |file_path|
         pid = parse_pid(file_path)
-
-        @report1.puts asset_report(pid)
+        @asset_rows << asset_report(pid)
       end
     end
 
-    def print_header
+    def print_assets
       labels = ['pid']
       labels += @facet_properties.map { |_k, v| v }
       @report1.puts labels.join("\t")
+      @asset_rows.each do |row|
+        @report1.puts row
+      end
     end
 
     def asset_report(pid)
@@ -43,8 +46,9 @@ module Hyrax::Migrator::Services
 
       add_collections(solr_record)
       record = [pid]
-      @facet_properties.each do |key, _value|
-        record << solr_record[key].to_s
+      @facet_properties.keys.each do |key|
+        values = solr_record[key].is_a?(Array) ? solr_record[key].join('||') : solr_record[key]
+        record << values
       end
       record.join("\t")
     end
@@ -70,8 +74,19 @@ module Hyrax::Migrator::Services
     def print_totals
       properties.each do |property|
         results = search_service.search(@collection_id, property)
-        @report2.puts results['facet_counts']['facet_fields'].to_hash.to_yaml
+        rows = format_facet_total(results['facet_counts']['facet_fields'])
+        rows.each do |row|
+          @report2.puts row
+        end
       end
+    end
+
+    def format_facet_total(facet_hash)
+      rows = []
+      facet_hash.each do |key, val|
+        rows << "#{key}\t#{val[0]}\t#{val[1]}"
+      end
+      rows
     end
 
     def search_service
