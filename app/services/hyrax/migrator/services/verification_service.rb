@@ -6,38 +6,35 @@ module Hyrax::Migrator::Services
   ##
   # A service to compare various elements from the source asset and the migrated asset
   class VerificationService
-    def initialize(migrator_work, migrator_config, profile_dir = nil)
-      @work = migrator_work
-      @profile_dir = profile_dir.nil? ? File.join(@work.working_directory, 'data') : profile_dir
-      @config = migrator_config
-      add_services
-    end
-
-    def add_services
-      @metadata_service = Hyrax::Migrator::Services::VerifyMetadataService.new(@work, @config, hyrax_asset, original_profile)
-      @checksums_service = Hyrax::Migrator::Services::VerifyChecksumsService.new(hyrax_asset, @profile_dir)
-      @derivatives_service = Hyrax::Migrator::Services::VerifyDerivativesService.new(hyrax_asset, original_profile)
-      @children_service = Hyrax::Migrator::Services::VerifyChildrenService.new(@work, hyrax_asset, original_profile)
-    end
-
-    def hyrax_asset
-      @hyrax_asset ||= Hyrax::Migrator::HyraxCore::Asset.find(@work.pid)
+    def initialize(pid, services, config = Hyrax::Migrator.config)
+      @migrated_work = MigratedWork.new(pid, config)
+      @services = services
     end
 
     def verify
       errors = []
-      errors << @metadata_service.verify_metadata
-      errors << @checksums_service.verify_content
-      errors << @derivatives_service.verify
-      errors << @children_service.verify_children
-      @work.remove_temp_directory
+      @services.each do |service|
+        verifier = service.new(@migrated_work)
+        errors << verifier.verify
+      end
+      @migrated_work.work.remove_temp_directory
       errors
-    rescue StandardError => e
-      errors << "Encountered an error while working on #{@work.pid}: #{e.message}"
     end
 
-    def original_profile
-      @original_profile ||= YAML.load_file(File.join(@profile_dir, "#{@work.pid}_profile.yml"))
+    # Package objects necessary for the verifiers
+    class MigratedWork
+      attr_reader :work, :asset, :working_directory, :original_profile, :config
+      def initialize(pid, config = Hyrax::Migrator.config)
+        @work = Hyrax::Migrator::Work.find_by(pid: pid)
+        @asset = Hyrax::Migrator::HyraxCore::Asset.find(pid)
+        @working_directory = @work.working_directory
+        @original_profile = read_original_profile
+        @config = config
+      end
+
+      def read_original_profile
+        YAML.load_file(File.join(@working_directory, "#{@work.pid}_profile.yml"))
+      end
     end
   end
 end
