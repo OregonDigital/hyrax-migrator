@@ -8,7 +8,6 @@ RSpec.describe Hyrax::Migrator::Services::VerifyVisibilityService do
   let(:migrated_work) { double }
 
   before do
-    allow(Hyrax::Migrator::Services::VerificationService::MigratedWork).to receive(:new).and_return(migrated_work)
     allow(migrated_work).to receive(:asset).and_return(asset)
     allow(migrated_work).to receive(:original_profile).and_return(original_profile)
   end
