@@ -2,6 +2,7 @@
 
 RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   let(:hyrax_work) { double }
+  let(:migrated_work) { double }
   let(:derivatives_info) do
     info = {}
     info['has_thumbnail'] = false
@@ -20,7 +21,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     hash['derivatives_info'] = derivatives_info
     hash
   end
-  let(:service) { described_class.new(hyrax_work, original_profile) }
+  let(:service) { described_class.new(migrated_work) }
   let(:pid) { 'df70jh899' }
   let(:set) { double }
   let(:sets) { [set] }
@@ -47,7 +48,8 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   before do
-    allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:find).and_return(hyrax_work)
+    allow(migrated_work).to receive(:asset).and_return(hyrax_work)
+    allow(migrated_work).to receive(:original_profile).and_return(original_profile)
     allow(Hyrax::Migrator::HyraxCore::DerivativePath).to receive(:new).with(anything).and_return(derivative_path)
     allow(hyrax_work).to receive(:as_json).and_return(json)
     allow(hyrax_work).to receive(:id).and_return('testabcd')
@@ -80,6 +82,9 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     end
   end
 
+  # Note that the verify method is responsible for creating the variable verification_errors.
+  # Accordingly, the following methods need that variable initialized.
+
   describe 'check_pdf_derivatives' do
     let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/c2/47/ds/08/x-jp2-0000.jp2', '/data/tmp/shared/derivatives/c2/47/ds/08/x-thumbnail.jpeg'] }
     let(:derivatives_info) do
@@ -90,6 +95,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     end
 
     it 'returns no errors' do
+      service.instance_variable_set(:@verification_errors, [])
       service.check_pdf_derivatives(file_set)
       expect(service.verification_errors).to eq([])
     end
@@ -104,6 +110,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     end
 
     it 'returns the error' do
+      service.instance_variable_set(:@verification_errors, [])
       service.check_image_derivatives(file_set)
       expect(service.verification_errors).to eq([])
     end
@@ -119,6 +126,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     end
 
     it 'returns the error' do
+      service.instance_variable_set(:@verification_errors, [])
       service.check_office_document_derivatives(file_set)
       expect(service.verification_errors).to eq([])
     end
@@ -133,6 +141,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     end
 
     it 'returns the error' do
+      service.instance_variable_set(:@verification_errors, [])
       service.check_audio_derivatives(file_set)
       expect(service.verification_errors).to eq([])
     end
@@ -142,6 +151,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
     let(:all_derivative_paths) { ['/data/tmp/shared/derivatives/nc/58/0m/64/9-jp2.jp2', '/data/tmp/shared/derivatives/nc/58/0m/64/9-mp4.mp4', '/data/tmp/shared/derivatives/nc/58/0m/64/9-webm.webm', '/data/tmp/shared/derivatives/nc/58/0m/64/9-thumbnail.jpeg'] }
 
     it 'returns the error' do
+      service.instance_variable_set(:@verification_errors, [])
       service.check_video_derivatives(file_set)
       expect(service.verification_errors).to eq([])
     end

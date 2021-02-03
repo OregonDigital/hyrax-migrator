@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
+  let(:migrated_work) { double }
   let(:migrator_work) { double }
   let(:hyrax_work) { double }
-  let(:service) { described_class.new(migrator_work, hyrax_work, original_profile) }
+  let(:service) { described_class.new(migrated_work) }
 
   before do
+    allow(migrated_work).to receive(:work).and_return(migrator_work)
+    allow(migrated_work).to receive(:asset).and_return(hyrax_work)
+    allow(migrated_work).to receive(:original_profile).and_return(original_profile)
     allow(hyrax_work).to receive(:ordered_member_ids).and_return(member_ids)
   end
 
@@ -21,7 +25,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
       let(:member_ids) { %w[df70j709q df70j710g] }
 
       it 'returns empty' do
-        expect(service.verify_children).to eq []
+        expect(service.verify).to eq []
       end
     end
 
@@ -29,7 +33,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
       let(:member_ids) { %w[df70j710g df70j709q] }
 
       it 'returns the first wrongly placed child' do
-        expect(service.verify_children).to eq ['df70j710g is out of order']
+        expect(service.verify).to eq ['df70j710g is out of order']
       end
     end
 
@@ -37,7 +41,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
       let(:member_ids) { %w[df70j709q] }
 
       it 'returns a list of missing children' do
-        expect(service.verify_children).to eq ['df70j710g missing;']
+        expect(service.verify).to eq ['df70j710g missing;']
       end
     end
 
@@ -45,7 +49,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
       let(:member_ids) { ['df70j709q', nil] }
 
       it 'returns a list of missing children' do
-        expect(service.verify_children).to eq ['df70j710g missing;']
+        expect(service.verify).to eq ['df70j710g missing;']
       end
     end
   end
@@ -60,7 +64,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChildrenService do
 
     context 'when there are no children' do
       it 'returns empty errors' do
-        expect(service.verify_children).to eq []
+        expect(service.verify).to eq []
       end
     end
   end
