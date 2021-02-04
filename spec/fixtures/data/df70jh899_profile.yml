@@ -12,6 +12,8 @@ derivatives_info:
   has_pyramidal_image: false
   has_content_mp4: false
   has_content_jpg: false
+visibility:
+  - 'public'
 fields:
   title:
   - Letters
