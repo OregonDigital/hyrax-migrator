@@ -27,23 +27,19 @@ module Hyrax::Migrator::Services
         errors += process_vals(key, val)
       end
       errors
-    rescue StandardError => e
-      puts e.message
     end
 
     def process_vals(key, val)
-      errors = []
-      val.each do |v|
-        errors << "Unable to verify #{key} in #{@migrated_work.work.pid}." unless test_val(key, v)
-      end
-      errors
+      return ["Unable to verify #{key} in #{@migrated_work.work.pid}."] unless test_val(key, val)
+
+      []
     end
 
     def test_val(key, val)
       new_field = map_fields['fields'][key]
-      return @new_profile[:fields][new_field].include?(val.to_s) if @migrated_work.original_profile['fields'][key].is_a?(Array)
+      return @new_profile[:fields][new_field].to_set == val.to_set if val.is_a?(Array)
 
-      @new_profile[:fields][new_field] == val.to_s
+      @new_profile[:fields][new_field] == val
     rescue StandardError
       false
     end

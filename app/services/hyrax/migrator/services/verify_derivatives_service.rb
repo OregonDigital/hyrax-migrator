@@ -97,13 +97,6 @@ module Hyrax::Migrator::Services
       all_derivatives(file_set).select { |b| File.extname(b) == ".#{extension}" }
     end
 
-    ## Return derivatives info for the migrated asset (OD2)
-    def info_for_migrated_asset
-      @migrated_work.asset.file_sets.map do |f|
-        info_for_migrated(f)
-      end
-    end
-
     def info_for_migrated(file_set)
       {
         file_set_id: file_set.id,

@@ -32,6 +32,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
         hash['title'] = ['Letters']
         hash['identifier'] = ['AX057_b03_f01_011_012']
         hash['rights_statement'] = ['http://rightsstatements.org/vocab/NoC-US/1.0/']
+        hash['object_orientation'] = 'leftyloosey'
         hash
       end
 
@@ -46,6 +47,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
         hash['id'] = pid
         hash['title'] = ['Letters']
         hash['rights_statement'] = ['http://rightsstatements.org/vocab/NoC-US/1.0/']
+        hash['object_orientation'] = 'leftyloosey'
         hash
       end
 
