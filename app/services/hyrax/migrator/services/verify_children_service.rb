@@ -5,7 +5,6 @@ require 'yaml'
 module Hyrax::Migrator::Services
   # A service to verify that a cpd's children were successfully attached
   class VerifyChildrenService < VerifyService
-
     def children
       @migrated_work.asset.ordered_member_ids
     end

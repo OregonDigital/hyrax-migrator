@@ -6,7 +6,6 @@ module Hyrax::Migrator::Services
   ##
   # A service to compare metadata from the source asset and the migrated asset
   class VerifyMetadataService < VerifyService
-
     def new_profile
       result_hash = {}
       result_hash[:colls] = colls
