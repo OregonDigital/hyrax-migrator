@@ -4,21 +4,13 @@ require 'yaml'
 
 module Hyrax::Migrator::Services
   # A service to verify that a cpd's children were successfully attached
-  class VerifyChildrenService
-    def initialize(migrator_work, hyrax_asset, original_profile, config = Hyrax::Migrator.config)
-      @migrator_work = migrator_work
-      @hyrax_asset = hyrax_asset
-      @original_profile = original_profile
-      @config = config
-      @errors = verify_children
-    end
-
+  class VerifyChildrenService < VerifyService
     def children
-      @hyrax_asset.ordered_member_ids
+      @migrated_work.asset.ordered_member_ids
     end
 
-    def verify_children
-      return [] if @original_profile['contents'].blank?
+    def verify
+      return [] if @migrated_work.original_profile['contents'].blank?
 
       return [] if compare
 
@@ -26,7 +18,7 @@ module Hyrax::Migrator::Services
     end
 
     def compare
-      @original_profile['contents'] == children
+      @migrated_work.original_profile['contents'] == children
     end
 
     def find_error
@@ -36,7 +28,7 @@ module Hyrax::Migrator::Services
     end
 
     def find_order_error
-      @original_profile['contents'].each_with_index do |pid, index|
+      @migrated_work.original_profile['contents'].each_with_index do |pid, index|
         return ["#{children[index]} is out of order"] if children[index] != pid
       end
     end
@@ -44,12 +36,12 @@ module Hyrax::Migrator::Services
     def size_equal?
       return false if children.include? nil
 
-      @original_profile['contents'].size == children.size
+      @migrated_work.original_profile['contents'].size == children.size
     end
 
     def find_missing_children
       errors = []
-      @original_profile['contents'].each do |pid|
+      @migrated_work.original_profile['contents'].each do |pid|
         errors << "#{pid} missing;" unless children.include? pid
       end
       errors

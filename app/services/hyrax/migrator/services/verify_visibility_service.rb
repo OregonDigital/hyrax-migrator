@@ -8,6 +8,8 @@ module Hyrax::Migrator::Services
       return 'visibility error' if lookup(@migrated_work.original_profile['visibility'])[:visibility] != @migrated_work.asset.visibility
 
       ''
+    rescue StandardError
+      'visibility error'
     end
   end
 end

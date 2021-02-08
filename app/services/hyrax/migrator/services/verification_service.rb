@@ -33,7 +33,7 @@ module Hyrax::Migrator::Services
       end
 
       def read_original_profile
-        YAML.load_file(File.join(@working_directory, "#{@work.pid}_profile.yml"))
+        YAML.load_file(File.join(@working_directory, "data/#{@work.pid}_profile.yml"))
       end
     end
   end

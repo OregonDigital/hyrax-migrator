@@ -5,19 +5,14 @@ require 'yaml'
 module Hyrax::Migrator::Services
   ##
   # A service to verify that derivatives for the content exist for the migrated asset
-  class VerifyDerivativesService
+  class VerifyDerivativesService < VerifyService
     attr_reader :verification_errors
-
-    def initialize(asset_item, original_profile)
-      @work = asset_item
-      @original_profile = original_profile
-      @verification_errors = []
-    end
 
     # Given derivatives info from the original profile, verify that the derivatives
     # were successfully created after migrating the new asset
     def verify
-      @work.file_sets.each do |file_set|
+      @verification_errors = []
+      @migrated_work.asset.file_sets.each do |file_set|
         verify_file_set(file_set)
       end
 
@@ -75,7 +70,7 @@ module Hyrax::Migrator::Services
 
     def check_thumbnail(file_set)
       has_thumbnail = info_for_migrated(file_set)[:has_thumbnail]
-      @verification_errors << "Missing thumbnail in #{@work.id}, file_set #{file_set.id}." unless has_thumbnail == true
+      @verification_errors << "Missing thumbnail in #{@migrated_work.asset.id}, file_set #{file_set.id}." unless has_thumbnail == true
     end
 
     def check_page_count(file_set)
@@ -83,15 +78,15 @@ module Hyrax::Migrator::Services
       # this means that the it probably didn't have page derivatives like it's the
       # case with some mime_types like application/vnd.ms-excel where it was not
       # not originally generated in OD1
-      return true unless @original_profile['derivatives_info'].present?
+      return true unless @migrated_work.original_profile['derivatives_info'].present?
 
-      original_count = @original_profile['derivatives_info']['page_count']
+      original_count = @migrated_work.original_profile['derivatives_info']['page_count']
       new_count = info_for_migrated(file_set)[:page_count]
-      @verification_errors << "Page count does not match for work #{@work.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
+      @verification_errors << "Page count does not match for work #{@migrated_work.asset.id}, file_set #{file_set.id}: original count #{original_count}, new count: #{new_count}" unless original_count == new_count
     end
 
     def check_extracted_content(file_set)
-      @verification_errors << "Missing extracted text for work #{@work.id}, file_set #{file_set.id}." unless info_for_migrated(file_set)[:has_extracted_text]
+      @verification_errors << "Missing extracted text for work #{@migrated_work.asset.id}, file_set #{file_set.id}." unless info_for_migrated(file_set)[:has_extracted_text]
     end
 
     def check_file_type(file_set, extension)
@@ -100,13 +95,6 @@ module Hyrax::Migrator::Services
 
     def derivatives_for_reference(file_set, extension)
       all_derivatives(file_set).select { |b| File.extname(b) == ".#{extension}" }
-    end
-
-    ## Return derivatives info for the migrated asset (OD2)
-    def info_for_migrated_asset
-      @work.file_sets.map do |f|
-        info_for_migrated(f)
-      end
     end
 
     def info_for_migrated(file_set)

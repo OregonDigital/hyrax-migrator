@@ -31,4 +31,14 @@ RSpec.describe Hyrax::Migrator::Services::VerifyVisibilityService do
       expect(service.verify).to eq('visibility error')
     end
   end
+
+  context 'when visibility is not in the profile' do
+    before do
+      original_profile.delete 'visibility'
+    end
+
+    it 'handles the error' do
+      expect(service.verify).to eq('visibility error')
+    end
+  end
 end
