@@ -84,7 +84,7 @@ module Hyrax::Migrator::Services
     def format_facet_total(facet_hash)
       rows = []
       facet_hash.values.first.each_slice(2) do |s|
-        puts "#{facet_hash.keys.first}\t#{s[0]}\t#{s[1]}"
+        rows << "#{facet_hash.keys.first}\t#{s[0]}\t#{s[1]}"
       end
       rows
     end
