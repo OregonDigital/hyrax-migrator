@@ -3,25 +3,21 @@
 module Hyrax::Migrator::Services
   # Create report on facet values for migrated batch of assets
   class FacetReporterService < BatchReporterService
-    def initialize(batch_name, collection_id, config = Hyrax::Migrator.config)
+    def initialize(batch_name, config = Hyrax::Migrator.config)
       @batch_name = batch_name
-      @collection_id = collection_id
       @migrator_config = config
       @errors = []
       @facet_properties = {}
       @collections = []
       @asset_rows = []
-      @report1 = report(:assets)
-      @report2 = report(:totals)
+      @report = report(:assets)
     end
 
     def create_report
       collect_assets
       print_assets
-      print_totals
       print_errors
-      @report1.close
-      @report2.close
+      @report.close
     end
 
     def collect_assets
@@ -34,9 +30,9 @@ module Hyrax::Migrator::Services
     def print_assets
       labels = ['pid']
       labels += @facet_properties.map { |_k, v| v }
-      @report1.puts labels.join("\t")
+      @report.puts labels.join("\t")
       @asset_rows.each do |row|
-        @report1.puts row
+        @report.puts row
       end
     end
 
@@ -71,41 +67,15 @@ module Hyrax::Migrator::Services
       end
     end
 
-    def print_totals
-      properties.each do |property|
-        results = search_service.search(@collection_id, property)
-        rows = format_facet_total(results['facet_counts']['facet_fields'])
-        rows.each do |row|
-          @report2.puts row
-        end
-      end
-    end
-
-    def format_facet_total(facet_hash)
-      rows = []
-      facet_hash.values.first.each_slice(2) do |s|
-        rows << "#{facet_hash.keys.first}\t#{s[0]}\t#{s[1]}"
-      end
-      rows
-    end
-
-    def search_service
-      @search_service ||= Hyrax::Migrator::HyraxCore::SearchService.new
-    end
-
-    def properties
-      Hyrax::Migrator::HyraxCore::Asset.find(@collection_id).available_facets.map(&:solr_name)
-    end
-
     def log_error(pid)
       @errors << pid
       "#{pid} not found"
     end
 
     def print_errors
-      @report2.puts 'assets not found:'
+      @report.puts 'assets not found:'
       @errors.each do |pid|
-        @report2.puts pid
+        @report.puts pid
       end
     end
 

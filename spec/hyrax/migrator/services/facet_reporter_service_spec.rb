@@ -4,20 +4,9 @@ RSpec.describe Hyrax::Migrator::Services::FacetReporterService do
   class Facet
     attr_accessor :solr_name, :label
   end
-  let(:service) { described_class.new('batch123', 'coll123') }
+  let(:service) { described_class.new('batch123') }
   let(:location_service) { instance_double('Hyrax::Migrator::Services::BagFileLocationService') }
   let(:bag1) { double }
-  let(:search_service) { instance_double('Hyrax::Migrator::HyraxCore::SearchService') }
-  let(:facet_results) do
-    { 'facet_counts' =>
-    { 'facet_fields' =>
-    { 'workType_label_sim' =>
-    ['colour photographs', 1,
-     'photomicrographs', 1,
-     'slides (photographs)', 1,
-     'stamps (exchange media)', 1,
-     'tax stamps', 1] } } }
-  end
   let(:collection) { instance_double('Collection', id: 'ohba') }
   let(:solr_record) do
     { :id => 'fx719p24f',
@@ -39,8 +28,6 @@ RSpec.describe Hyrax::Migrator::Services::FacetReporterService do
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:solr_record).and_return(solr_record)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:find).and_return(collection)
     allow(collection).to receive(:available_facets).and_return(facets)
-    allow(Hyrax::Migrator::HyraxCore::SearchService).to receive(:new).and_return(search_service)
-    allow(search_service).to receive(:search).and_return(facet_results)
     allow(File).to receive(:open).and_return test_io
   end
 
@@ -48,11 +35,6 @@ RSpec.describe Hyrax::Migrator::Services::FacetReporterService do
     it 'writes a file' do
       service.create_report
       expect(test_io.string).to include 'fx719p24f'
-    end
-
-    it 'writes the totals for the facets' do
-      service.create_report
-      expect(test_io.string).to include 'Work Type'
     end
 
     context 'when there is not a solr record' do
