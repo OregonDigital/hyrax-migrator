@@ -22,19 +22,12 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
 
   describe '#upload_file_content' do
     context 'when upload service is :file_system' do
-      let(:dest_filename) { File.join(config.file_system_path, basename_content_file) }
-      let(:dest_filename_obj) do
-        {
-          'local_filename' => dest_filename
-        }
-      end
-
       before do
         config.upload_storage_service = :file_system
       end
 
-      it 'returns the destination filename of the content file transfered' do
-        expect(service.upload_file_content).to eq dest_filename_obj
+      it 'returns the content file path' do
+        expect(service.upload_file_content['local_filename']).to eq File.join(work_file_path, 'data', basename_content_file)
       end
     end
 
@@ -46,40 +39,6 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
 
       it 'raises file not found error' do
         expect { service.upload_file_content }.to raise_error(StandardError, 'file not found')
-      end
-    end
-
-    context 'when upload service is :file_system and copy_local_file fails with mismatched bytes copied' do
-      before do
-        config.upload_storage_service = :file_system
-        allow(File).to receive(:size).and_return 0
-      end
-
-      it 'raises file not found error' do
-        expect { service.upload_file_content }.to raise_error(StandardError)
-      end
-    end
-
-    context 'when upload service is :file_system and copy_local_file fails with checksum validation error' do
-      let(:invalid_checksum_data) do
-        [{
-          file_name: '3t945r08v_content.jpeg',
-          checksum: 'invalid',
-          checksum_encoding: 'md5'
-        }, {
-          file_name: '3t945r08v_content.jpeg',
-          checksum: 'invalid',
-          checksum_encoding: 'sha1'
-        }]
-      end
-
-      before do
-        config.upload_storage_service = :file_system
-        allow(service).to receive(:content_identity_checksums).and_return invalid_checksum_data
-      end
-
-      it 'raises error' do
-        expect { service.upload_file_content }.to raise_error(StandardError)
       end
     end
 
