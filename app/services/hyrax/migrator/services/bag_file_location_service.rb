@@ -83,10 +83,20 @@ module Hyrax::Migrator::Services
     end
 
     def local_bags(batch_path)
-      bag_zip_files = Dir.entries(batch_path).select { |e| File.file?(File.join(batch_path, e)) && File.extname(e) == '.zip' }
-      bag_zip_files.map { |f| File.join(batch_path, f) }
-    rescue Errno::ENOENT
-      log_and_raise("batch directory #{batch_path} not found")
+      log_and_raise("batch directory #{batch_path} not found") unless Dir.exist?(batch_path)
+      bags = list_dirs(batch_path) || list_zips(batch_path)
+      bags.map { |f| File.join(batch_path, f) }
+    end
+
+    def list_zips(batch_path)
+      Dir.entries(batch_path).select { |e| File.file?(File.join(batch_path, e)) && File.extname(e) == '.zip' }
+    end
+
+    def list_dirs(batch_path)
+      result = Dir.entries(batch_path).select { |e| File.directory?(File.join(batch_path, e)) && !/[a-z0-9]/.match(e).nil? }
+      return result unless result.empty?
+
+      nil
     end
 
     def batch_locations
