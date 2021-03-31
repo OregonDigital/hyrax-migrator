@@ -23,6 +23,8 @@ module Hyrax::Migrator
       # be a temporary directory that should be removed.
       FileUtils.rm_rf(working_directory)
       !Dir.exist?(working_directory)
+    rescue StandardError => e
+      Rails.logger.error(e.message)
     end
 
     private
@@ -56,6 +58,8 @@ module Hyrax::Migrator
         end
       end
       destination_path
+    rescue StandardError => e
+      Rails.logger.error(e.message)
     end
 
     ##
@@ -123,6 +127,8 @@ module Hyrax::Migrator
 
     def temporary_directory(prefix)
       Dir.mktmpdir([prefix, Time.now.to_i.to_s], Hyrax::Migrator.config.file_system_path)
+    rescue Errno::ENOENT => e
+      Rails.logger.error(e.message)
     end
   end
 end

@@ -7,12 +7,12 @@ RSpec.describe Hyrax::Migrator::Middleware do
     let(:config) { Hyrax::Migrator::Middleware::Configuration.new }
 
     it 'returns the default middleware' do
-      expect(middleware.default.actor_stack).to respond_to :bag_validator_initial
+      expect(middleware.default.actor_stack).to respond_to :crosswalk_metadata_initial
     end
   end
 
   describe 'custom' do
-    let(:actor_stack) { [Hyrax::Migrator::Actors::CrosswalkMetadataActor] }
+    let(:actor_stack) { [Hyrax::Migrator::Actors::ModelLookupActor] }
     let(:config) do
       c = Hyrax::Migrator::Middleware::Configuration.new
       c.actor_stack = actor_stack
@@ -20,7 +20,7 @@ RSpec.describe Hyrax::Migrator::Middleware do
     end
 
     it 'returns middleware with a custom stack' do
-      expect(middleware.custom(config).actor_stack).to respond_to :crosswalk_metadata_initial
+      expect(middleware.custom(config).actor_stack).to respond_to :model_lookup_initial
     end
   end
 end
