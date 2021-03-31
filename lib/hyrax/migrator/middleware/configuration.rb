@@ -16,13 +16,11 @@ module Hyrax
           # TODO: Replace this with a valid default stack of actors for
           # processing a work through migration.
           @actor_stack ||= [
-            Hyrax::Migrator::Actors::BagValidatorActor,
             Hyrax::Migrator::Actors::CrosswalkMetadataActor,
             Hyrax::Migrator::Actors::RequiredFieldsActor,
             Hyrax::Migrator::Actors::ModelLookupActor,
             Hyrax::Migrator::Actors::AdminSetMembershipActor,
             Hyrax::Migrator::Actors::VisibilityLookupActor,
-            Hyrax::Migrator::Actors::FileIdentityActor,
             Hyrax::Migrator::Actors::FileUploadActor,
             Hyrax::Migrator::Actors::ListChildrenActor,
             Hyrax::Migrator::Actors::ChildrenAuditActor,
