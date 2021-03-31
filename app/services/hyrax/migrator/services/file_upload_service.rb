@@ -42,51 +42,11 @@ module Hyrax
         content = content_file
         return local_file_obj(nil) unless content.present?
 
-        copy_local_file(content)
-
-        local_file_obj(dest_local_file)
-      rescue StandardError => e
-        log_and_raise("FileUploadService upload_to_file_system error: #{e.message} : #{e.backtrace}")
-      end
-
-      def copy_local_file(content)
-        bytes_copied = IO.copy_stream(content, make_path_for(dest_local_file))
-
-        raise StandardError, "Expected #{File.size(dest_local_file)} bytes, received #{bytes_copied} bytes" unless File.size(dest_local_file) == bytes_copied
-
-        ensure_integrity_of(content)
-      end
-
-      def ensure_integrity_of(content)
-        sha1_checksum = Digest::SHA1.file(content).hexdigest
-        md5_checksum = Digest::MD5.file(content).hexdigest
-
-        raise StandardError, 'Content does not match precomputed checksums.' unless sha1_checksum == content_checksum('sha1') && md5_checksum == content_checksum('md5')
-      end
-
-      def content_checksum(encoding)
-        case encoding
-        when 'sha1'
-          content_identity_checksums.detect { |c| c[:checksum_encoding] == 'sha1' }.try(:[], :checksum)
-        when 'md5'
-          content_identity_checksums.detect { |c| c[:checksum_encoding] == 'md5' }.try(:[], :checksum)
-        end
-      end
-
-      def content_identity_checksums
-        Hyrax::Migrator::Services::LoadFileIdentityService.new(@work_file_path).content_file_checksums
-      end
-
-      def dest_local_file
-        File.join(file_system_path, File.basename(content_file))
+        local_file_obj(content)
       end
 
       def local_file_obj(filename)
         { 'local_filename' => filename }
-      end
-
-      def make_path_for(file)
-        file.tap { |path| FileUtils.mkdir_p File.dirname(path) }
       end
 
       def upload_to_s3
