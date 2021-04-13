@@ -2,10 +2,12 @@
 
 module Hyrax::Migrator::Services
   # requires a batch name, iterates through the batch and prints a report either to screen or file
+  # optionally provide a migrator config and/or an array of report fields, eg [:verification]
   class BatchReporterService
-    def initialize(batch_name, migrator_config = Hyrax::Migrator.config)
+    def initialize(batch_name, args = {})
       @batch_name = batch_name
-      @migrator_config = migrator_config
+      @data_list = args[:data_list] || default_data_list
+      @migrator_config = args[:migrator_config] || Hyrax::Migrator.config
     end
 
     def write_report
@@ -27,8 +29,11 @@ module Hyrax::Migrator::Services
       w = Hyrax::Migrator::Work.find_by(pid: pid)
       return 'migrator work not found' if w.nil?
 
-      exists = Hyrax::Migrator::HyraxCore::Asset.exists?(pid)
-      "#{w.aasm_state}\t#{w.status}\t#{w.status_message}\t#{errors(w)}\t#{exists}"
+      line = []
+      @data_list.each do |d|
+        line << send(d, w).to_s
+      end
+      line.join("\t")
     end
 
     def location_service
@@ -46,14 +51,42 @@ module Hyrax::Migrator::Services
       end
     end
 
+    def headings
+      headings = []
+      @data_list.each do |d|
+        headings << d.to_s
+      end
+      headings.join("\t")
+    end
+
+    def default_data_list
+      %i[aasm_state status status_message asset_exists errors]
+    end
+
+    def aasm_state(work)
+      work.aasm_state || ''
+    end
+
+    def status(work)
+      work.status || ''
+    end
+
+    def status_message(work)
+      work.status_message || ''
+    end
+
+    def asset_exists(work)
+      Hyrax::Migrator::HyraxCore::Asset.exists?(work.pid) || ''
+    end
+
     def errors(work)
       return 'no errors' if work.env[:errors].blank?
 
       work.env[:errors].join('|')
     end
 
-    def headings
-      'aasm_state, status, status_message, errors, asset.exists?'
+    def verification(work)
+      work.env[:verification_errors] || ''
     end
   end
 end
