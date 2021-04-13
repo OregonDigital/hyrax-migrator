@@ -4,14 +4,16 @@ module Hyrax::Migrator::Services
   # requires a batch name, iterates through the batch and launches a verify work job for each work.
   # at the moment, does not allow custom config to be passed to job
   class BatchVerificationService
-    def initialize(batch_name)
+    def initialize(batch_name, options = {})
       @batch_name = batch_name
+      @options = options
     end
 
     def verify
       location_service[@batch_name].each do |file_path|
         pid = parse_pid(file_path)
-        Hyrax::Migrator::Jobs::VerifyWorkJob.perform_later({ pid: pid })
+        args = @options.merge({ pid: pid })
+        Hyrax::Migrator::Jobs::VerifyWorkJob.perform_later(args)
       end
     end
 

@@ -25,5 +25,14 @@ RSpec.describe Hyrax::Migrator::Services::BatchVerificationService do
         expect(Hyrax::Migrator::Jobs::VerifyWorkJob).to have_been_enqueued.exactly(1).times
       end
     end
+
+    context 'when given an extra argument' do
+      let(:service) { described_class.new(batch_name, { fruit: 'banana' }) }
+
+      it 'passes it along' do
+        service.verify
+        expect(Hyrax::Migrator::Jobs::VerifyWorkJob).to have_been_enqueued.with({ fruit: 'banana', pid: 'df65vc341' })
+      end
+    end
   end
 end
