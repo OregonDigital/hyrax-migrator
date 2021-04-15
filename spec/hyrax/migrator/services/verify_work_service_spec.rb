@@ -21,19 +21,6 @@ RSpec.describe Hyrax::Migrator::Services::VerifyWorkService do
     end
   end
 
-  describe 'running the service when there are no errors' do
-    before do
-      allow(Hyrax::Migrator::Services::VerificationService).to receive(:new).and_return(verification_service)
-      allow(verification_service).to receive(:verify).and_return([])
-      allow(Hyrax::Migrator::Work).to receive(:find_by).and_return(work)
-    end
-
-    it 'returns without editing the work' do
-      service.run
-      expect(work).not_to receive(:save)
-    end
-  end
-
   describe 'running the service with a custom list of services' do
     let(:args) { { pid: pid, verify_services: ['Hyrax::Migrator::Services::VerifyMetadataService'] } }
     let(:verify_metadata_service) { double }
