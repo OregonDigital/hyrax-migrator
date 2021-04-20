@@ -2,7 +2,8 @@
 
 RSpec.describe Hyrax::Migrator::Services::BatchReporterService do
   let(:batch_name) { 'batch1' }
-  let(:service) { described_class.new(batch_name) }
+  let(:service) { described_class.new(batch_name, args) }
+  let(:args) { {} }
   let(:location_service) { instance_double('Hyrax::Migrator::Services::BagFileLocationService') }
   let(:all_bags_dir) { File.join(Rails.root, '..', 'fixtures') }
   let(:bag1) { File.join(all_bags_dir, batch_name, 'df65vc341.zip') }
@@ -18,6 +19,7 @@ RSpec.describe Hyrax::Migrator::Services::BatchReporterService do
     allow(work1).to receive(:status).and_return('success')
     allow(work1).to receive(:status_message).and_return('doing great')
     allow(work1).to receive(:env).and_return(env)
+    allow(work1).to receive(:pid).and_return('df65vc341')
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:exists?).with(anything).and_return(true)
   end
 
@@ -33,14 +35,25 @@ RSpec.describe Hyrax::Migrator::Services::BatchReporterService do
     end
 
     it 'writes the information to a file' do
-      expect(file).to receive(:puts).with(message)
+      expect(file).to receive(:puts).with(/message/)
       service.write_report
+    end
+
+    context 'when reporting after verification' do
+      let(:args) { { data_list: [:verification] } }
+      let(:verification_err) { 'can not verify banana' }
+      let(:env) { { verification_errors: [verification_err] } }
+
+      it 'writes verification errors to file' do
+        expect(file).to receive(:puts).with(/banana/)
+        service.write_report
+      end
     end
   end
 
   describe '#screen_report' do
     let(:env) { { errors: ['something minor'] } }
-    let(:message) { "df65vc341: dandy\tsuccess\tdoing great\tsomething minor\ttrue\n" }
+    let(:message) { "df65vc341: dandy\tsuccess\tdoing great\ttrue\tsomething minor\n" }
 
     it 'writes the report to screen' do
       printed = capture_stdout do
