@@ -158,5 +158,11 @@ module Hyrax::Migrator
     def required_fields_file
       @required_fields_file ||= ''
     end
+
+    # A list of the verify service classes to be run by default by the VerifyWorkJob
+    attr_writer :verify_services
+    def verify_services
+      @verify_services ||= ENV['VERIFY_SERVICES']
+    end
   end
 end

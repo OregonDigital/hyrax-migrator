@@ -21,6 +21,10 @@ Metrics/BlockLength:
     - 'hyrax-migrator.gemspec'
     - 'spec/**/*'
 
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/hyrax/migrator/configuration.rb'
+
 Style/AsciiComments:
   Enabled: false
 
@@ -91,5 +95,7 @@ RSpec/MessageSpies:
 Layout/LineLength:
   Enabled: false
 
+RSpec/MultipleExpectations:
+  Enabled: false
 RSpec/NestedGroups:
   Enabled: false
