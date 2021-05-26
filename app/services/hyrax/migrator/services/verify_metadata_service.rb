@@ -37,6 +37,8 @@ module Hyrax::Migrator::Services
 
     def test_val(key, val)
       new_field = map_fields['fields'][key]
+      return true if new_field.nil?
+
       return @new_profile[:fields][new_field].to_set == val.to_set if val.is_a?(Array)
 
       @new_profile[:fields][new_field] == val
