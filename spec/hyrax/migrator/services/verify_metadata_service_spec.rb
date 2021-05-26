@@ -55,5 +55,25 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
         expect(service.verify).to eq(["Unable to verify identifier in #{pid}."])
       end
     end
+
+    context 'when metadata should be discarded' do
+      let(:json) do
+        hash = {}
+        hash['id'] = pid
+        hash['title'] = ['Letters']
+        hash['identifier'] = ['AX057_b03_f01_011_012']
+        hash['rights_statement'] = ['http://rightsstatements.org/vocab/NoC-US/1.0/']
+        hash['object_orientation'] = 'leftyloosey'
+        hash
+      end
+
+      before do
+        original_profile['fields']['format'] = ['https://w3id.org/spar/mediatype/image/tiff']
+      end
+
+      it 'ignores the deprecated field' do
+        expect(service.verify).to eq([])
+      end
+    end
   end
 end
