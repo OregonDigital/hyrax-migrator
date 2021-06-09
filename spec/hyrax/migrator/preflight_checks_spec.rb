@@ -33,6 +33,8 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
     allow(descmeta).to receive(:accessRestrictions).and_return([])
     allow(descmeta).to receive(:graph).and_return(graph)
     allow(work).to receive(:pid).and_return('3t945r08v')
+    allow(descmeta).to receive(:date).and_return(['2/2/02'])
+    allow(descmeta).to receive_messages(acquisitionDate: [], awardDate: [], collectedDate: [], issued: [], viewDate: [])
   end
 
   after do
