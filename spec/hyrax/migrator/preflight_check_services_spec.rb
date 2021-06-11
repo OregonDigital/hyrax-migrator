@@ -11,6 +11,7 @@ RSpec.describe Hyrax::Migrator::PreflightCheckServices do
   let(:visibility) { double }
   let(:status) { double }
   let(:work) { double }
+  let(:edtf) { double }
 
   before do
     allow(Hyrax::Migrator::CrosswalkMetadataPreflight).to receive(:new).and_return(crosswalk)
@@ -18,6 +19,7 @@ RSpec.describe Hyrax::Migrator::PreflightCheckServices do
     allow(Hyrax::Migrator::AssetStatus).to receive(:new).and_return(status)
     allow(Hyrax::Migrator::VisibilityLookupPreflight).to receive(:new).and_return(visibility)
     allow(Hyrax::Migrator::CpdCheck).to receive(:new).and_return(cpd)
+    allow(Hyrax::Migrator::EdtfCheck).to receive(:new).and_return(edtf)
     allow(crosswalk).to receive(:crosswalk)
     allow(crosswalk).to receive(:work=).with(work)
   end

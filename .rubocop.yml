@@ -25,6 +25,10 @@ Metrics/ClassLength:
   Exclude:
     - 'lib/hyrax/migrator/configuration.rb'
 
+Metrics/AbcSize:
+  Exclude:
+    - 'lib/hyrax/migrator/preflight_checks.rb'
+
 Style/AsciiComments:
   Enabled: false
 
