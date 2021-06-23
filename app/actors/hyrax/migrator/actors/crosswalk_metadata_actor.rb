@@ -37,12 +37,32 @@ module Hyrax::Migrator::Actors
       log("failed crosswalk: #{e.message} : #{e.backtrace}")
     end
 
+    # update overwrites work attributes, will leave the work attributes empty if no changes were found
+    def update(work)
+      super
+      @attributes = promote_changes
+      @attributes ? crosswalk_metadata_succeeded : crosswalk_metadata_failed
+    end
+
     private
+
+    def promote_changes
+      attributes = Hyrax::Migrator::Services::CrosswalkMetadataService.new(work, config).crosswalk
+      attributes.each do |key, val|
+        attributes.delete key unless test(key, val)
+      end
+    rescue StandardError => e
+      crosswalk_metadata_failed
+      log("failed crosswalk: #{e.message} : #{e.backtrace}")
+    end
+
+    def test(key, val)
+      @work.env[:attributes][key].nil? || @work.env[:attributes][key] != val
+    end
 
     def post_success
       @work.env[:errors] = @attributes.delete :errors
-      @work.env[:attributes] ||= {}
-      @work.env[:attributes].merge!(@attributes)
+      @work.env[:attributes] = @attributes
       succeeded(aasm.current_state, "Work #{@work.pid} crosswalked metadata.", Hyrax::Migrator::Work::SUCCESS)
     end
 

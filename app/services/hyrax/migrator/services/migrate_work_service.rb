@@ -10,6 +10,8 @@ module Hyrax::Migrator::Services
     end
 
     def run
+      return middleware.update(work) unless @args[:update].nil?
+
       middleware.start(work)
     end
 

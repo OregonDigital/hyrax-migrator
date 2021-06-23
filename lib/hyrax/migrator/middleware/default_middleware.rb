@@ -28,6 +28,11 @@ module Hyrax
           actor.create(work)
         end
 
+        def update(work)
+          actor = find_actor_with_state(work.aasm_state)
+          actor.update(work)
+        end
+
         private
 
         ##
