@@ -19,6 +19,7 @@ module Hyrax::Migrator::Services
           work = Hyrax::Migrator::Work.find_by(pid: pid)
           next unless needs_update?(work)
 
+          prepare(work) unless work.aasm_state.include? 'failed'
           Hyrax::Migrator::Jobs::MigrateWorkJob.perform_later(args(pid, file_path))
         end
       end
@@ -26,8 +27,19 @@ module Hyrax::Migrator::Services
 
     private
 
+    def prepare(work)
+      work.aasm_state = divine_state
+      work.status = 'update'
+      work.save
+    end
+
+    def divine_state
+      actor = @options[:middleware_config][:actor_stack].first
+      actor.split('::').last.gsub('Actor', 'Initial').underscore
+    end
+
     def needs_update?(work)
-      work.updated_at.to_date > export_date(work)
+      work.updated_at.to_date < export_date(work) || work.aasm_state == 'work_update_failed'
     end
 
     def export_date(work)
