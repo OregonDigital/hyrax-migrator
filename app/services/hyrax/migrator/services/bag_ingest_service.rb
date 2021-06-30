@@ -9,7 +9,7 @@ module Hyrax::Migrator::Services
     # @param batch_dir_names [String Array] or single name
     # @param options hash for passing args to the MigrateWorkService
     def initialize(input_batch_names, options = nil)
-      @option = options
+      @options = options
       @migrator_config = set_config
       @input_batch_names = input_batch_names.is_a?(Array) ? input_batch_names : [input_batch_names]
       @location_service = bag_file_location_service
