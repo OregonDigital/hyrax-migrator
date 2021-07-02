@@ -22,6 +22,14 @@ module Hyrax::Migrator::Services
       @result
     end
 
+    def update
+      @new_attrs = crosswalk
+      promote_blanks_cvs
+      promote_blanks_strings
+      promote_destroys
+      @new_attrs
+    end
+
     private
 
     # Load the nt file and return graph
@@ -50,6 +58,51 @@ module Hyrax::Migrator::Services
       return nil if @skip_field_mode
 
       raise URI::InvalidURIError, object.to_s
+    end
+
+    def mark_destroy(cv_val)
+      cv_val['_destroy'] = 1
+      cv_val
+    end
+
+    def old_attrs
+      @work.env[:attributes].clone
+    end
+
+    def blanks
+      old_attrs.select { |key, _val| @new_attrs[key].nil? }
+    end
+
+    def cv_attrs
+      old_attrs.select { |key, _val| key.to_s.include? 'attributes' }
+    end
+
+    def promote_blanks_cvs
+      blanks.select { |key, _val| key.to_s.include? 'attributes' }.each do |key, val|
+        if !val.is_a? Array
+          @new_attrs[key] = mark_destroy(val)
+        else
+          @new_attrs[key] ||= []
+          val.each do |v|
+            @new_attrs[key] << mark_destroy(v)
+          end
+        end
+      end
+    end
+
+    def promote_blanks_strings
+      blanks.reject { |key, _val| key.to_s.include? 'attributes' }.each do |key, val|
+        @new_attrs[key] = val.is_a? Array ? [] : ''
+      end
+    end
+
+    def promote_destroys
+      cv_attrs.select { |_key, val| val.is_a? Array }.each do |key, _val|
+        @new_attrs[key] ||= []
+        (old_attrs[key] - @new_attrs[key]).each do |cv_val|
+          @new_attrs[key] << mark_destroy(cv_val)
+        end
+      end
     end
   end
 end

@@ -125,7 +125,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
     end
 
     context 'when there is no value returned from process' do
-      let(:predicate_str2) { 'http://purl.org/dc/terms/format' }
+      let(:predicate_str2) { 'http://purl.org/dc/terms/subject' }
       let(:predicate2) { RDF::URI(predicate_str2) }
 
       before do
@@ -188,17 +188,17 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
   end
 
   context 'with attributes_data function' do
-    let(:predicate_str) { 'http://purl.org/dc/terms/format' }
+    let(:predicate_str) { 'http://purl.org/dc/terms/subject' }
     let(:predicate) { RDF::URI(predicate_str) }
     let(:object) { RDF::URI('http://test/test') }
-    let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
+    let(:data) { { property: 'subject_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
 
     before do
       service.graph = graph
     end
 
     it 'transforms the object using the function' do
-      expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://test/test' }]
+      expect(service.crosswalk[:subject_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://test/test' }]
     end
 
     context 'when object is a string rather than a uri' do

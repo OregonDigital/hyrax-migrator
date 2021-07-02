@@ -62,7 +62,7 @@ RSpec.describe Hyrax::Migrator::Actors::CrosswalkMetadataActor do
       before do
         allow(actor).to receive(:config).and_return(config)
         allow(Hyrax::Migrator::Services::CrosswalkMetadataService).to receive(:new).and_return(cms)
-        allow(cms).to receive(:crosswalk).and_return(new_attr)
+        allow(cms).to receive(:update).and_return(new_attr)
         actor.next_actor = terminal
         work.env[:attributes] = old_attr
       end
@@ -73,7 +73,7 @@ RSpec.describe Hyrax::Migrator::Actors::CrosswalkMetadataActor do
       end
       it 'replaces the attrs' do
         actor.update(work)
-        expect(work.env[:attributes]).to eq({ isPartOf: 'So Much Kawaii' })
+        expect(work.env[:attributes]).to eq(new_attr)
       end
       it 'calls the next actor' do
         expect(terminal).to receive(:update)

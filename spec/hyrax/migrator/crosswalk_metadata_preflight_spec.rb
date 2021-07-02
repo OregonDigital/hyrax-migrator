@@ -13,10 +13,10 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataPreflight do
   end
   let(:rdfsubject) { RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234') }
 
-  let(:predicate_str) { 'http://purl.org/dc/terms/format' }
+  let(:predicate_str) { 'http://purl.org/dc/terms/subject' }
   let(:predicate) { RDF::URI(predicate_str) }
-  let(:rdfobject) { RDF::URI('http://formats_r_us.org/thing') }
-  let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
+  let(:rdfobject) { RDF::URI('http://opaquenamespace.org/ns/subject/AnagonyeChidi') }
+  let(:data) { { property: 'subject_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
@@ -49,7 +49,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadataPreflight do
   describe 'crosswalk' do
     context 'when there is valid metadata' do
       it 'returns results' do
-        expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://formats_r_us.org/thing' }]
+        expect(service.crosswalk[:subject_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://opaquenamespace.org/ns/subject/AnagonyeChidi' }]
       end
     end
 

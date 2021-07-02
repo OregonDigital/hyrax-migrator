@@ -29,6 +29,7 @@ RSpec.describe Hyrax::Migrator::Services::BatchUpdateService do
       allow(BagIt::Bag).to receive(:new).and_return(baggit_bag)
       allow(baggit_bag).to receive(:bag_info).and_return({ 'Bagging-Date' => '2021-03-02' })
       allow(work).to receive(:updated_at).and_return Time.local('2021-02-01').in_time_zone
+      allow(work).to receive(:aasm_state).and_return('workflow_metadata_succeeded')
       allow(service).to receive(:parse_pid).and_return('abcde1234')
     end
 

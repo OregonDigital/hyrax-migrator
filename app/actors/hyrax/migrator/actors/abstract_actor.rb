@@ -58,7 +58,7 @@ module Hyrax::Migrator::Actors
 
     def errors(message)
       @work.env[:errors] ||= []
-      @work.env[:errors] << message
+      @work.env[:errors] << "#{Time.zone.now.strftime('%F %T')} #{message}"
       @work.save
     end
 

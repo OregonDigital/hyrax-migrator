@@ -5,7 +5,7 @@ module Hyrax::Migrator::Services
   # requires a batch name, iterates through the batch and checks for changes for each work.
   # pass in custom actor stack able to handle required updates
   # eg: Hyrax::Migrator::Services::BatchUpdateService.new(batchname, { middleware_config: actors })
-  # where actors = ['Hyrax::Migrator::Actors::CrosswalkMetadataActor', 'Hyrax::Migrator::Actors::UpdateWorkActor', 'Hyrax::Migrator::Actors::TerminalActor']
+  # where actors = { actor_stack => ['Hyrax::Migrator::Actors::CrosswalkMetadataActor', 'Hyrax::Migrator::Actors::UpdateWorkActor', 'Hyrax::Migrator::Actors::TerminalActor'] }
   class BatchUpdateService < Hyrax::Migrator::Services::BagIngestService
     def initialize(input_batch_names, options)
       super
@@ -39,7 +39,7 @@ module Hyrax::Migrator::Services
     end
 
     def needs_update?(work)
-      work.updated_at.to_date < export_date(work) || work.aasm_state == 'work_update_failed'
+      work.updated_at.to_date < export_date(work) || work.aasm_state == 'update_work_failed'
     end
 
     def export_date(work)
