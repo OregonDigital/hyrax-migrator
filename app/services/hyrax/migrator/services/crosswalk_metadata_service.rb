@@ -92,7 +92,7 @@ module Hyrax::Migrator::Services
 
     def promote_blanks_strings
       blanks.reject { |key, _val| key.to_s.include? 'attributes' }.each do |key, val|
-        @new_attrs[key] = val.is_a? Array ? [] : ''
+        @new_attrs[key] = (val.is_a? Array) ? [] : ''
       end
     end
 

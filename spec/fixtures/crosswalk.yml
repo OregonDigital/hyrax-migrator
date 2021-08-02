@@ -622,4 +622,4 @@ crosswalk:
   - property: date_uploaded
     predicate: http://purl.org/dc/terms/dateSubmitted
     multiple: false
-    function:
+    function: datetime_data

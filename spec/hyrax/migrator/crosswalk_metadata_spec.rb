@@ -15,7 +15,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
   let(:predicate_str) { 'http://purl.org/dc/terms/title' }
   let(:predicate) { RDF::URI(predicate_str) }
   let(:object) { RDF::Literal('String Cheese Theory') }
-  let(:data) { { property: 'title', predicate: predicate_str, multiple: true } }
+  let(:data) { { property: 'title', predicate: predicate_str, multiple: true, function: nil } }
   let(:pid) { '3t945r08v' }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
@@ -23,8 +23,8 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
   let(:work) { create(:work, pid: pid, file_path: file_path) }
   let(:service) { described_class.new(crosswalk_metadata_file, crosswalk_overrides_file) }
   let(:result_hash) { { title: [object.to_s] } }
-  let(:predicate2_str) { 'http://opaquenamespace.org/ns/fullText' }
-  let(:object2) { RDF::Literal('my little pony') }
+  let(:predicate2_str) { 'http://opaquenamespace.org/ns/primarySet' }
+  let(:object2) { RDF::URI('http://oregondigital.org/resource/oregondigital:houseAtreides') }
   let(:data2) { { predicate: predicate2_str, function: 'return_nil' } }
   let(:predicate2) { RDF::URI(predicate2_str) }
   let(:data3) { { property: 'resource_type', predicate: 'http://my_little_pred', multiple: false } }
@@ -47,11 +47,13 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
 
   describe 'crosswalk_hash' do
     context 'when the lookup files exist' do
+      let(:crosswalk_data) { service.crosswalk_hash }
+
       it 'loads the OD2 properties into an array of hashes' do
-        expect(service.send(:crosswalk_hash)).to include(data)
+        expect(crosswalk_data.select { |h| h[:property] == 'title' }).to eq([data])
       end
       it 'loads the override predicates into the array of hashes' do
-        expect(service.send(:crosswalk_hash)).to include(data2)
+        expect(crosswalk_data.select { |h| h[:predicate] == predicate2_str }).to eq([data2])
       end
     end
 
@@ -214,7 +216,7 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
     let(:predicate_str) { 'http://purl.org/dc/terms/dateSubmitted' }
     let(:predicate) { RDF::URI(predicate_str) }
     let(:object) { RDF::Literal('2014-10-28') }
-    let(:data) { { property: 'dateSubmitted', predicate: predicate_str, multiple: true, function: 'datetime_data' } }
+    let(:data) { { property: 'date_uploaded', predicate: predicate_str, multiple: true, function: 'datetime_data' } }
 
     before do
       service.graph = graph
