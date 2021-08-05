@@ -77,14 +77,14 @@ jobs:
 
 workflows:
   version: 2
-    jobs:
-      - checkout_code
-      - bundle:
-          requires:
-            - checkout_code
-      - lint:
-          requires:
-            - bundle
-      - test:
-          requires:
-            - lint
+  jobs:
+    - checkout_code
+    - bundle:
+        requires:
+          - checkout_code
+    - lint:
+        requires:
+          - bundle
+    - test:
+        requires:
+          - lint
