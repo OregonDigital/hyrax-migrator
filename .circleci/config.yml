@@ -1,10 +1,19 @@
 version: 2
 jobs:
-  build:
+  checkout_code:
     docker:
       - image: circleci/ruby:2.5-node-browsers
-        environment:
-          RAILS_ENV: test
+    working_directory: ~/app
+    steps:
+      - checkout
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/app
+
+  bundle:
+    docker:
+      - image: circleci/ruby:2.5-node-browsers
     working_directory: ~/app
     steps:
       - run:
@@ -16,22 +25,42 @@ jobs:
             sudo apt-get install -y -f software-properties-common build-essential nodejs make apt-utils
             sudo apt-get install -t stretch -y openjdk-8-jre-headless ca-certificates-java
             sudo apt-get install -y openjdk-8-jre openjdk-8-jdk openjdk-8-jdk-headless
-      - checkout
       - restore_cache:
-          key: gemfile-{{ checksum "Gemfile.lock" }}
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
       - run:
           name: Install Ruby Dependencies
           command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
-      - run:
-          name: Run Rubocop
-          command: bundle exec rubocop
       - save_cache:
-          key: gemfile-{{ checksum "Gemfile.lock" }}
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
           paths:
             - ./vendor/bundle
-      - run:
-          name: Create DB
-          command: spec/dummy/bin/rake db:create db:schema:load --trace
+
+  lint:
+    docker:
+      - image: circleci/ruby:2.5-node-browsers
+    working_directory: ~/app
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
+      - run: bundle --path vendor/bundle
+      - run: bundle exec rubocop
+
+  test:
+    docker:
+      - image: circleci/ruby:2.5-node-browsers
+        environment:
+          RAILS_ENV: test
+    working_directory: ~/app
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
+      - run: bundle --path vendor/bundle
       - run:
           name: Run Tests
           command: |
@@ -45,3 +74,18 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - checkout_code
+      - bundle:
+          requires:
+            - checkout_code
+      - lint:
+          requires:
+            - bundle
+      - test:
+          requires:
+            - lint
