@@ -13,10 +13,10 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   end
   let(:rdfsubject) { RDF::URI('http://oregondigital.org/resource/oregondigital:abcde1234') }
 
-  let(:predicate_str) { 'http://purl.org/dc/terms/format' }
+  let(:predicate_str) { 'http://purl.org/dc/terms/subject' }
   let(:predicate) { RDF::URI(predicate_str) }
-  let(:rdfobject) { RDF::URI('http://formats_r_us.org/thing') }
-  let(:data) { { property: 'format_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
+  let(:rdfobject) { RDF::URI('http://opaquenamespace.org/ns/subject/AnagonyeChidi') }
+  let(:data) { { property: 'subject_attributes', predicate: predicate_str, multiple: true, function: 'attributes_data' } }
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
@@ -56,7 +56,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   describe 'crosswalk' do
     context 'when there is valid metadata' do
       it 'returns results' do
-        expect(service.crosswalk[:format_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://formats_r_us.org/thing' }]
+        expect(service.crosswalk[:subject_attributes]).to eq [{ '_destroy' => 0, 'id' => 'http://opaquenamespace.org/ns/subject/AnagonyeChidi' }]
       end
     end
 
@@ -68,6 +68,57 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       rescue Hyrax::Migrator::Services::CrosswalkMetadataService::PredicateNotFoundError
         result = service.instance_variable_get(:@result)
         expect(result[:errors].size).to eq 1
+      end
+    end
+  end
+
+  describe 'update' do
+    let(:old_env) do
+      { title: ['The Tragedy of Hamlet, Prince of Denmark'],
+        subject_attributes: [{ 'id' => 'http://id.loc.gov/authorities/names/n79021597', '_destroy' => 0 }, { 'id' => 'http://id.loc.gov/authorities/subjects/sh85121053', '_destroy' => 0 }],
+        creator_attributes: [{ 'id' => 'http://id.loc.gov/authorities/names/n78095332', '_destroy' => 0 }],
+        alternate: ['Hamlet'] }
+    end
+    let(:graph) do
+      g = RDF::Graph.new
+      g << RDF::Statement.new(rdfsubject, RDF::URI('http://purl.org/dc/terms/title'), 'Rosencrantz and Guildenstern Are Dead') # change in title
+      g << RDF::Statement.new(rdfsubject,  RDF::URI('http://purl.org/dc/terms/subject'), RDF::URI('http://id.loc.gov/authorities/subjects/sh85134575')) # addition to subject
+      g << RDF::Statement.new(rdfsubject,  RDF::URI('http://purl.org/dc/terms/subject'), RDF::URI('http://id.loc.gov/authorities/names/n79021597')) # one subject retained, the other is removed
+      g # creator and alternative are removed
+    end
+
+    before do
+      work.env[:attributes] = old_env
+      work.save
+    end
+
+    context 'when there is a change in a string field' do
+      it 'includes the change' do
+        expect(service.update[:title]).to eq ['Rosencrantz and Guildenstern Are Dead']
+      end
+    end
+
+    context 'when there is an addition to a controlled field' do
+      it 'adds the new value' do
+        expect(service.update[:subject_attributes]).to include({ 'id' => 'http://id.loc.gov/authorities/subjects/sh85134575', '_destroy' => 0 })
+      end
+    end
+
+    context 'when a string field is removed' do
+      it 'unsets the field' do
+        expect(service.update[:alternate]).to eq []
+      end
+    end
+
+    context 'when a controlled field becomes empty' do
+      it 'marks the contained val as destroyed' do
+        expect(service.update[:creator_attributes]).to eq [{ 'id' => 'http://id.loc.gov/authorities/names/n78095332', '_destroy' => 1 }]
+      end
+    end
+
+    context 'when a controlled value is removed from a field' do
+      it 'marks the contained val as destroyed' do
+        expect(service.update[:subject_attributes]).to include({ 'id' => 'http://id.loc.gov/authorities/subjects/sh85121053', '_destroy' => 1 })
       end
     end
   end

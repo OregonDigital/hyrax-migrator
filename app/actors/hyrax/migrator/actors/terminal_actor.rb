@@ -10,6 +10,11 @@ module Hyrax
           true
         end
 
+        def update(work)
+          work.remove_temp_directory
+          true
+        end
+
         def next_actor
           true
         end

@@ -28,21 +28,30 @@ module Hyrax::Migrator::Actors
 
     def create(work)
       super
+      run_service(:crosswalk)
+    end
+
+    # update overwrites work attributes
+    def update(work)
+      super
+      run_service(:update)
+    end
+
+    private
+
+    def run_service(method)
       crosswalk_metadata_initial
       update_work(aasm.current_state)
-      @attributes = Hyrax::Migrator::Services::CrosswalkMetadataService.new(work, config).crosswalk
+      @attributes = Hyrax::Migrator::Services::CrosswalkMetadataService.new(work, config).send(method)
       @attributes ? crosswalk_metadata_succeeded : crosswalk_metadata_failed
     rescue StandardError => e
       crosswalk_metadata_failed
       log("failed crosswalk: #{e.message} : #{e.backtrace}")
     end
 
-    private
-
     def post_success
       @work.env[:errors] = @attributes.delete :errors
-      @work.env[:attributes] ||= {}
-      @work.env[:attributes].merge!(@attributes)
+      @work.env[:attributes] = @attributes
       succeeded(aasm.current_state, "Work #{@work.pid} crosswalked metadata.", Hyrax::Migrator::Work::SUCCESS)
     end
 

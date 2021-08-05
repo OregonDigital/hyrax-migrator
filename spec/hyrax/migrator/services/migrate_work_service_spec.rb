@@ -24,24 +24,41 @@ RSpec.describe Hyrax::Migrator::Services::MigrateWorkService do
       allow(service).to receive(:middleware).and_return(middleware)
     end
 
-    it do
-      allow(middleware).to receive(:start).with(work).and_return(true)
-      expect(service).to receive(:work).and_return(work)
-      service.run
+    context 'when creating' do
+      it do
+        allow(middleware).to receive(:start).with(work).and_return(true)
+        expect(service).to receive(:work).and_return(work)
+        service.run
+      end
+      it do
+        allow(service).to receive(:work).and_return(work)
+        expect(middleware).to receive(:start).with(work)
+        service.run
+      end
     end
-    it do
-      allow(service).to receive(:work).and_return(work)
-      expect(middleware).to receive(:start).with(work)
-      service.run
+
+    context 'when updating' do
+      let(:service) { described_class.new(pid: pid, file_path: file_path, update: true) }
+
+      it do
+        allow(middleware).to receive(:update).with(work).and_return(true)
+        expect(service).to receive(:work).and_return(work)
+        service.run
+      end
+      it do
+        allow(service).to receive(:work).and_return(work)
+        expect(middleware).to receive(:update).with(work)
+        service.run
+      end
     end
   end
 
   describe 'running the service with a custom config' do
     let(:service) { described_class.new(pid: pid, file_path: file_path, middleware_config: middleware_config) }
-    let(:middleware_config) { { actor_stack: ['Hyrax::Migrator::Actors::BagValidatorActor'] } }
+    let(:middleware_config) { { actor_stack: ['Hyrax::Migrator::Actors::ListChildrenActor'] } }
     let(:config) do
       c = Hyrax::Migrator::Middleware::Configuration.new
-      c.actor_stack = [Hyrax::Migrator::Actors::BagValidatorActor]
+      c.actor_stack = [Hyrax::Migrator::Actors::ListChildrenActor]
       c
     end
     let(:middleware) { Hyrax::Migrator::Middleware.custom(config) }

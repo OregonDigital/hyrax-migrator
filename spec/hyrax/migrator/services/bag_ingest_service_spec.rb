@@ -1,12 +1,10 @@
 # frozen_string_literal:true
 
-require 'byebug'
-
 RSpec.describe Hyrax::Migrator::Services::BagIngestService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:batch_name) { 'batch1' }
   let(:batch_dir_names) { [batch_name] }
-  let(:service) { described_class.new(batch_dir_names, config) }
+  let(:service) { described_class.new(batch_dir_names, { migrator_config: config }) }
   let(:location_service) { instance_double('Hyrax::Migrator::Services::BagFileLocationService') }
   let(:all_bags_dir) { File.join(Rails.root, '..', 'fixtures') }
   let(:bag1) { File.join(all_bags_dir, batch_name, 'df65vc341.zip') }

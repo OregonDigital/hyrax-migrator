@@ -11,7 +11,7 @@ RSpec.describe Hyrax::Migrator::Middleware::DefaultMiddleware do
   it { is_expected.to respond_to(:start) }
   it { expect(Hyrax::Migrator::Middleware.default).to be_a described_class }
 
-  context 'with an array of actors' do
+  context 'when creating with an array of actors' do
     let(:actors) { [TestActor, TestActor, TerminalTestActor] }
     let(:aasm_state) { nil }
     let(:work) { create(:work, aasm_state: aasm_state) }
@@ -57,6 +57,27 @@ RSpec.describe Hyrax::Migrator::Middleware::DefaultMiddleware do
       end
     end
   end
+
+  context 'when updating with an array of actors' do
+    let(:actors) { [TestActor, TestActor, TerminalTestActor] }
+    let(:aasm_state) { :test_init }
+    let(:work) { create(:work, aasm_state: aasm_state, status: 'update') }
+
+    describe '#update a work' do
+      it 'calls the first actor' do
+        expect(middleware.actor_stack).to receive(:update).with(work)
+        middleware.update(work)
+      end
+      it 'calls the second actor' do
+        expect(middleware.actor_stack.next_actor).to receive(:update).with(work)
+        middleware.update(work)
+      end
+      it 'calls the last actor' do
+        expect(middleware.actor_stack.next_actor.next_actor).to receive(:update).with(work)
+        middleware.update(work)
+      end
+    end
+  end
 end
 
 class TestActor < Hyrax::Migrator::Actors::AbstractActor
@@ -69,6 +90,11 @@ class TestActor < Hyrax::Migrator::Actors::AbstractActor
     end
   end
   def create(work)
+    super
+    call_next_actor
+  end
+
+  def update(work)
     super
     call_next_actor
   end
@@ -86,6 +112,10 @@ class TerminalTestActor < Hyrax::Migrator::Actors::AbstractActor
   def create(_work)
     # Super not called, expects actor to fail in call_next_actor
     # super
+    call_next_actor
+  end
+
+  def update(_work)
     call_next_actor
   end
 end

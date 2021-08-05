@@ -28,6 +28,7 @@ Metrics/ClassLength:
 Metrics/AbcSize:
   Exclude:
     - 'lib/hyrax/migrator/preflight_checks.rb'
+    - 'lib/hyrax/migrator/preflight_check_services.rb'
 
 Style/AsciiComments:
   Enabled: false
@@ -49,6 +50,10 @@ Style/RedundantBegin:
     - 'lib/hyrax/migrator/preflight_checks.rb'
 
 Style/SingleLineBlockParams:
+  Enabled: false
+
+#parens required
+Style/TernaryParentheses:
   Enabled: false
 
 Rails/ApplicationJob:

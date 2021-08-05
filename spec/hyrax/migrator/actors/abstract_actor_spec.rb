@@ -23,14 +23,26 @@ RSpec.describe Hyrax::Migrator::Actors::AbstractActor do
       it { expect(actor.call_next_actor).to be_truthy }
     end
 
-    context 'when work is set' do
+    context 'when work is set with create' do
       before do
         actor.next_actor = terminal
-        actor.work = work
+        actor.create(work)
       end
 
       it 'calls create on next actor' do
         expect(actor.next_actor).to receive(:create).with(work)
+        actor.call_next_actor
+      end
+    end
+
+    context 'when work is set with update' do
+      before do
+        actor.next_actor = terminal
+        actor.update(work)
+      end
+
+      it 'calls update on next actor' do
+        expect(actor.next_actor).to receive(:update).with(work)
         actor.call_next_actor
       end
     end

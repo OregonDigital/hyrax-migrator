@@ -6,14 +6,13 @@ module Hyrax::Migrator::Services
   class BagIngestService
     attr_reader :migrator_config, :location_service, :input_batch_names
 
-    # @param batch_dir_names [String Array]
-    # @param config [Hyrax::Migrator::Configuration]
+    # @param batch_dir_names [String Array] or single name
     # @param options hash for passing args to the MigrateWorkService
-    def initialize(input_batch_names, migrator_config, options = nil)
-      @migrator_config = migrator_config
-      @input_batch_names = input_batch_names
-      @location_service = bag_file_location_service
+    def initialize(input_batch_names, options = nil)
       @options = options
+      @migrator_config = set_config
+      @input_batch_names = input_batch_names.is_a?(Array) ? input_batch_names : [input_batch_names]
+      @location_service = bag_file_location_service
     end
 
     def ingest
@@ -31,6 +30,12 @@ module Hyrax::Migrator::Services
     end
 
     private
+
+    def set_config
+      return Hyrax::Migrator.config if @options.nil?
+
+      @migrator_config = @options.include?(:migrator_config) ? @options.delete(:migrator_config) : Hyrax::Migrator.config
+    end
 
     def args(pid, file_path)
       args = { pid: pid, file_path: file_path }

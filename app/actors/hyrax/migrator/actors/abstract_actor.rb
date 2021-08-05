@@ -33,7 +33,7 @@ module Hyrax::Migrator::Actors
       return true if @next_actor.nil?
       raise StandardError, "#{self.class} missing @work, try calling super in #create or set the variable directly." unless @work
 
-      @next_actor.create(@work)
+      @next_actor.send(@method, @work)
     end
 
     ##
@@ -41,6 +41,12 @@ module Hyrax::Migrator::Actors
     # @param work [Hyrax::Migrator::Work] - the Work model to be processed, including env
     def create(work)
       @work = work
+      @method = :create
+    end
+
+    def update(work)
+      @work = work
+      @method = :update
     end
 
     ##
@@ -52,7 +58,7 @@ module Hyrax::Migrator::Actors
 
     def errors(message)
       @work.env[:errors] ||= []
-      @work.env[:errors] << message
+      @work.env[:errors] << "#{Time.zone.now.strftime('%F %T')} #{message}"
       @work.save
     end
 
