@@ -11,69 +11,69 @@ jobs:
           paths:
             - ~/app
 
-    bundle:
-      docker:
-        - image: circleci/ruby:2.5-node-browsers
-      working_directory: ~/app
-      steps:
-        - run:
-            name: Update Debian Packages
-            command: |
-              echo "deb http://http.debian.net/debian stretch main" | sudo tee -a /etc/apt/sources.list
-              sudo apt-get update --fix-missing -qq
-              sudo apt-get upgrade -qq
-              sudo apt-get install -y -f software-properties-common build-essential nodejs make apt-utils
-              sudo apt-get install -t stretch -y openjdk-8-jre-headless ca-certificates-java
-              sudo apt-get install -y openjdk-8-jre openjdk-8-jdk openjdk-8-jdk-headless
-        - restore_cache:
-            key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-        - restore_cache:
-            key: v1-bundle-{{ checksum "Gemfile.lock" }}
-        - run:
-            name: Install Ruby Dependencies
-            command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
-        - save_cache:
-            key: v1-bundle-{{ checksum "Gemfile.lock" }}
-            paths:
-              - ./vendor/bundle
+  bundle:
+    docker:
+      - image: circleci/ruby:2.5-node-browsers
+    working_directory: ~/app
+    steps:
+      - run:
+          name: Update Debian Packages
+          command: |
+            echo "deb http://http.debian.net/debian stretch main" | sudo tee -a /etc/apt/sources.list
+            sudo apt-get update --fix-missing -qq
+            sudo apt-get upgrade -qq
+            sudo apt-get install -y -f software-properties-common build-essential nodejs make apt-utils
+            sudo apt-get install -t stretch -y openjdk-8-jre-headless ca-certificates-java
+            sudo apt-get install -y openjdk-8-jre openjdk-8-jdk openjdk-8-jdk-headless
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
+      - run:
+          name: Install Ruby Dependencies
+          command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
+      - save_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - ./vendor/bundle
 
-    lint:
-      docker:
-        - image: circleci/ruby:2.5-node-browsers
-      working_directory: ~/app
-      steps:
-        - restore_cache:
-            key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-        - restore_cache:
-            key: v1-bundle-{{ checksum "Gemfile.lock" }}
-        - run: bundle --path vendor/bundle
-        - run: bundle exec rubocop
+  lint:
+    docker:
+      - image: circleci/ruby:2.5-node-browsers
+    working_directory: ~/app
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
+      - run: bundle --path vendor/bundle
+      - run: bundle exec rubocop
 
-    test:
-      docker:
-        - image: circleci/ruby:2.5-node-browsers
-          environment:
-            RAILS_ENV: test
-      working_directory: ~/app
-      steps:
-        - restore_cache:
-            key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-        - restore_cache:
-            key: v1-bundle-{{ checksum "Gemfile.lock" }}
-        - run: bundle --path vendor/bundle
-        - run:
-            name: Run Tests
-            command: |
-              bundle exec rspec --profile 10 \
-                                --format RspecJunitFormatter \
-                                --out /tmp/test-results/rspec.xml \
-                                --format progress \
-                                $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
-        - store_test_results:
-            path: /tmp/test-results
-        - store_artifacts:
-            path: /tmp/test-results
-            destination: test-results
+  test:
+    docker:
+      - image: circleci/ruby:2.5-node-browsers
+        environment:
+          RAILS_ENV: test
+    working_directory: ~/app
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v1-bundle-{{ checksum "Gemfile.lock" }}
+      - run: bundle --path vendor/bundle
+      - run:
+          name: Run Tests
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out /tmp/test-results/rspec.xml \
+                              --format progress \
+                              $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
 
 workflows:
   ci:
