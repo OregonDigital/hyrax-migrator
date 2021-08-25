@@ -145,4 +145,22 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
       end
     end
   end
+
+  describe 'cv_attrs' do
+    let(:attributes) do
+      hash = {}
+      hash[:visibility] = 'open'
+      hash[:admin_set_id] = 'spike-spiegel-papers'
+      hash[:title] = ['Aardvark a mile for one of your smiles']
+      hash
+    end
+
+    before do
+      allow(work.env).to receive(:[]).with(:attributes).and_return(attributes)
+    end
+
+    it 'does not include attrs set by other services' do
+      expect(service.send(:old_attrs).keys).not_to include(:visibility)
+    end
+  end
 end
