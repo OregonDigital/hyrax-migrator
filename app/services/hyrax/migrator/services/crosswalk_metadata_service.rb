@@ -65,8 +65,12 @@ module Hyrax::Migrator::Services
       cv_val
     end
 
+    def crosswalk_ignore
+      %i[visibility admin_set_id member_of_collections_attributes work_members_attributes]
+    end
+
     def old_attrs
-      @work.env[:attributes].clone
+      @work.env[:attributes].clone.reject { |k, _v| crosswalk_ignore.include? k }
     end
 
     def blanks
