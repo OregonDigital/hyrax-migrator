@@ -2,18 +2,16 @@
 
 RSpec.describe Hyrax::Migrator::Services::VerifyLabelsExistService do
   let(:migrated_work) { double }
+  let(:asset) { double }
   let(:service) { described_class.new(migrated_work) }
   let(:pid) { 'df70jh899' }
   let(:graphworker) { double }
   let(:properties) { [{ name: 'photographer_label', is_controlled: true, collection_facetable: true }] }
-  let(:solr_doc) do
-    d = {}
-    d['photographer_sim'] = ['http://opaquenamespace.org/ns/creators/LemkeJim']
-    d
-  end
+  let(:solr_doc) { { 'photographer_sim' => ['http://opaquenamespace.org/ns/creators/LemkeJim'] } }
 
   before do
-    allow(migrated_work).to receive(:pid).and_return(pid)
+    allow(migrated_work).to receive(:asset).and_return(asset)
+    allow(asset).to receive(:id).and_return(pid)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:properties).and_return(properties)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:fetch_graph_worker).and_return(graphworker)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:solr_record).with(pid).and_return(solr_doc)
@@ -29,9 +27,9 @@ RSpec.describe Hyrax::Migrator::Services::VerifyLabelsExistService do
       before do
         properties << { name: 'illustrator_label', is_controlled: true, collection_facetable: true }
         solr_doc['photographer_label_sim'] = ['Jim Lemke']
-        solr_doc['illustrator_sim'] = ['http://opaquenamespace.org/ns/creators/RabunSheila']
-        solr_doc['illustrator_label_sim'] = ['Sheila Rabun']
-        solr_doc['creator_combined_label_sim'] = ['Jim Lemke', 'Sheila Rabun']
+        solr_doc['illustrator_sim'] = ['http://opaquenamespace.org/ns/creators/RabunSJ']
+        solr_doc['illustrator_label_sim'] = ['SJ Rabun']
+        solr_doc['creator_combined_label_sim'] = ['Jim Lemke', 'SJ Rabun']
       end
 
       it 'finds no errors' do
@@ -59,8 +57,8 @@ RSpec.describe Hyrax::Migrator::Services::VerifyLabelsExistService do
       before do
         properties << { name: 'illustrator_label', is_controlled: true, collection_facetable: true }
         solr_doc['photographer_label_sim'] = ['Jim Lemke']
-        solr_doc['illustrator_sim'] = ['http://opaquenamespace.org/ns/creators/RabunSheila']
-        solr_doc['illustrator_label_sim'] = ['Sheila Rabun']
+        solr_doc['illustrator_sim'] = ['http://opaquenamespace.org/ns/creators/RabunSJ']
+        solr_doc['illustrator_label_sim'] = ['SJ Rabun']
         solr_doc['creator_combined_label_sim'] = ['Jim Lemke']
       end
 

@@ -13,7 +13,7 @@ module Hyrax::Migrator::Services
     end
 
     def solr_doc
-      Hyrax::Migrator::HyraxCore::Asset.solr_record(@migrated_work.pid)
+      Hyrax::Migrator::HyraxCore::Asset.solr_record(@migrated_work.asset.id)
     end
 
     def properties
@@ -39,29 +39,28 @@ module Hyrax::Migrator::Services
     def verify_labels(property)
       return if solr_doc[solrize(property)].size == solr_doc[solrlabelize(property)].size
 
-      write_err(@migrated_work.pid, property, 'fetch labels error')
+      write_err(@migrated_work.asset.id, property, 'fetch labels error')
     rescue StandardError
-      write_err(@migrated_work.pid, property, 'fetch labels error')
+      write_err(@migrated_work.asset.id, property, 'fetch labels error')
     end
 
     def combined_labels
-      @combined_labels ||= { scientific: 0, topic: 0, creator: 0, location: 0 }
+      @combined_labels ||= { scientific: Set.new, topic: Set.new, creator: Set.new, location: Set.new }
     end
 
     def count_combined(field)
-      count = solr_doc["#{field}_sim"].size
-      combined_labels.each do |key, _val|
-        combined_labels[key] += count if combined?(key, field.to_sym)
+      combined_labels.keys.select { |key| combined?(key, field.to_sym) }.each do |key|
+        combined_labels[key].merge solr_doc["#{field}_label_sim"] unless solr_doc["#{field}_label_sim"].blank?
       end
     end
 
     def verify_combined
-      combined_labels.select { |_key, val| val.positive? }.each do |key, val|
-        next if val == solr_doc["#{key}_combined_label_sim"].size
+      combined_labels.reject { |_key, val| val.empty? }.each do |key, val|
+        next if val.subset? solr_doc["#{key}_combined_label_sim"].to_set
 
-        write_err(@migrated_work.pid, key, 'combined_label error')
+        write_err(@migrated_work.asset.id, key, 'combined_label error')
       rescue StandardError
-        write_err(@migrated_work.pid, key, 'combined_label error')
+        write_err(@migrated_work.asset.id, key, 'combined_label error')
       end
     end
 
