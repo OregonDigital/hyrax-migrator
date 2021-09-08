@@ -12,21 +12,21 @@ module Hyrax::Migrator::Services
     # were successfully created after migrating the new asset
     def verify
       @verification_errors = []
+      return ['warning: no file_sets found'] if @migrated_work.asset.file_sets.empty?
+
       @migrated_work.asset.file_sets.each do |file_set|
         verify_file_set(file_set)
       end
-
       @verification_errors
     rescue StandardError => e
-      puts e.message
-      puts e.backtrace.join('\n')
+      @verification_errors << e.message
+      @verification_errors
     end
 
     # No coverage for Hyrax application integration to eliminate dependencies
     # :nocov:
     def verify_file_set(object)
       fsc = object.class
-
       case object.mime_type
       when *fsc.pdf_mime_types             then check_pdf_derivatives(object)
       when *fsc.office_document_mime_types then check_office_document_derivatives(object)
@@ -90,7 +90,7 @@ module Hyrax::Migrator::Services
     end
 
     def check_file_type(file_set, extension)
-      @verification_errors << "Missing #{extension} derivative for work #{@work.id}, file_set #{file_set.id}." unless derivatives_for_reference(file_set, extension).present?
+      @verification_errors << "Missing #{extension} derivative for work #{@migrated_work.asset.id}, file_set #{file_set.id}." unless derivatives_for_reference(file_set, extension).present?
     end
 
     def derivatives_for_reference(file_set, extension)

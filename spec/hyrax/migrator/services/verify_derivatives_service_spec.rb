@@ -61,9 +61,9 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   end
 
   describe 'verify' do
-    context 'when derivatives check is successfull' do
+    context 'when derivatives check is successful' do
       before do
-        allow(service).to receive(:verify_file_set).and_return([])
+        allow(service).to receive(:verify_file_set).and_return nil
       end
 
       it 'checks every file_set in hyrax_work (returns no errors)' do
@@ -71,13 +71,32 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
       end
     end
 
-    context 'when derivatives check fails due to error' do
+    context 'when there is no file set' do
       before do
-        allow(service).to receive(:verify_file_set).and_raise(StandardError)
+        allow(hyrax_work).to receive(:file_sets).and_return([])
       end
 
+      it 'returns a warning' do
+        expect(service.verify).to eq(['warning: no file_sets found'])
+      end
+    end
+
+    context 'when derivatives check fails due to error' do
+      before do
+        allow(service).to receive(:verify_file_set).and_raise(StandardError.new('I am an error'))
+      end
+
+      RSpec::Matchers.define :match_block do
+        match do |response|
+          response.call == ['I am an error']
+        end
+        supports_block_expectations
+      end
       it 'raises error when hyrax fails' do
         expect { service.verify }.not_to raise_error
+      end
+      it 'returns the error message' do
+        expect { service.verify }.to match_block
       end
     end
   end
