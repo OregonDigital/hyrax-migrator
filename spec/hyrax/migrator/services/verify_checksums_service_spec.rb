@@ -34,7 +34,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
       let(:original_checksum) { ['invalid'] }
 
       it 'returns errors' do
-        expect(service.verify).to include(match(/Content does not match precomputed/))
+        expect(service.verify).to include(match(/Unable to verify /))
       end
     end
 
@@ -44,7 +44,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
       end
 
       it 'reports the mismatch' do
-        expect(service.verify).to include(match(/Content does not match precomputed/))
+        expect(service.verify).to include(match(/Unable to verify /))
       end
     end
 
@@ -53,8 +53,8 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
         allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
       end
 
-      it 'returns no errors' do
-        expect(service.verify).to eq([])
+      it 'returns an error' do
+        expect(service.verify).to include(match(/Unable to load /))
       end
     end
   end
