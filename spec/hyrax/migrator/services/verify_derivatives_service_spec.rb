@@ -50,6 +50,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
   before do
     allow(migrated_work).to receive(:asset).and_return(hyrax_work)
     allow(migrated_work).to receive(:original_profile).and_return(original_profile)
+    allow(hyrax_work).to receive(:model_name).and_return('Thing')
     allow(Hyrax::Migrator::HyraxCore::DerivativePath).to receive(:new).with(anything).and_return(derivative_path)
     allow(hyrax_work).to receive(:as_json).and_return(json)
     allow(hyrax_work).to receive(:id).and_return('testabcd')
@@ -76,8 +77,20 @@ RSpec.describe Hyrax::Migrator::Services::VerifyDerivativesService do
         allow(hyrax_work).to receive(:file_sets).and_return([])
       end
 
-      it 'returns a warning' do
-        expect(service.verify).to eq(['warning: no file_sets found'])
+      context 'and the asset is an Image' do
+        it 'returns a warning' do
+          expect(service.verify).to eq(['warning: no file_sets found'])
+        end
+      end
+
+      context 'and the asset is a Generic' do
+        before do
+          allow(hyrax_work).to receive(:model_name).and_return('Generic')
+        end
+
+        it 'returns no errors' do
+          expect(service.verify).to eq([])
+        end
       end
     end
 
