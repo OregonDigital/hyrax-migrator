@@ -13,6 +13,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
   before do
     allow(migrated_work).to receive(:asset).and_return(hyrax_work)
     allow(migrated_work).to receive(:working_directory).and_return('some_path')
+    allow(migrated_work).to receive(:model_name).and_return('Thing')
     allow(hyrax_work).to receive(:as_json).and_return(json)
     allow(hyrax_work).to receive(:file_sets).and_return([file_set])
     allow(YAML).to receive(:load_file).and_return(YAML.load_file('spec/fixtures/data/df70jh899_checksums.yml'))
@@ -34,7 +35,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
       let(:original_checksum) { ['invalid'] }
 
       it 'returns errors' do
-        expect(service.verify).to include(match(/Content does not match precomputed/))
+        expect(service.verify).to include(match(/Unable to verify /))
       end
     end
 
@@ -44,7 +45,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
       end
 
       it 'reports the mismatch' do
-        expect(service.verify).to include(match(/Content does not match precomputed/))
+        expect(service.verify).to include(match(/Unable to verify /))
       end
     end
 
@@ -53,8 +54,19 @@ RSpec.describe Hyrax::Migrator::Services::VerifyChecksumsService do
         allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
       end
 
+      it 'returns an error' do
+        expect(service.verify).to include(match(/Unable to load /))
+      end
+    end
+
+    context 'when the asset is a compound object' do
+      before do
+        allow(YAML).to receive(:load_file).and_raise(Errno::ENOENT)
+        allow(migrated_work).to receive(:model_name).and_return('Generic')
+      end
+
       it 'returns no errors' do
-        expect(service.verify).to eq([])
+        expect(service.verify).to eq []
       end
     end
   end

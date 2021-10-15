@@ -12,8 +12,7 @@ module Hyrax::Migrator::Services
     # were successfully created after migrating the new asset
     def verify
       @verification_errors = []
-      return ['warning: no file_sets found'] if @migrated_work.asset.file_sets.empty?
-
+      @verification_errors << 'warning: no file_sets found' if no_fileset_warning
       @migrated_work.asset.file_sets.each do |file_set|
         verify_file_set(file_set)
       end
@@ -21,6 +20,10 @@ module Hyrax::Migrator::Services
     rescue StandardError => e
       @verification_errors << e.message
       @verification_errors
+    end
+
+    def no_fileset_warning
+      @migrated_work.asset.file_sets.empty? && @migrated_work.asset.model_name.to_s != 'Generic'
     end
 
     # No coverage for Hyrax application integration to eliminate dependencies

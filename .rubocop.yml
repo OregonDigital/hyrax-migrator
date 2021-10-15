@@ -108,3 +108,5 @@ RSpec/MultipleExpectations:
   Enabled: false
 RSpec/NestedGroups:
   Enabled: false
+RSpec/ContextWording:
+  Enabled: false
