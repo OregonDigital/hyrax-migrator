@@ -1,0 +1,17 @@
+<div>
+  <h3>Exported profile for <%= @work.pid %> </h3>
+  <p><%= @profile['sets'] %></p>
+  <p>visibility: <%= @profile['visibility'] %></p>
+  <% if @profile.keys.include? 'contents' %>
+    <p><ul>
+    <% @profile['contents'].each do |child| %>
+      <li> <%= child %> </li>
+    <% end %>
+    </ul></p>
+  <% end %>
+  <p>fields:<ul>
+    <% @profile['fields'].each do |field| %>
+      <li><%= field %></li>
+    <% end %>
+  </ul></p>
+</div>

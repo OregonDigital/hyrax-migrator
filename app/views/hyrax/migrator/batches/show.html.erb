@@ -1,0 +1,8 @@
+<div>
+  <h3>Profile index for batch <%= params[:id] %> </h3>
+  <ul>
+    <% @pids.each do |pid| %>
+      <li><%=link_to pid, profile_path(pid) %> </li>
+    <% end %>
+    </ul>
+</div>
