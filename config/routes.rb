@@ -6,5 +6,4 @@ Hyrax::Migrator::Engine.routes.draw do
   resources :profiles, only: [:show]
 
   resources :batches, only: [:show]
-
 end
