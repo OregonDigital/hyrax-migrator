@@ -92,6 +92,9 @@ Rails/RakeEnvironment:
 RSpec/LeakyConstantDeclaration:
   Enabled: false
 
+RSpec/FilePath:
+  Enabled: false
+
 Lint/NonDeterministicRequireOrder:
   Enabled: false
 

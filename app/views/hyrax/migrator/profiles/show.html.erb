@@ -1,0 +1,39 @@
+
+<div class="row">
+<div class="col-sm-6">
+  <h3>Exported profile for <%= @work.pid %> </h3>
+  <p><%= @profile['sets'] %></p>
+  <p>visibility: <%= @profile['visibility'] %></p>
+  <p>fields:<ul>
+    <% @profile['fields'].each do |field| %>
+      <li><%= field %></li>
+    <% end %>
+  </ul></p>
+  <% if @profile.keys.include? 'contents' %>
+    <p>Children: <ul>
+    <% @profile['contents'].each do |child| %>
+      <li> <%= child %> </li>
+    <% end %>
+    </ul></p>
+  <% end %>
+</div>
+
+<div class="col-sm-6">
+  <h3>Hyrax profile for <%= @work.pid %> </h3>
+  <p>Collections: <%= @colls %></p>
+  <p>Admin set: <%= @hyrax_work.admin_set_id %></p>
+  <p>visibility: <%= @hyrax_work.visibility %></p>
+  <p>fields:<ul>
+    <% @fields.each do |field| %>
+      <li><%= field %></li>
+    <% end %>
+  </ul></p>
+  <% unless @hyrax_work.ordered_member_ids.blank? %>
+    <p>Children: <ul>
+    <% @hyrax_work.ordered_member_ids.each do |child| %>
+      <li> <%= child %> </li>
+    <% end %>
+    </ul></p>
+  <% end %>
+</div>
+</div>
