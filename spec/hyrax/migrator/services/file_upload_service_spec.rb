@@ -76,7 +76,7 @@ RSpec.describe Hyrax::Migrator::Services::FileUploadService do
       config.upload_storage_service = :aws_s3
       allow(Aws::S3::Client).to receive(:new) { s3_client }
       allow(presigner).to receive(:presigned_url).with(
-        'get_object',
+        :get_object,
         bucket: config.aws_s3_bucket,
         key: basename_content_file,
         expires_in: config.aws_s3_url_availability
