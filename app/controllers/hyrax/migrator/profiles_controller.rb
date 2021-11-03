@@ -5,6 +5,8 @@ require 'yaml'
 module Hyrax::Migrator
   # Display exported/migrated profiles for inspection
   class ProfilesController < ApplicationController
+    layout 'application'
+    helper_method :profile_fields, :children?
     def show
       @work = Work.find_by(pid: params[:id])
       @profile = YAML.load_file(File.join(@work.working_directory, "data/#{params[:id]}_profile.yml"))
@@ -12,6 +14,10 @@ module Hyrax::Migrator
       @fields = fields
       @colls = colls
       render 'show'
+    end
+
+    def profile_fields
+      @profile['fields'].sort.to_h
     end
 
     def extract(val)
@@ -26,7 +32,7 @@ module Hyrax::Migrator
 
         fields[field] = val.respond_to?(:to_a) ? field_array(val) : extract(val)
       end
-      fields
+      fields.sort.to_h
     end
 
     def field_array(val)
@@ -35,6 +41,10 @@ module Hyrax::Migrator
         arr << extract(v)
       end
       arr
+    end
+
+    def children?
+      @hyrax_work.model_name == 'Generic' && !@hyrax_work.ordered_member_ids.blank?
     end
 
     def colls

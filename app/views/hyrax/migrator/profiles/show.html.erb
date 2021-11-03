@@ -1,11 +1,10 @@
-
 <div class="row">
 <div class="col-sm-6">
   <h3>Exported profile for <%= @work.pid %> </h3>
   <p><%= @profile['sets'] %></p>
   <p>visibility: <%= @profile['visibility'] %></p>
   <p>fields:<ul>
-    <% @profile['fields'].each do |field| %>
+    <% profile_fields.each do |field| %>
       <li><%= field %></li>
     <% end %>
   </ul></p>
@@ -28,7 +27,7 @@
       <li><%= field %></li>
     <% end %>
   </ul></p>
-  <% unless @hyrax_work.ordered_member_ids.blank? %>
+  <% if children? %>
     <p>Children: <ul>
     <% @hyrax_work.ordered_member_ids.each do |child| %>
       <li> <%= child %> </li>
