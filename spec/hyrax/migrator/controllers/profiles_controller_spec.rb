@@ -10,15 +10,15 @@ RSpec.describe Hyrax::Migrator::ProfilesController, type: :controller do
   let(:controlled_vocab) { instance_double('Controlled Vocabulary', rdf_subject: RDF::URI(uri)) }
   let(:coll) { instance_double('Collection', id: 'kawaii') }
   let(:field_hash) do
-    hash = { 'subject': [controlled_vocab] }
+    hash = { 'subject' => [controlled_vocab] }
     hash['title'] = ['Obaachan']
     hash['original_filename'] = 'obaachan'
     hash
   end
   let(:result_hash) do
-    hash = { 'subject': [uri] }
+    hash = { 'original_filename' => 'obaachan' }
+    hash['subject'] = [uri]
     hash['title'] = ['Obaachan']
-    hash['original_filename'] = 'obaachan'
     hash
   end
 
