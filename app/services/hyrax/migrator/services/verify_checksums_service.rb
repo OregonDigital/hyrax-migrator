@@ -23,7 +23,7 @@ module Hyrax::Migrator::Services
 
     def verify
       @errors = []
-      return @errors if @migrated_work.model_name.to_s == 'Generic'
+      return @errors if @migrated_work.asset.model_name.to_s == 'Generic'
 
       @errors << "Unable to verify #{ALGORITHM} checksums for #{@migrated_work.asset.id}." unless original_checksums['checksums'][ALGORITHM].first == new_content_checksum
       @errors
