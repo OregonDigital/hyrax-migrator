@@ -27,7 +27,7 @@ module Hyrax::Migrator
         rescue StandardError => e
           @errors << "System error: #{e.message}"
         ensure
-          write_errors
+          write_errors(pid)
         end
       end
       close
@@ -102,9 +102,9 @@ module Hyrax::Migrator
       end
     end
 
-    def write_errors
+    def write_errors(pid)
       @errors.each do |e|
-        @report.puts e
+        @report.puts "#{pid}\t#{e}"
       end
     end
 
