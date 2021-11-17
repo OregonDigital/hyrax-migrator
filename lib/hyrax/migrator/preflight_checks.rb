@@ -17,7 +17,7 @@ module Hyrax::Migrator
       @verbose = verbose
       @counters = { cpds: 0, visibility: 0 }
       @error_count = { crosswalk: 0, visibility: 0, status: 0, edtf: 0, required: 0, cpd: 0 }
-      @report = File.open(File.join(@work_dir, "report_#{Time.zone.now.strftime('%Y%m%d%H%M%S')}.txt"), 'w')
+      @report = File.open(File.join(@work_dir, "#{batchname}_report_#{Time.zone.now.strftime('%Y%m%d%H%M%S')}.txt"), 'w')
       @services = Hyrax::Migrator::PreflightCheckServices.new(files, work_dir, pidlist)
     end
 
@@ -134,6 +134,10 @@ module Hyrax::Migrator
         @report.puts "  #{k}: #{v}"
       end
       @report.close
+    end
+
+    def batchname
+      File.basename(@pidlist, ".*").split("_pid").first
     end
   end
 end
