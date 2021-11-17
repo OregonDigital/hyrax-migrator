@@ -16,6 +16,7 @@ module Hyrax::Migrator
       @pidlist = pidlist
       @verbose = verbose
       @counters = { cpds: 0, visibility: 0 }
+      @error_count = { crosswalk: 0, visibility: 0, status: 0, edtf: 0, required: 0, cpd: 0 }
       @report = File.open(File.join(@work_dir, "report_#{Time.zone.now.strftime('%Y%m%d%H%M%S')}.txt"), 'w')
       @services = Hyrax::Migrator::PreflightCheckServices.new(files, work_dir, pidlist)
     end
@@ -47,6 +48,7 @@ module Hyrax::Migrator
     def fetch_results
       @results = @services.run(%i[crosswalk visibility cpd edtf])
       concat_errors(@results[:crosswalk][:errors])
+      count_errors(:crosswalk, @results[:crosswalk][:errors])
       run_required
       cpds?
       visibility?
@@ -57,6 +59,7 @@ module Hyrax::Migrator
       @services.members[:required].reset(@results[:crosswalk])
       @results[:required] = @services.members[:required].run
       concat_errors(@results[:required])
+      count_errors(:required, @results[:required])
     end
 
     def status?
@@ -64,6 +67,7 @@ module Hyrax::Migrator
       return true if result == 'ok'
 
       concat_errors(result)
+      count_errors(:status, result)
       verbose_display if @verbose
       false
     end
@@ -71,23 +75,37 @@ module Hyrax::Migrator
     def cpds?
       result = @results.delete :cpd
       @counters[:cpds] += 1 if result.include? 'cpd'
-      concat_errors(result) if result.include? 'missing'
+      return unless result.include? 'missing'
+
+      concat_errors(result)
+      count_errors(:cpd, result)
     end
 
     def visibility?
       result = @results.delete :visibility
       @counters[:visibility] += 1 unless result.value? 'open'
-      concat_errors(result) if result.include? 'error'
+      return unless result.include? 'error'
+
+      concat_errors(result)
+      count_errors(:visibility, result)
     end
 
     def edtf?
       result = @results.delete :edtf
-      concat_errors(result) unless result.empty?
+      return if result.empty?
+
+      concat_errors(result)
+      count_errors(:edtf, result)
     end
 
     def concat_errors(error)
       err = error.is_a?(Array) ? error : [error]
       @errors.concat err
+    end
+
+    def count_errors(service, error)
+      count = error.is_a?(Array) ? error.size : 1
+      @error_count[service] += count
     end
 
     def files
@@ -111,6 +129,10 @@ module Hyrax::Migrator
     def close
       @report.puts "CPD count: #{@counters[:cpds]}"
       @report.puts "Restricted items count: #{@counters[:visibility]}"
+      @report.puts "Errors: "
+      @error_count.each do |k, v|
+        @report.puts "  #{k}: #{v}"
+      end
       @report.close
     end
   end
