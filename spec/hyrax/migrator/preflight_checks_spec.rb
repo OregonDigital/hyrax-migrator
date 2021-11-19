@@ -14,7 +14,7 @@ class GenericAsset
 end
 
 RSpec.describe Hyrax::Migrator::PreflightChecks do
-  let(:preflight) { described_class.new('spec/fixtures', 'pidlist', true) }
+  let(:preflight) { described_class.new('spec/fixtures', 'pidlist') }
   let(:work) { double }
   let(:nt) { 'spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt' }
   let(:graph) { RDF::Graph.load(nt) }

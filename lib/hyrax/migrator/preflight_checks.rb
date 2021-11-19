@@ -4,17 +4,15 @@
 # Also a list of pids in the work_dir, one pid per line
 # Will write a report of any errors found to the work dir
 # To use: rake preflight_tools:metadata_preflight work_dir=/data1/batch/some_dir pidlist=list.txt
-# If verbose=true then the attributes will be displayed
 
 require 'hyrax/migrator/preflight_check_services'
 
 module Hyrax::Migrator
   # Intended to be run on OD1, reuses migrator code to perform pre-migration checks
   class PreflightChecks
-    def initialize(work_dir, pidlist, verbose = false)
+    def initialize(work_dir, pidlist)
       @work_dir = work_dir
       @pidlist = pidlist
-      @verbose = verbose
       @counters = { cpds: 0, visibility: 0 }
       @error_count = { crosswalk: 0, visibility: 0, status: 0, edtf: 0, required: 0, cpd: 0 }
       @report = File.open(File.join(@work_dir, "#{batchname}_report_#{Time.zone.now.strftime('%Y%m%d%H%M%S')}.txt"), 'w')
@@ -42,7 +40,6 @@ module Hyrax::Migrator
 
       @services.reset(%i[crosswalk visibility cpd edtf], work)
       fetch_results
-      verbose_display if @verbose
     end
 
     def fetch_results
@@ -68,7 +65,6 @@ module Hyrax::Migrator
 
       concat_errors(result)
       count_errors(:status, result)
-      verbose_display if @verbose
       false
     end
 
@@ -114,12 +110,6 @@ module Hyrax::Migrator
         required_fields: File.join(@work_dir, 'required_fields.yml') }
     end
 
-    def verbose_display
-      @errors.each do |e|
-        puts e
-      end
-    end
-
     def write_errors(pid)
       @errors.each do |e|
         @report.puts "#{pid}\t#{e}"
@@ -129,7 +119,7 @@ module Hyrax::Migrator
     def close
       @report.puts "CPD count: #{@counters[:cpds]}"
       @report.puts "Restricted items count: #{@counters[:visibility]}"
-      @report.puts "Errors: "
+      @report.puts 'Errors: '
       @error_count.each do |k, v|
         @report.puts "  #{k}: #{v}"
       end
