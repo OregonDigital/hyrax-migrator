@@ -14,7 +14,7 @@ class GenericAsset
 end
 
 RSpec.describe Hyrax::Migrator::PreflightChecks do
-  let(:preflight) { described_class.new('spec/fixtures', 'pidlist', true) }
+  let(:preflight) { described_class.new('spec/fixtures', 'pidlist') }
   let(:work) { double }
   let(:nt) { 'spec/fixtures/3t945r08v/data/3t945r08v_descMetadata.nt' }
   let(:graph) { RDF::Graph.load(nt) }
@@ -46,11 +46,6 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
 
   describe 'verify' do
     context 'when processing a given pid' do
-      it 'writes the pid to errors' do
-        preflight.verify
-        expect(preflight.instance_variable_get(:@errors)).to include 'Working on oregondigital:abcde5678...'
-      end
-
       context 'when there is an error' do
         it 'writes it to errors' do
           preflight.verify
@@ -105,14 +100,13 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
     end
   end
 
-  describe 'verbose_display' do
-    context 'when there are errors and verbose is true' do
-      it 'displays them' do
-        printed = capture_stdout do
-          preflight.verify
-        end
-        expect(printed).to include('Predicate not found')
-      end
+  describe 'count_errors' do
+    it 'counts them' do
+      preflight.verify
+      error_count = preflight.instance_variable_get(:@error_count)
+      expect(error_count[:crosswalk]).to eq 4
+      expect(error_count[:required]).to eq 2
+      expect(error_count[:edtf]).to eq 2
     end
   end
 end
