@@ -26,14 +26,14 @@ module Hyrax::Migrator
         rescue StandardError => e
           @errors << "System error: #{e.message}"
         ensure
-          write_errors(pid)
+          write_errors(pid.strip)
         end
       end
       close
     end
 
     def process(pid)
-      @errors = ["Working on #{pid.strip}..."]
+      @errors = ['...']
       work = GenericAsset.find(pid)
       @services.members[:status].reset(work)
       return unless status?
