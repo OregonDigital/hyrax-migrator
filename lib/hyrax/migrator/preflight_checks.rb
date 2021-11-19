@@ -127,7 +127,7 @@ module Hyrax::Migrator
     end
 
     def batchname
-      File.basename(@pidlist, ".*").split("_pid").first
+      File.basename(@pidlist, '.*').split('_pid').first
     end
   end
 end
