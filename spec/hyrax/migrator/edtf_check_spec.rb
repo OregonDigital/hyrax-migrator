@@ -23,7 +23,7 @@ RSpec.describe Hyrax::Migrator::EdtfCheck do
       end
 
       it 'returns an error' do
-        expect(service.check_date_fields).to eq ["abcde1234: in date, #{bad_date.first} is not in EDTF format"]
+        expect(service.check_date_fields).to eq ["in date, #{bad_date.first} is not in EDTF format"]
       end
     end
 

@@ -46,11 +46,6 @@ RSpec.describe Hyrax::Migrator::PreflightChecks do
 
   describe 'verify' do
     context 'when processing a given pid' do
-      it 'writes the pid to errors' do
-        preflight.verify
-        expect(preflight.instance_variable_get(:@errors)).to include 'Working on oregondigital:abcde5678...'
-      end
-
       context 'when there is an error' do
         it 'writes it to errors' do
           preflight.verify
