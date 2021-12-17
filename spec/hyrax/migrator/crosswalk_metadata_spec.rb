@@ -86,6 +86,14 @@ RSpec.describe Hyrax::Migrator::CrosswalkMetadata do
         expect(service.send(:lookup, bad_predicate)).to eq(nil)
       end
     end
+
+    context 'when given a predicate that has a case typo' do
+      let(:bad_predicate) { 'http://purl.org/dc/terms/Title' }
+
+      it 'returns nil' do
+        expect(service.send(:lookup, bad_predicate)).to eq(nil)
+      end
+    end
   end
 
   describe 'process' do
