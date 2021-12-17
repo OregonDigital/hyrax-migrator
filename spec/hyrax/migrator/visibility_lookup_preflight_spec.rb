@@ -14,7 +14,7 @@ RSpec.describe Hyrax::Migrator::VisibilityLookupPreflight do
       end
 
       it 'returns no errors' do
-        expect(service.lookup_visibility).to eq({ visibility: 'open' })
+        expect(service.lookup_visibility).to eq('open')
       end
     end
 
@@ -26,7 +26,7 @@ RSpec.describe Hyrax::Migrator::VisibilityLookupPreflight do
       end
 
       it 'returns the group' do
-        expect(service.lookup_visibility).to eq({ visibility: 'uo' })
+        expect(service.lookup_visibility).to eq('uo')
       end
     end
 

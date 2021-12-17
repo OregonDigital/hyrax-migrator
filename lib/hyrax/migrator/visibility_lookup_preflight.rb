@@ -10,7 +10,7 @@ module Hyrax::Migrator
 
     def lookup_visibility
       result = super
-      return result unless result.nil?
+      return result[:visibility] unless result.nil?
 
       'error: read_groups does not agree with access_restrictions'
     end
