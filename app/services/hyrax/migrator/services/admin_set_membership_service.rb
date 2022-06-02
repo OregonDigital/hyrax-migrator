@@ -63,8 +63,8 @@ module Hyrax::Migrator::Services
     end
 
     def metadata_institution
-      institution = @graph.statements.detect { |s| s.predicate.to_s.casecmp(INSTITUTION_PREDICATE).zero? }
-      institution.object.to_s if institution.present?
+      institutions = @graph.statements.select { |s| s.predicate.to_s.casecmp(INSTITUTION_PREDICATE).zero? }
+      institutions.map { |i| i.object.to_s } unless institutions.blank?
     end
 
     def metadata_set
@@ -77,8 +77,8 @@ module Hyrax::Migrator::Services
       id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : log_and_raise('Primary Set/Admin Set mapping failed')
     end
 
-    def admin_set_id_from_institution(uri)
-      id = match_institution(uri)
+    def admin_set_id_from_institution(uris)
+      id = match_institution(uris)
       id.present? ? Hyrax::Migrator::HyraxCore::AdminSet.find(id).id : log_and_raise('Institution/Admin Set mapping failed')
     end
 
@@ -92,9 +92,12 @@ module Hyrax::Migrator::Services
       hash_match[:admin_set_id] if hash_match.present?
     end
 
-    def match_institution(uri)
-      hash_match = crosswalk_data[:institution_crosswalk].detect { |data| data[:institution_uri] == uri }
-      hash_match[:admin_set_id] if hash_match.present?
+    def match_institution(uris)
+      uris.each do |uri|
+        hash_match = crosswalk_data[:institution_crosswalk].detect { |data| data[:institution_uri] == uri }
+        return hash_match[:admin_set_id] if hash_match.present?
+      end
+      nil
     end
 
     def strip_id(uri)

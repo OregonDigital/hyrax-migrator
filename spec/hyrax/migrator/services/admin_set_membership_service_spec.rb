@@ -38,7 +38,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     context 'when primary_set does not exist but institution does exist' do
       before do
         allow(service).to receive(:metadata_primary_set).and_return(nil)
-        allow(service).to receive(:metadata_institution).and_return('http://dbpedia.org/resource/University_of_Oregon')
+        allow(service).to receive(:metadata_institution).and_return(['http://dbpedia.org/resource/University_of_Oregon'])
       end
 
       let(:admin_set) { instance_double('AdminSet', id: 'uo', title: 'University', description: 'Hello world') }
@@ -159,7 +159,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     end
 
     context 'when called' do
-      let(:metadata_institution) { 'http://dbpedia.org/resource/University_of_Oregon' }
+      let(:metadata_institution) { ['http://dbpedia.org/resource/University_of_Oregon'] }
 
       it 'returns corresponding admin set id' do
         expect(service.send(:admin_set_id_from_institution, metadata_institution)).to eq 'uo'
@@ -167,7 +167,7 @@ RSpec.describe Hyrax::Migrator::Services::AdminSetMembershipService do
     end
 
     context 'when the lookup fails' do
-      let(:metadata_institution) { 'http://dbpedia.org/resource/Brakebills-University' }
+      let(:metadata_institution) { ['http://dbpedia.org/resource/Brakebills-University'] }
 
       it { expect { service.send(:admin_set_id_from_institution, metadata_institution) }.to raise_error StandardError }
     end
