@@ -1,17 +1,24 @@
 # frozen_string_literal:true
 
 module Hyrax::Migrator::Services
+  # rubocop:disable Metrics/ClassLength
   # Called by the CrosswalkMetadataActor to map OD1 metadata to OD2
   class CrosswalkMetadataService < Hyrax::Migrator::CrosswalkMetadata
     def initialize(work, migrator_config)
       @work = work
       @data_dir = File.join(work.working_directory, 'data')
       @config = migrator_config
-      @skip_field_mode = migrator_config.skip_field_mode
-      @crosswalk_metadata_file = @config.crosswalk_metadata_file
-      @crosswalk_overrides_file = @config.crosswalk_overrides_file
+      set_configs
       @result = {}
       @errors = []
+      @info = []
+    end
+
+    def set_configs
+      @skip_field_mode = @config.skip_field_mode
+      @crosswalk_metadata_file = @config.crosswalk_metadata_file
+      @crosswalk_overrides_file = @config.crosswalk_overrides_file
+      @full_size_map_file = @config.full_size_map_file
     end
 
     # returns result hash
@@ -19,6 +26,7 @@ module Hyrax::Migrator::Services
       super
     ensure
       @result[:errors] = @errors unless @errors.empty?
+      @result[:info] = @info unless @info.empty?
       @result
     end
 
@@ -58,6 +66,26 @@ module Hyrax::Migrator::Services
       return nil if @skip_field_mode
 
       raise URI::InvalidURIError, object.to_s
+    end
+
+    def log_info(object)
+      @info << object.to_s
+      nil
+    end
+
+    # for use with set on the crosswalk
+    def full_size_hack(object)
+      return nil if @result[:full_size_download_allowed] == false
+
+      record = full_size_map.select { |coll| coll[:id] == object.to_s }.first
+      data = lookup('http://opaquenamespace.org/ns/fullSizeDownloadAllowed')
+      assemble_hash(data, record[:perm]) unless record.blank?
+      nil
+    end
+
+    def full_size_map
+      yaml = YAML.load_file(@full_size_map_file).deep_symbolize_keys
+      yaml[:full_size]
     end
 
     def mark_destroy(cv_val)
@@ -109,4 +137,5 @@ module Hyrax::Migrator::Services
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

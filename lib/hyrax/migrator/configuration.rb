@@ -164,5 +164,10 @@ module Hyrax::Migrator
     def verify_services
       @verify_services ||= ENV['VERIFY_SERVICES']
     end
+
+    attr_writer :full_size_map_file
+    def full_size_map_file
+      @full_size_map_file ||= ''
+    end
   end
 end

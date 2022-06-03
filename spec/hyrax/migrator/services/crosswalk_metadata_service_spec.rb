@@ -20,6 +20,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
+  let(:full_size_map_file) { File.join(Rails.root, '..', 'fixtures', 'full_size_download_map.yml') }
   let(:service) { described_class.new(work, config) }
   let(:pid) { '3t945r08v' }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
@@ -28,6 +29,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
     config.crosswalk_overrides_file = crosswalk_overrides_file
+    config.full_size_map_file = full_size_map_file
     allow(RDF::Graph).to receive(:load).and_return(graph)
   end
 
@@ -161,6 +163,28 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
     it 'does not include attrs set by other services' do
       expect(service.send(:old_attrs).keys).not_to include(:visibility)
+    end
+  end
+
+  describe 'log_info' do
+    let(:object) { 'May 13, 2015' }
+
+    it 'adds the object to the result' do
+      service.send(:log_info, object)
+      expect(service.instance_variable_get(:@info)).to eq [object]
+    end
+  end
+
+  describe 'full_size_hack' do
+    let(:object) { 'super-restricted-coll' }
+
+    before do
+      service.result[:full_size_download_allowed] = true
+    end
+
+    it 'sets the permission' do
+      service.send(:full_size_hack, object)
+      expect(service.result[:full_size_download_allowed]).to eq false
     end
   end
 end

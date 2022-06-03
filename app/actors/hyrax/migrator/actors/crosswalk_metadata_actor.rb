@@ -51,6 +51,7 @@ module Hyrax::Migrator::Actors
 
     def post_success
       @work.env[:errors] = @attributes.delete :errors
+      @work.env[:info] = @attributes.delete :info
       @work.env[:attributes] = @attributes
       succeeded(aasm.current_state, "Work #{@work.pid} crosswalked metadata.", Hyrax::Migrator::Work::SUCCESS)
     end
