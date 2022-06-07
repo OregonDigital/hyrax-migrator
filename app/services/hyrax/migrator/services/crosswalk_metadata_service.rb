@@ -18,7 +18,7 @@ module Hyrax::Migrator::Services
       @skip_field_mode = @config.skip_field_mode
       @crosswalk_metadata_file = @config.crosswalk_metadata_file
       @crosswalk_overrides_file = @config.crosswalk_overrides_file
-      @full_size_map_file = @config.full_size_map_file
+      @crosswalk_admin_sets_file = @config.crosswalk_admin_sets_file
     end
 
     # returns result hash
@@ -77,15 +77,15 @@ module Hyrax::Migrator::Services
     def full_size_hack(object)
       return nil if @result[:full_size_download_allowed] == false
 
-      record = full_size_map.select { |coll| coll[:id] == object.to_s }.first
+      record = admin_set_map.select { |coll| coll[:primary_set] == object.to_s }.first
       data = lookup('http://opaquenamespace.org/ns/fullSizeDownloadAllowed')
-      assemble_hash(data, record[:perm]) unless record.blank?
+      assemble_hash(data, record[:full_size_download]) unless record.blank?
       nil
     end
 
-    def full_size_map
-      yaml = YAML.load_file(@full_size_map_file).deep_symbolize_keys
-      yaml[:full_size]
+    def admin_set_map
+      yaml = YAML.load_file(@crosswalk_admin_sets_file).deep_symbolize_keys
+      yaml[:primary_set_crosswalk]
     end
 
     def mark_destroy(cv_val)

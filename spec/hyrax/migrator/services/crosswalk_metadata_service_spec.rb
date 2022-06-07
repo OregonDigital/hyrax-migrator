@@ -20,7 +20,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   let(:config) { Hyrax::Migrator::Configuration.new }
   let(:crosswalk_metadata_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk.yml') }
   let(:crosswalk_overrides_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_overrides.yml') }
-  let(:full_size_map_file) { File.join(Rails.root, '..', 'fixtures', 'full_size_download_map.yml') }
+  let(:crosswalk_admin_sets_file) { File.join(Rails.root, '..', 'fixtures', 'crosswalk_admin_sets.yml') }
   let(:service) { described_class.new(work, config) }
   let(:pid) { '3t945r08v' }
   let(:file_path) { File.join(Rails.root, '..', 'fixtures', pid) }
@@ -29,7 +29,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   before do
     config.crosswalk_metadata_file = crosswalk_metadata_file
     config.crosswalk_overrides_file = crosswalk_overrides_file
-    config.full_size_map_file = full_size_map_file
+    config.crosswalk_admin_sets_file = crosswalk_admin_sets_file
     allow(RDF::Graph).to receive(:load).and_return(graph)
   end
 
@@ -176,7 +176,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   end
 
   describe 'full_size_hack' do
-    let(:object) { 'super-restricted-coll' }
+    let(:object) { 'angelus-studio' }
 
     before do
       service.result[:full_size_download_allowed] = true
