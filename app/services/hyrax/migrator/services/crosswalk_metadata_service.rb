@@ -77,7 +77,8 @@ module Hyrax::Migrator::Services
     def full_size_hack(object)
       return nil if @result[:full_size_download_allowed] == false
 
-      record = admin_set_map.select { |coll| coll[:primary_set] == object.to_s }.first
+      id = object.to_s.split(':')[2]
+      record = admin_set_map.select { |coll| coll[:primary_set] == id }.first
       data = lookup('http://opaquenamespace.org/ns/fullSizeDownloadAllowed')
       assemble_hash(data, record[:full_size_download]) unless record.blank?
       nil

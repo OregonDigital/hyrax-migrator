@@ -176,7 +176,7 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
   end
 
   describe 'full_size_hack' do
-    let(:object) { 'angelus-studio' }
+    let(:object) { RDF::URI('http://oregondigital.org/resource/oregondigital:angelus-studio') }
 
     before do
       service.result[:full_size_download_allowed] = true
