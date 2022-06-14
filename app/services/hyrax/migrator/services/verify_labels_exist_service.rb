@@ -28,14 +28,6 @@ module Hyrax::Migrator::Services
       "#{field}_label_sim"
     end
 
-    def combined?(category, field)
-      graphworker.send("#{category}_combined_facet?".to_sym, field)
-    end
-
-    def graphworker
-      @graphworker ||= Hyrax::Migrator::HyraxCore::Asset.fetch_graph_worker
-    end
-
     def verify_labels(property)
       return if solr_doc[solrize(property)].size == solr_doc[solrlabelize(property)].size
 
@@ -49,9 +41,10 @@ module Hyrax::Migrator::Services
     end
 
     def count_combined(field)
-      combined_labels.keys.select { |key| combined?(key, field.to_sym) }.each do |key|
-        combined_labels[key].merge solr_doc["#{field}_label_sim"] unless solr_doc["#{field}_label_sim"].blank?
-      end
+      return unless combined_properties.keys.include? field
+
+      k = combined_properties[field]
+      combined_labels[k.to_sym].merge solr_doc["#{field}_label_sim"] unless solr_doc["#{field}_label_sim"].blank?
     end
 
     def verify_combined
@@ -63,6 +56,29 @@ module Hyrax::Migrator::Services
         write_err(@migrated_work.asset.id, key, 'combined_label error')
       end
     end
+
+    def combined_properties
+      @combined_properties ||= combined_property_map
+    end
+
+    # rubocop:disable Metrics/MethodLength
+    def combined_property_map
+      cpm = {}
+      %w[ranger_district water_basin location].each do |prop|
+        cpm[prop] = 'location'
+      end
+      %w[arranger artist author cartographer collector composer creator contributor dedicatee donor designer editor illustrator interviewee interviewer lyricist owner patron photographer print_maker recipient transcriber translator].each do |prop|
+        cpm[prop] = 'creator'
+      end
+      %w[keyword subject].each do |prop|
+        cpm[prop] = 'topic'
+      end
+      %w[taxon_class family genus order species phylum_or_division].each do |prop|
+        cpm[prop] = 'scientific'
+      end
+      cpm
+    end
+    # rubocop:enable Metrics/MethodLength
 
     def write_err(pid, property, msg)
       errs << "#{msg}: #{pid}, #{property}"
