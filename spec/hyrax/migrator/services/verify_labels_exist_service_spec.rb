@@ -5,7 +5,6 @@ RSpec.describe Hyrax::Migrator::Services::VerifyLabelsExistService do
   let(:asset) { double }
   let(:service) { described_class.new(migrated_work) }
   let(:pid) { 'df70jh899' }
-  let(:graphworker) { double }
   let(:properties) { [{ name: 'photographer_label', is_controlled: true, collection_facetable: true }] }
   let(:solr_doc) { { 'photographer_sim' => ['http://opaquenamespace.org/ns/creators/LemkeJim'] } }
 
@@ -13,13 +12,7 @@ RSpec.describe Hyrax::Migrator::Services::VerifyLabelsExistService do
     allow(migrated_work).to receive(:asset).and_return(asset)
     allow(asset).to receive(:id).and_return(pid)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:properties).and_return(properties)
-    allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:fetch_graph_worker).and_return(graphworker)
     allow(Hyrax::Migrator::HyraxCore::Asset).to receive(:solr_record).with(pid).and_return(solr_doc)
-    allow(graphworker).to receive(:creator_combined_facet?).with(:photographer).and_return(true)
-    allow(graphworker).to receive(:creator_combined_facet?).with(:illustrator).and_return(true)
-    allow(graphworker).to receive(:scientific_combined_facet?).and_return(false)
-    allow(graphworker).to receive(:location_combined_facet?).and_return(false)
-    allow(graphworker).to receive(:topic_combined_facet?).and_return(false)
   end
 
   describe 'verify' do
