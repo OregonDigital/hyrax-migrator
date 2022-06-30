@@ -75,7 +75,7 @@ module Hyrax::Migrator::Services
 
     # for use with set on the crosswalk
     def full_size_hack(object)
-      return nil if @result[:full_size_download_allowed] == 0
+      return nil if @result[:full_size_download_allowed].zero?
 
       id = object.to_s.split(':')[2]
       record = admin_set_map.select { |coll| coll[:primary_set] == id }.first
