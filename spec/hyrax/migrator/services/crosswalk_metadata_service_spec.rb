@@ -179,12 +179,12 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
     let(:object) { RDF::URI('http://oregondigital.org/resource/oregondigital:angelus-studio') }
 
     before do
-      service.result[:full_size_download_allowed] = true
+      service.result[:full_size_download_allowed] = 1
     end
 
     it 'sets the permission' do
       service.send(:full_size_hack, object)
-      expect(service.result[:full_size_download_allowed]).to eq false
+      expect(service.result[:full_size_download_allowed]).to eq 0
     end
   end
 end
