@@ -44,6 +44,9 @@ Style/CollectionMethods:
 Style/ClassAndModuleChildren:
   Enabled: false
 
+Style/NumericPredicate:
+  Enabled: false
+
 Style/RedundantBegin:
   Exclude:
     - 'lib/tasks/preflight_tools/preflight.rake'
