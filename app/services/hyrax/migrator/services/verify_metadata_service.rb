@@ -26,6 +26,15 @@ module Hyrax::Migrator::Services
 
         errors += process_vals(key, val)
       end
+      errors.concat check_colls
+      errors
+    end
+
+    def check_colls
+      errors = []
+      @migrated_work.original_profile['sets']['set'].each do |s|
+        errors << "missing coll: #{s}" unless @new_profile[:colls].include? s
+      end
       errors
     end
 
