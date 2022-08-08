@@ -56,6 +56,26 @@ RSpec.describe Hyrax::Migrator::Services::VerifyMetadataService do
       end
     end
 
+    context 'when a coll is missing' do
+      let(:json) do
+        hash = {}
+        hash['id'] = pid
+        hash['title'] = ['Letters']
+        hash['identifier'] = ['AX057_b03_f01_011_012']
+        hash['rights_statement'] = ['http://rightsstatements.org/vocab/NoC-US/1.0/']
+        hash['object_orientation'] = 'leftyloosey'
+        hash
+      end
+
+      before do
+        allow(hyrax_work).to receive(:member_of_collections).and_return([])
+      end
+
+      it 'returns an error' do
+        expect(service.verify).to eq(['missing coll: joel-palmer'])
+      end
+    end
+
     context 'when metadata should be discarded' do
       let(:json) do
         hash = {}
