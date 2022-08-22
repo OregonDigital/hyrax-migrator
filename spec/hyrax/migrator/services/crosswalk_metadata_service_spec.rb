@@ -127,10 +127,15 @@ RSpec.describe Hyrax::Migrator::Services::CrosswalkMetadataService do
 
   describe 'attributes_data' do
     let(:rdfobject) { RDF::Literal('blah blah') }
+    let(:rdfobject2) { RDF::URI('http://opaquenamespace.org/ns/subject/Flügelhorn') }
     let(:error) { URI::InvalidURIError }
 
-    it 'raises an error' do
+    it 'raises an error if there is a string when it should be a uri' do
       expect { service.send(:attributes_data, rdfobject) }.to raise_error(error)
+    end
+
+    it 'raises an error if the uri contains non-ascii characters' do
+      expect { service.send(:attributes_data, rdfobject2) }.to raise_error(error)
     end
 
     context 'when skip field mode is enabled' do
